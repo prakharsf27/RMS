@@ -25,6 +25,7 @@ export default function Reports() {
   }, []);
 
   if (loading) return <LoadingSpinner label="Aggregating dataset..." />;
+  if (!data) return <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.6 }}>Could not load analytics. Please try again later.</div>;
 
   const hiredCount = data.byStatus.find(s => s._id === 'offered')?.count || 0;
   const rejectedCount = data.byStatus.find(s => s._id === 'rejected')?.count || 0;

@@ -21,7 +21,7 @@ router.route('/profile')
   .put(protect, updateProfile);
 
 // Admin Routes
-router.get('/users', protect, authorize('admin'), getAllUsers);
+router.get('/users', protect, authorize('admin', 'recruiter'), getAllUsers);
 router.put('/users/bulk/status', protect, authorize('admin'), bulkUserStatus);
 router.delete('/users/bulk/delete', protect, authorize('admin'), bulkUserDelete);
 router.put('/users/:id/status', protect, authorize('admin'), toggleUserStatus);
