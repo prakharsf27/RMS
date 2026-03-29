@@ -26,7 +26,7 @@ exports.register = async (req, res) => {
       lname,
       email,
       password,
-      role: role || 'candidate',
+      role: role === 'admin' ? 'candidate' : (role || 'candidate'),
       avatar: `https://ui-avatars.com/api/?name=${fname}+${lname}&background=random`
     });
 

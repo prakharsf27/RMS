@@ -143,7 +143,7 @@ export default function Login() {
                  >
                    <option value="candidate">Candidate</option>
                    <option value="recruiter">Recruiter</option>
-                   <option value="admin">Admin</option>
+                   
                  </select>
                </div>
             )}
