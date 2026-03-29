@@ -26,7 +26,7 @@ export default function Login() {
     
     try {
       if (isRegister) {
-        await register(fname, lname, email, password, role);
+        await register({ fname, lname, email, password, role });
       } else {
         await login(email, password);
       }
