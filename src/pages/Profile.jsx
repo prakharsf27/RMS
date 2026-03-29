@@ -101,7 +101,7 @@ export default function Profile() {
                
                <Input 
                  label="Email Address" 
-                 icon={<Mail size={16} />} 
+                 icon={Mail} 
                  value={formData.email} 
                  disabled={!isEditing}
                  onChange={(e) => setFormData({...formData, email: e.target.value})}
