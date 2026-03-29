@@ -1,0 +1,227 @@
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.avatarCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem !important;
+  text-align: center;
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary-light);
+  box-shadow: var(--shadow-glow);
+}
+
+.cameraBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: white;
+  border: 3px solid var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.cameraBtn:hover {
+  transform: scale(1.1);
+}
+
+.userName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.userRole {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--success);
+  padding: 0.5rem 1rem;
+  background-color: var(--success-light);
+  border-radius: 20px;
+}
+
+.statsCard {
+  padding: 1.5rem !important;
+}
+
+.statLine {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.75rem;
+}
+
+.statLine:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.statLine span {
+  font-size: 0.813rem;
+  color: var(--text-tertiary);
+}
+
+.statLine strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.formHeader h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.bioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bioGroup label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.bioGroup textarea {
+  min-height: 120px;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated-hover);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.938rem;
+  transition: all 0.2s;
+  resize: vertical;
+}
+
+.bioGroup textarea:disabled {
+  background-color: var(--bg-elevated);
+  opacity: 0.7;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.securityCard {
+  padding: 2rem !important;
+}
+
+.securityCard h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.securityCard p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.securityItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background-color: var(--bg-elevated-hover);
+  border-radius: 12px;
+}
+
+.securityItem strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.securityItem p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 900px) {
+  .container { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+}

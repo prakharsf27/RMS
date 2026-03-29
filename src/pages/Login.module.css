@@ -1,0 +1,284 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #0b1120;
+  overflow: hidden;
+}
+
+.leftPanel {
+  flex: 1.2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.leftPanel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 250px;
+  background: linear-gradient(to right, transparent, #0b1120);
+  pointer-events: none;
+}
+
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: slowZoom 30s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 4rem;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(to top, rgba(11, 17, 32, 0.98) 0%, rgba(11, 17, 32, 0.6) 35%, transparent 100%);
+  z-index: 5;
+}
+
+.brandDisplay {
+  max-width: 480px;
+  animation: slideUp 1s ease forwards;
+}
+
+.brandDisplay h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.brandDisplay p {
+  font-size: 1.25rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+}
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.featureList span {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.875rem 1.25rem;
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  width: fit-content;
+}
+
+.featureList span:hover {
+  transform: translateX(12px);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rightPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(circle at 50% 50%, #111827 0%, #0b1120 100%);
+  position: relative;
+}
+
+.rightPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 460px;
+  padding: 3rem !important;
+  background: rgba(30, 41, 59, 0.45) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  animation: formEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 10;
+}
+
+@keyframes formEntrance {
+  from { opacity: 0; transform: translateX(40px) scale(0.98); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.header h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  background: linear-gradient(to right, #60a5fa, #c084fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  color: var(--text-tertiary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.submitBtn {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  padding: 0.875rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 10px 20px -10px rgba(139, 92, 246, 0.5) !important;
+}
+
+.submitBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px -10px rgba(139, 92, 246, 0.7) !important;
+}
+
+.errorBanner {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  padding: 0.875rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.toggleBtn {
+  margin-top: 1.5rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  width: 100%;
+}
+
+.toggleBtn:hover {
+  color: #fff;
+}
+
+.demoAccounts {
+  margin-top: 2.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.demoAccounts::before {
+  content: '';
+  position: absolute;
+  top: -1.25rem;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.demoAccounts p {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: 1.25rem;
+}
+
+.demoButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.demoBtn {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+.demoBtn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .leftPanel {
+    display: none;
+  }
+}

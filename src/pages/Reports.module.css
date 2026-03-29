@@ -1,0 +1,110 @@
+.header {
+  margin-bottom: 2.5rem;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.metricCard {
+  display: flex !important;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem !important;
+  border-left: 4px solid var(--primary);
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.metricLabel {
+  display: block;
+  font-size: 0.813rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.metricVal {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.chartCard {
+  padding: 2rem !important;
+}
+
+.lowerInfo {
+  margin-bottom: 2rem;
+}
+
+.proCard {
+  padding: 2rem !important;
+  background: linear-gradient(135deg, var(--bg-elevated), var(--bg-color));
+}
+
+.proCard h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.proCard p {
+  color: var(--text-secondary);
+  font-size: 0.938rem;
+  margin-bottom: 2rem;
+}
+
+.perfList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  background-color: var(--bg-elevated-hover);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.perfItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.perfItem span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.perfItem strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+  .chartsGrid { grid-template-columns: 1fr; }
+  .perfList { grid-template-columns: 1fr; gap: 1rem; }
+}

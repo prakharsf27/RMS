@@ -1,0 +1,213 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import api from "../lib/api";
+import { Card } from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
+import { Button } from "../components/ui/Button";
+import { Table } from "../components/ui/Table";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail } from "lucide-react";
+import { format } from "date-fns";
+
+export default function Applications() {
+  const { user } = useAuth();
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const fetchApplications = async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get("/applications");
+      setApplications(data);
+    } catch (err) {
+      console.error("Fetch apps error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const handleUpdateStatus = async (appId, status) => {
+    try {
+      await api.put(`/applications/${appId}`, { status });
+      fetchApplications();
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
+  const handleBulkStatus = async (status) => {
+    if (selectedIds.length === 0) return;
+    try {
+      await api.put("/applications/bulk/status", { ids: selectedIds, status });
+      setSelectedIds([]);
+      fetchApplications();
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (window.confirm(`Delete ${selectedIds.length} records? This cannot be undone.`)) {
+        try {
+          await api.delete("/applications/bulk/delete", { data: { ids: selectedIds } });
+          setSelectedIds([]);
+          fetchApplications();
+        } catch (err) {
+          alert(err.response?.data?.message || err.message);
+        }
+    }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const headers = [
+    <Square size={16} />,
+    "Candidate", 
+    "Job Role", 
+    "Applied Date", 
+    "Match Score",
+    "Status", 
+    "Actions"
+  ];
+
+  return (
+    <div className="animate-fade-in">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>
+            {user.role === "candidate" ? "My Applications" : "Hiring Pipeline"}
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+            {user.role === "candidate" ? "Track your active job applications." : "Manage candidate progression and hiring decisions."}
+          </p>
+        </div>
+      </div>
+
+      {selectedIds.length > 0 && user.role !== "candidate" && (
+        <div className="animate-fade-in" style={{ 
+            backgroundColor: 'var(--bg-elevated)', 
+            padding: '1rem', 
+            borderRadius: '12px', 
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            border: '1px solid var(--primary-light)',
+            boxShadow: 'var(--shadow-glow)'
+        }}>
+            <span style={{ fontWeight: 600 }}>{selectedIds.length} applications selected</span>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <Button size="sm" variant="success" onClick={() => handleBulkStatus('offered')}>Bulk Hire</Button>
+                <Button size="sm" variant="danger" onClick={() => handleBulkStatus('rejected')}>Bulk Reject</Button>
+                {user.role === 'admin' && (
+                    <Button size="sm" variant="secondary" onClick={handleBulkDelete} style={{ color: 'var(--danger)' }}>
+                        <Trash2 size={16} /> Delete
+                    </Button>
+                )}
+            </div>
+        </div>
+      )}
+
+      <Card>
+        {loading ? (
+          <LoadingSpinner label="Synchronizing pipeline..." />
+        ) : applications.length > 0 ? (
+          <Table 
+            headers={headers} 
+            data={applications} 
+            renderRow={(app) => {
+              const isSelected = selectedIds.includes(app._id);
+              return (
+                <tr key={app._id} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
+                  <td>
+                    <button 
+                        onClick={() => toggleSelect(app._id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
+                    >
+                        {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
+                    </button>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <img src={app.candidateId.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
+                      <div>
+                        <div style={{ fontWeight: 600 }}>{app.candidateId.fname} {app.candidateId.lname}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{app.candidateId.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{app.jobId.title}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{app.jobId.department}</div>
+                  </td>
+                  <td>{format(new Date(app.appliedAt), "MMM d, yyyy")}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <div style={{ 
+                            width: '40px', 
+                            height: '40px', 
+                            borderRadius: '50%', 
+                            border: `3px solid ${app.matchScore > 70 ? 'var(--success)' : app.matchScore > 40 ? 'var(--warning)' : 'var(--danger)'}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.75rem',
+                            fontWeight: 800
+                        }}>
+                            {app.matchScore}%
+                        </div>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Keywords</span>
+                    </div>
+                  </td>
+                  <td>
+                    <Badge variant={
+                      app.status === "offered" ? "success" : 
+                      app.status === "rejected" ? "danger" : 
+                      app.status === "applied" ? "info" : "neutral"
+                    }>
+                      {app.status}
+                    </Badge>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      {user.role !== "candidate" && app.status === "applied" && (
+                        <>
+                          <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
+                            <CheckCircle2 size={16} /> Hire
+                          </Button>
+                          <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(app._id, "rejected")}>
+                            <XCircle size={16} /> Reject
+                          </Button>
+                        </>
+                      )}
+                      {user.role === "admin" && (
+                        <Button size="sm" variant="ghost" onClick={() => handleBulkStatus(app._id)} style={{ color: 'var(--danger)' }}>
+                          <Trash2 size={16} />
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            }} 
+          />
+        ) : (
+          <div style={{ textAlign: "center", padding: "4rem", color: "var(--text-tertiary)" }}>
+            <Clock size={48} style={{ margin: "0 auto 1rem", opacity: 0.5 }} />
+            <p>No applications found in the system.</p>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
