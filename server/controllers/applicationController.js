@@ -26,8 +26,8 @@ exports.applyForJob = async (req, res) => {
   try {
     const { jobId } = req.body;
     
-    // Resume is optional; passed via Multer/Cloudinary
-    const resumeUrl = req.file ? req.file.path : null;
+    // Resume URL: from Cloudinary upload OR from direct link provided by candidate
+    const resumeUrl = req.file?.path || req.body.resumeUrl || null;
 
     const job = await Job.findById(jobId);
     if (!job) return res.status(404).json({ message: 'Job not found' });

@@ -79,6 +79,9 @@ export default function Jobs() {
       if (formData.resumeFile) {
         payload.append("resume", formData.resumeFile);
       }
+      if (formData.resumeUrl) {
+        payload.append("resumeUrl", formData.resumeUrl);
+      }
       
       await api.post("/applications", payload, {
         headers: { "Content-Type": "multipart/form-data" }
