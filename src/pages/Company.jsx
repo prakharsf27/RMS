@@ -36,6 +36,8 @@ export default function Company() {
   useEffect(() => {
     if (user.role === "recruiter") {
       fetchCompany();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
@@ -86,13 +88,13 @@ export default function Company() {
                 </div>
                 
                 <div className={styles.formGrid}>
-                <Input label="Website" name="website" value={formData.website} icon={<Globe size={18}/>} onChange={handleChange} />
-                <Input label="Business Email" name="email" value={formData.email} icon={<Mail size={18}/>} onChange={handleChange} />
+                <Input label="Website" name="website" value={formData.website} icon={Globe} onChange={handleChange} />
+                <Input label="Business Email" name="email" value={formData.email} icon={Mail} onChange={handleChange} />
                 </div>
 
                 <div className={styles.formGrid}>
-                <Input label="Logo URL" name="logo" value={formData.logo} icon={<Globe size={18}/>} onChange={handleChange} />
-                <Input label="Headquarters" name="location" value={formData.location} icon={<MapPin size={18}/>} onChange={handleChange} required />
+                <Input label="Logo URL" name="logo" value={formData.logo} icon={Globe} onChange={handleChange} />
+                <Input label="Headquarters" name="location" value={formData.location} icon={MapPin} onChange={handleChange} required />
                 </div>
 
                 <div className={styles.textareaGroup}>

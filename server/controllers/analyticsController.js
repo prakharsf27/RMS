@@ -24,7 +24,7 @@ exports.getStats = async (req, res) => {
         $lookup: {
           from: 'jobs',
           localField: 'jobId',
-          remoteField: '_id',
+          foreignField: '_id',
           as: 'job'
         }
       },
