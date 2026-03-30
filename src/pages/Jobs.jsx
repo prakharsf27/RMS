@@ -166,7 +166,7 @@ export default function Jobs() {
             headers={headers}
             data={jobs}
             renderRow={(job) => (
-              <tr key={job._id}>
+              <>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
                     <div className={styles.companyIcon}>
@@ -211,7 +211,7 @@ export default function Jobs() {
                     </div>
                   )}
                 </td>
-              </tr>
+              </>
             )}
           />
 

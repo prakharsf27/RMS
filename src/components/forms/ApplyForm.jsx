@@ -53,11 +53,13 @@ export const ApplyForm = ({ onSubmit, jobTitle, company, isSubmitting = false })
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       <div style={{ padding: '1.25rem', backgroundColor: 'var(--primary-light)', borderRadius: '16px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {company?.logo && (
-          <div style={{ width: '48px', height: '48px', backgroundColor: '#fff', borderRadius: '10px', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)' }}>
+        <div style={{ width: '48px', height: '48px', backgroundColor: '#fff', borderRadius: '10px', padding: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)', flexShrink: 0 }}>
+          {company?.logo ? (
             <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-        )}
+          ) : (
+            <span style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1.25rem' }}>{company?.name?.[0] || '?'}</span>
+          )}
+        </div>
         <div>
           <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--primary)', fontWeight: 700 }}>Applying for: {jobTitle}</p>
           {company?.name && <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>at {company.name}</p>}
