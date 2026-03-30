@@ -55,7 +55,11 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
+    if (!user) {
+      return res.status(404).json({ message: 'User not found. Please register if you are new.' });
+    }
+
+    if (await user.matchPassword(password)) {
       if (user.status === 'suspended') {
         return res.status(403).json({ message: 'Account suspended. Contact support.' });
       }
@@ -70,7 +74,7 @@ exports.login = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: 'Incorrect password. Please try again.' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

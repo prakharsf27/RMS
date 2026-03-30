@@ -79,7 +79,20 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleAuth} className={styles.form}>
-            {error && <div className={styles.errorBanner}>{error}</div>}
+            {error && (
+              <div className={styles.errorBanner}>
+                {error}
+                {!isRegister && error.includes("not found") && (
+                  <button 
+                    type="button" 
+                    className={styles.errorLink} 
+                    onClick={() => { setIsRegister(true); setError(""); }}
+                  >
+                    Register instead?
+                  </button>
+                )}
+              </div>
+            )}
 
             {isRegister && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
