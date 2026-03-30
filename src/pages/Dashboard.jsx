@@ -8,6 +8,7 @@ import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { Badge } from "../components/ui/Badge";
 import { format } from "date-fns";
 import { Users, Briefcase, FileText, CheckCircle, TrendingUp, Award, Eye, Heart, Zap, BookOpen, Clock, MapPin } from "lucide-react";
+import illustration from "../assets/recruitment_illustration.png";
 import styles from "./Dashboard.module.css";
 
 export default function Dashboard() {
@@ -67,6 +68,11 @@ export default function Dashboard() {
             </p>
           </div>
           {user.role === "candidate" && (
+            <div className={styles.headerIllustration}>
+                <img src={illustration} alt="Recruitment Illustration" />
+            </div>
+          )}
+          {user.role === "candidate" && (
             <div className={styles.ctaCard}>
                 <h3 className="text-gradient">Ready for more?</h3>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -91,6 +97,70 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
+
+      {user.role === "candidate" && (
+        <section className={styles.mncSection}>
+           <div className={styles.mncHeader}>
+              <h2 className="text-gradient">Get hired in the top MNCs</h2>
+              <p>Trusted by industry leaders worldwide for talent acquisition.</p>
+           </div>
+           <div className={styles.mncSlider}>
+              <div className={styles.mncTrack}>
+                {[
+                  { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
+                  { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
+                  { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
+                  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
+                  { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
+                  { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
+                  { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
+                  { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
+                  { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
+                  { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
+                  { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
+                  { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
+                  { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" }
+                ].map((company, i) => (
+                    <div key={i} className={styles.mncLogo}>
+                        <div className={styles.mncIcon}>
+                            <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                        <span>{company.name}</span>
+                    </div>
+                ))}
+                {[
+                  { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
+                  { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
+                  { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
+                  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
+                  { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
+                  { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
+                  { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
+                  { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
+                  { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
+                  { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
+                  { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
+                  { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
+                  { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" }
+                ].map((company, i) => (
+                    <div key={`${i}-dup`} className={styles.mncLogo}>
+                         <div className={styles.mncIcon}>
+                            <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                         </div>
+                        <span>{company.name}</span>
+                    </div>
+                ))}
+              </div>
+           </div>
+        </section>
+      )}
+
+      {user.role === "candidate" && (
+        <Card className={styles.candidateWelcome} premium glow style={{ marginBottom: '2rem' }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Ready for your next opportunity?</h2>
+          <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Browse open jobs and track your applications easily.</p>
+        </Card>
+      )}
 
       <div className={styles.dashboardGrid}>
         <div className={styles.recentSection}>
@@ -213,15 +283,17 @@ export default function Dashboard() {
           <Card className={styles.insightCard}>
              <div className={styles.insightHeader}>
                 <TrendingUp size={18} color="var(--success)" />
-                <span>Global Market Insights</span>
+                <span>Global Market Trends</span>
              </div>
              <div className={styles.newsGrid} style={{ border: 'none' }}>
                 {[
-                  { title: "Generative AI in Recruitment", trend: "+45% Search" },
-                  { title: "Remote-First Stability", trend: "Market High" }
+                  { title: "Generative AI in Recruitment", trend: "Up 45%", detail: "AI-driven screening is becoming the standard for 2024." },
+                  { title: "Remote-First Stability", trend: "Steady", detail: "MNCs are standardizing hybrid models across EU/US." },
+                  { title: "FinTech Hiring Surge", trend: "High Demand", detail: "Massive scaling in embedded finance sectors." }
                 ].map((news, i) => (
-                    <div key={i} style={{ marginBottom: '1rem' }}>
-                        <h4 style={{ fontSize: '0.9rem' }}>{news.title}</h4>
+                    <div key={i} className={styles.newsItem} style={{ border: 'none', padding: '0.75rem 0' }}>
+                        <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{news.title}</h4>
+                        <p style={{ fontSize: '0.813rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{news.detail}</p>
                         <span style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 700 }}>{news.trend}</span>
                     </div>
                 ))}
