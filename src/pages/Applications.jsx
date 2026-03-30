@@ -127,6 +127,9 @@ export default function Applications() {
             data={applications} 
             renderRow={(app) => {
               const isSelected = selectedIds.includes(app._id);
+              const candidate = app.candidateId || { fname: 'Deleted', lname: 'User', email: 'N/A', avatar: 'https://ui-avatars.com/api/?name=Deleted+User' };
+              const job = app.jobId || { title: 'Unknown Role', department: 'Unknown' };
+
               return (
                 <tr key={app._id} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
                   <td>
@@ -138,19 +141,19 @@ export default function Applications() {
                     </button>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <img src={app.candidateId.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '200px' }}>
+                      <img src={candidate.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
                       <div>
-                        <div style={{ fontWeight: 600 }}>{app.candidateId.fname} {app.candidateId.lname}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{app.candidateId.email}</div>
+                        <div style={{ fontWeight: 600 }}>{candidate.fname} {candidate.lname}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{candidate.email}</div>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{app.jobId.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{app.jobId.department}</div>
+                    <div style={{ fontWeight: 600, minWidth: '150px' }}>{job.title}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.department}</div>
                   </td>
-                  <td>{format(new Date(app.appliedAt), "MMM d, yyyy")}</td>
+                  <td>{app.appliedAt ? format(new Date(app.appliedAt), "MMM d, yyyy") : 'N/A'}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <div style={{ 
@@ -164,9 +167,8 @@ export default function Applications() {
                             fontSize: '0.75rem',
                             fontWeight: 800
                         }}>
-                            {app.matchScore}%
+                            {app.matchScore || 0}%
                         </div>
-                        <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Keywords</span>
                     </div>
                   </td>
                   <td>
@@ -180,6 +182,11 @@ export default function Applications() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                      {user.role !== "candidate" && (
+                         <Button size="sm" variant="info" onClick={() => navigate('/notifications', { state: { recipient: candidate } })}>
+                            <Mail size={14} />
+                         </Button>
+                      )}
                       {user.role !== "candidate" && app.status === "applied" && (
                         <>
                           <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
@@ -190,8 +197,8 @@ export default function Applications() {
                           </Button>
                         </>
                       )}
-                      {user.role === "admin" && (
-                        <Button size="sm" variant="ghost" onClick={() => handleBulkStatus(app._id)} style={{ color: 'var(--danger)' }}>
+                      {user.role === 'admin' && (
+                        <Button size="sm" variant="ghost" onClick={() => handleBulkDelete()} style={{ color: 'var(--danger)' }}>
                           <Trash2 size={16} />
                         </Button>
                       )}

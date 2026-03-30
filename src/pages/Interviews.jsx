@@ -7,12 +7,14 @@ import { Badge } from "../components/ui/Badge";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { Calendar, Clock, Video, MapPin, Plus, CheckCircle, XCircle } from "lucide-react";
+import { Calendar, Clock, Video, MapPin, Plus, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import styles from "./Interviews.module.css";
 
 export default function Interviews() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -94,7 +96,7 @@ export default function Interviews() {
                        {int.type === 'virtual' ? <Video size={24} /> : <MapPin size={24} />}
                     </div>
                     <div className={styles.intInfo}>
-                       <h3>{int.candidateId.fname} {int.candidateId.lname}</h3>
+                       <h3>{int.candidateId?.fname || 'Unknown'} {int.candidateId?.lname || 'Candidate'}</h3>
                        <p className={styles.jobText}>{int.jobTitle}</p>
                        <div className={styles.metaRow}>
                           <span className={styles.metaItem}><Calendar size={14} /> {format(new Date(int.date), "MMM d, yyyy")}</span>
@@ -175,9 +177,9 @@ export default function Interviews() {
                 required
               >
                 <option value="">Choose a candidate application...</option>
-                {applications.filter(a => a.status === 'applied').map(app => (
+                {applications.filter(a => a.status === 'applied' && a.candidateId).map(app => (
                     <option key={app._id} value={app._id}>
-                        {app.candidateId.fname} {app.candidateId.lname} - {app.jobId.title}
+                        {app.candidateId.fname} {app.candidateId.lname} - {app.jobId?.title || 'Unknown Role'}
                     </option>
                 ))}
               </select>

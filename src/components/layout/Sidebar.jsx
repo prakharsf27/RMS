@@ -47,8 +47,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/notifications", icon: Mail, label: "Messages", roles: ["admin", "recruiter", "candidate"] },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
-    { to: "/profile", icon: User, label: "Profile", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/audit", icon: ShieldAlert, label: "Audit Logs", roles: ["admin"] },
+    { to: "/profile", icon: User, label: "Profile", roles: ["admin", "recruiter", "candidate"] }
   ];
 
   const allowedLinks = navLinks.filter(link => link.roles.includes(user.role));

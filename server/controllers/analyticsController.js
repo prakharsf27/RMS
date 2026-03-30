@@ -8,10 +8,30 @@ const Interview = require('../models/Interview');
 // @access  Private (Admin/Recruiter)
 exports.getStats = async (req, res) => {
   try {
-    const jobsCount = await Job.countDocuments();
-    const appsCount = await Application.countDocuments();
-    const candidatesCount = await User.countDocuments({ role: 'candidate' });
-    const interviewsCount = await Interview.countDocuments();
+    const query = {};
+    if (req.user.role === 'recruiter') {
+        query.recruiterId = req.user._id;
+    }
+
+    const jobsCount = await Job.countDocuments(query);
+    
+    // For Applications, we filter by jobId if user is recruiter
+    let appQuery = {};
+    if (req.user.role === 'recruiter') {
+        const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
+        appQuery.jobId = { $in: recruiterJobs.map(j => j._id) };
+    }
+    const appsCount = await Application.countDocuments(appQuery);
+
+    // Candidates: Recruiters see only those who applied to their jobs
+    let candQuery = { role: 'candidate' };
+    if (req.user.role === 'recruiter') {
+        const applicants = await Application.find(appQuery).distinct('candidateId');
+        candQuery._id = { $in: applicants };
+    }
+    const candidatesCount = await User.countDocuments(candQuery);
+    
+    const interviewsCount = await Interview.countDocuments(query);
 
     // Hired vs Rejected vs Applied (for Pie Chart)
     const statsByStatus = await Application.aggregate([

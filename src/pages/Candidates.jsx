@@ -6,10 +6,12 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users } from "lucide-react";
+import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Candidates() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [pendingRecruiters, setPendingRecruiters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,7 +141,7 @@ export default function Candidates() {
                      headers={recruiterHeaders}
                      data={pendingRecruiters}
                      renderRow={(rec) => (
-                        <tr key={rec._id}>
+                        <>
                            <td>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                  <img src={rec.avatar} style={{ width: '32px', height: '32px', borderRadius: '8px' }} alt="" />
@@ -156,7 +158,7 @@ export default function Candidates() {
                                  </Button>
                               </div>
                            </td>
-                        </tr>
+                        </>
                      )}
                    />
                 </Card>
@@ -173,7 +175,7 @@ export default function Candidates() {
                   const isBlocked = candidate.status === 'suspended';
                   const isSelected = selectedIds.includes(candidate._id);
                   return (
-                    <tr key={candidate._id} style={{ opacity: isBlocked ? 0.6 : 1, backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
+                    <>
                       <td>
                         <button 
                             onClick={() => toggleSelect(candidate._id)}
@@ -183,7 +185,7 @@ export default function Candidates() {
                         </button>
                       </td>
                       <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px' }}>
                           <img src={candidate.avatar} style={{ width: '40px', height: '40px', borderRadius: '12px' }} alt="" />
                           <div style={{ fontWeight: 700 }}>{candidate.fname} {candidate.lname}</div>
                         </div>
@@ -198,10 +200,15 @@ export default function Candidates() {
                                  {isBlocked ? <ShieldCheck size={14} /> : <ShieldOff size={14} />}
                               </Button>
                            )}
-                           <Button size="sm" variant="ghost">Profile</Button>
+                           <Button size="sm" variant="info" onClick={() => navigate('/notifications', { state: { recipient: candidate } })}>
+                              <MessageSquare size={14} />
+                           </Button>
+                           <Button size="sm" variant="ghost" onClick={() => navigate('/profile', { state: { userId: candidate._id } })}>
+                              <ExternalLink size={14} /> Profile
+                           </Button>
                         </div>
                       </td>
-                    </tr>
+                    </>
                   );
                 }} 
               />

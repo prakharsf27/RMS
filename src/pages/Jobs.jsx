@@ -28,8 +28,10 @@ export default function Jobs() {
   const [totalResults, setTotalResults] = useState(0);
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchJobs = async () => {
@@ -61,8 +63,14 @@ export default function Jobs() {
   const handleCreateJob = async (formData) => {
     setIsSubmitting(true);
     try {
-      await api.post("/jobs", formData);
+      if (isEditing) {
+        await api.put(`/jobs/${selectedJob._id}`, formData);
+      } else {
+        await api.post("/jobs", formData);
+      }
       setIsPostModalOpen(false);
+      setIsEditing(false);
+      setSelectedJob(null);
       fetchJobs();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -102,6 +110,17 @@ export default function Jobs() {
     setIsApplyModalOpen(true);
   };
 
+  const openEdit = (job) => {
+    setSelectedJob(job);
+    setIsEditing(true);
+    setIsPostModalOpen(true);
+  };
+
+  const openView = (job) => {
+    setSelectedJob(job);
+    setIsViewModalOpen(true);
+  };
+
   const headers = ["Company", "Role", "Department", "Location", "Status", "Applicants", "Date Posted", ""];
 
   return (
@@ -112,7 +131,7 @@ export default function Jobs() {
           <p>Explore all open opportunities across our global engineering locations.</p>
         </div>
         {user.role !== "candidate" && (
-          <Button onClick={() => setIsPostModalOpen(true)}>
+          <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
             <Plus size={18} /> Post New Job
           </Button>
         )}
@@ -206,8 +225,8 @@ export default function Jobs() {
                     </Button>
                   ) : (
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <Button variant="secondary" size="sm">Edit</Button>
-                      <Button variant="secondary" size="sm">View</Button>
+                      <Button variant="secondary" size="sm" onClick={() => openEdit(job)}>Edit</Button>
+                      <Button variant="secondary" size="sm" onClick={() => openView(job)}>View</Button>
                     </div>
                   )}
                 </td>
@@ -241,10 +260,62 @@ export default function Jobs() {
 
       <Modal 
         isOpen={isPostModalOpen} 
-        onClose={() => setIsPostModalOpen(false)} 
-        title="Post New Requirement"
+        onClose={() => { setIsPostModalOpen(false); setIsEditing(false); setSelectedJob(null); }} 
+        title={isEditing ? "Edit Job Requirement" : "Post New Requirement"}
       >
-        <JobForm onSubmit={handleCreateJob} isSubmitting={isSubmitting} />
+        <JobForm 
+            onSubmit={handleCreateJob} 
+            isSubmitting={isSubmitting} 
+            initialData={isEditing ? selectedJob : null} 
+        />
+      </Modal>
+
+      <Modal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        title="Job Details View"
+      >
+        {selectedJob && (
+          <div style={{ padding: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+                <div className={styles.companyIcon} style={{ width: '64px', height: '64px', fontSize: '1.5rem' }}>
+                    {selectedJob.company?.logo ? (
+                        <img src={selectedJob.company.logo} alt="" />
+                    ) : (
+                        <span>{selectedJob.company?.name?.[0] || 'C'}</span>
+                    )}
+                </div>
+                <div>
+                    <h2 style={{ margin: 0 }}>{selectedJob.title}</h2>
+                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0' }}>{selectedJob.company?.name} · {selectedJob.location}</p>
+                    <Badge variant="success">{selectedJob.type}</Badge>
+                </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+                <div>
+                    <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Department</h4>
+                    <p style={{ fontWeight: 600 }}>{selectedJob.department}</p>
+                </div>
+                <div>
+                    <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Salary Range</h4>
+                    <p style={{ fontWeight: 600 }}>{selectedJob.salary || 'Competitive'}</p>
+                </div>
+            </div>
+
+            <div style={{ marginBottom: '2rem' }}>
+                <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Job Description</h4>
+                <p style={{ lineHeight: 1.6, color: 'var(--text-primary)' }}>{selectedJob.description}</p>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
+                 <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close Review</Button>
+                 {user.role === 'candidate' && (
+                     <Button onClick={() => { setIsViewModalOpen(false); openApply(selectedJob); }}>Apply Now</Button>
+                 )}
+            </div>
+          </div>
+        )}
       </Modal>
 
       <Modal 

@@ -203,27 +203,6 @@ export default function Dashboard() {
              </div>
           </Card>
           
-          <div className={styles.sectionHeader} style={{ marginTop: '2rem' }}>
-            <h3>System Activity</h3>
-          </div>
-          <Card className={styles.activityFeed}>
-             {activities.length > 0 ? (
-                <div className={styles.activityList}>
-                    {activities.map(log => (
-                        <div key={log._id} className={styles.activityItem}>
-                            <div className={styles.activityDot}></div>
-                            <div className={styles.activityContent}>
-                                <p className={styles.activityAction}>{log.action}</p>
-                                <p className={styles.activityDetails}>{log.details}</p>
-                                <span className={styles.activityTime}>{format(new Date(log.timestamp), "h:mm a")}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-             ) : (
-                <p className={styles.emptyActivity}>No recent activity found.</p>
-             )}
-          </Card>
         </div>
       </div>
     </div>

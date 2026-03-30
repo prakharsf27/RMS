@@ -59,12 +59,15 @@ export const JobForm = ({ onSubmit, initialData = null, isSubmitting = false }) 
                 value={formData.type}
                 onChange={handleChange}
                 style={{
-                    padding: '0.75rem',
+                    padding: '0.875rem 1rem',
                     borderRadius: '12px',
                     border: '1px solid var(--border-color)',
                     backgroundColor: 'var(--bg-elevated)',
                     color: 'var(--text-primary)',
-                    fontFamily: 'inherit'
+                    fontFamily: 'inherit',
+                    fontSize: '0.95rem',
+                    height: '52px',
+                    width: '100%'
                 }}
             >
                 <option value="Full-Time">Full-Time</option>

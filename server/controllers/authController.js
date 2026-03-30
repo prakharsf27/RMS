@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const sendEmail = require('../config/emailService');
 
 // Generate Token
 const generateToken = (id) => {
@@ -31,6 +32,13 @@ exports.register = async (req, res) => {
     });
 
     if (user) {
+      // Send Welcome Email
+      sendEmail({
+        email: user.email,
+        type: 'WELCOME',
+        data: { name: user.fname }
+      });
+
       res.status(201).json({
         _id: user._id,
         fname: user.fname,
@@ -86,7 +94,19 @@ exports.login = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: 'candidate' }).select('-password');
+    let query = { role: 'candidate' };
+    
+    // Privacy: Recruiters only see candidates who applied to their jobs
+    if (req.user.role === 'recruiter') {
+      const Application = require('../models/Application');
+      const Job = require('../models/Job');
+      
+      const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
+      const applicants = await Application.find({ jobId: { $in: recruiterJobs.map(j => j._id) } }).distinct('candidateId');
+      query._id = { $in: applicants };
+    }
+
+    const users = await User.find(query).select('-password');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -2,6 +2,7 @@ const Application = require('../models/Application');
 const Job = require('../models/Job');
 const Notification = require('../models/Notification');
 const { cloudinary } = require('../config/cloudinary');
+const sendEmail = require('../config/emailService');
 
 // Utility to calculate match score based on simple keyword matching
 const calculateMatchScore = (jobRequirements, userBio = "") => {
@@ -51,6 +52,16 @@ exports.applyForJob = async (req, res) => {
     job.applicantsCount += 1;
     await job.save();
 
+    // Send Confirmation Email
+    sendEmail({
+      email: req.user.email,
+      type: 'APPLICATION_CONFIRM',
+      data: {
+        jobTitle: job.title,
+        companyName: job.company?.name || 'TalentFlow Partner'
+      }
+    });
+
     res.status(201).json(application);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -65,6 +76,11 @@ exports.getApplications = async (req, res) => {
     let query = {};
     if (req.user.role === 'candidate') {
       query.candidateId = req.user._id;
+    }
+
+    if (req.user.role === 'recruiter') {
+      const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
+      query.jobId = { $in: recruiterJobs.map(j => j._id) };
     }
 
     const applications = await Application.find(query)
@@ -104,6 +120,17 @@ exports.updateStatus = async (req, res) => {
         subject,
         message,
         sender: 'TalentFlow Recruitment'
+    });
+
+    // Send Status Update Email
+    sendEmail({
+      email: application.candidateId.email,
+      type: 'STATUS_UPDATE',
+      data: {
+        jobTitle: application.jobId.title,
+        status,
+        message
+      }
     });
 
     res.json(application);

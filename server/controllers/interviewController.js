@@ -1,5 +1,7 @@
 const Interview = require('../models/Interview');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+const sendEmail = require('../config/emailService');
 
 // @desc    Schedule interview
 // @route   POST /api/interviews
@@ -11,13 +13,29 @@ exports.scheduleInterview = async (req, res) => {
       recruiterId: req.user._id
     });
 
-    // Notify candidate
+    // Notify candidate via system
     await Notification.create({
         userId: interview.candidateId,
         subject: 'Interview Scheduled',
         message: `A new interview for the ${interview.jobTitle} position has been scheduled.`,
         sender: 'TalentFlow System'
     });
+
+    // Send Interview Email
+    const candidate = await User.findById(interview.candidateId);
+    if (candidate) {
+      sendEmail({
+        email: candidate.email,
+        type: 'INTERVIEW_SCHEDULED',
+        data: {
+          jobTitle: interview.jobTitle,
+          date: interview.date,
+          time: interview.time,
+          location: interview.location,
+          notes: interview.notes
+        }
+      });
+    }
 
     res.status(201).json(interview);
   } catch (error) {
