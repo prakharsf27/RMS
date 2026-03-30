@@ -52,6 +52,25 @@ exports.getStats = async (req, res) => {
       { $group: { _id: '$job.department', count: { $sum: 1 } } }
     ]);
 
+    // Candidate Stats
+    if (req.user.role === 'candidate') {
+      const candidateId = req.user._id;
+      const appliedCount = await Application.countDocuments({ candidateId });
+      const offeredCount = await Application.countDocuments({ candidateId, status: 'offered' });
+      const interviewsCount = await Interview.countDocuments({ candidateId });
+      const userDoc = await User.findById(candidateId).select('profileViews');
+
+      return res.json({
+        summary: {
+          applications: appliedCount,
+          offers: offeredCount,
+          interviews: interviewsCount,
+          profileViews: userDoc?.profileViews || 0,
+          jobs: await Job.countDocuments({ status: 'active' }) // Total open jobs for context
+        }
+      });
+    }
+
     res.json({
       summary: {
         jobs: jobsCount,

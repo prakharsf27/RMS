@@ -23,6 +23,7 @@ import styles from "./Sidebar.module.css";
 export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("rms_theme") || "light");
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -57,11 +58,20 @@ export const Sidebar = ({ isOpen, onClose }) => {
   };
 
   return (
-    <aside className={cn(styles.sidebar, isOpen && styles.open)}>
+    <aside className={cn(
+      styles.sidebar, 
+      isOpen && styles.open,
+      isCollapsed && styles.collapsed
+    )}>
       <div className={styles.logo}>
         <div className={styles.logoIcon}>T</div>
         <span className={styles.logoText}>TalentFlow</span>
-        {/* Close button for mobile */}
+        <button 
+           className={styles.collapseToggle} 
+           onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+           <Zap size={16} className={isCollapsed ? "rotate-180" : ""} />
+        </button>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
           <X size={20} />
         </button>

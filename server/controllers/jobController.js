@@ -166,3 +166,62 @@ exports.deleteJob = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Get recommended jobs for candidate
+// @route   GET /api/jobs/recommended
+// @access  Private (Candidate)
+exports.getRecommendedJobs = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('skills');
+    const userSkills = user?.skills || [];
+    
+    // Find active jobs
+    const jobs = await Job.find({ status: 'active' })
+      .populate('recruiterId', 'fname lname email')
+      .limit(10);
+      
+    // Join with Company matching recruiterId
+    const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
+      const Company = require('../models/Company');
+      const company = await Company.findOne({ recruiterId: job.recruiterId._id });
+      return { ...job.toObject(), company };
+    }));
+    
+    // Mock Match Score calculation
+    const recommendedJobs = jobsWithCompany.map(job => {
+      let matchCount = 0;
+      const jobReqs = (job.requirements || []).map(r => r.toLowerCase());
+      
+      userSkills.forEach(skill => {
+        if (jobReqs.some(req => req.includes(skill.toLowerCase()))) {
+          matchCount++;
+        }
+      });
+      
+      // Artificial boost based on department/title match
+      let score = 70 + (matchCount * 5); // baseline 70%
+      if (score > 98) score = 98; // cap at 98%
+      
+      // If no skills match, assign a varied score between 65-80
+      if (matchCount === 0) {
+        const randomBonus = (job._id.toString().charCodeAt(0) % 15);
+        score = 65 + randomBonus;
+      }
+
+      return {
+        ...job,
+        matchScore: score,
+        missingSkills: (job.requirements || []).filter(req => 
+          !userSkills.some(skill => req.toLowerCase().includes(skill.toLowerCase()))
+        ).slice(0, 3)
+      };
+    });
+
+    // Sort by match score descending
+    recommendedJobs.sort((a, b) => b.matchScore - a.matchScore);
+
+    res.json(recommendedJobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

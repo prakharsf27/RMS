@@ -13,6 +13,9 @@ const UserSchema = new mongoose.Schema({
   },
   avatar: { type: String },
   bio: { type: String },
+  skills: [{ type: String }],
+  savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+  profileViews: { type: Number, default: 0 },
   status: { 
     type: String, 
     enum: ['active', 'suspended'], 
