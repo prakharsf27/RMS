@@ -180,8 +180,23 @@ exports.updateProfile = async (req, res) => {
     user.lname = req.body.lname || user.lname;
     user.email = req.body.email || user.email;
     user.bio = req.body.bio || user.bio;
+    user.dob = req.body.dob || user.dob;
+    user.phone = req.body.phone || user.phone;
+    user.experienceLevel = req.body.experienceLevel || user.experienceLevel;
+    user.yearsOfExperience = req.body.yearsOfExperience || user.yearsOfExperience;
+
     if (req.body.password) {
       user.password = req.body.password;
+    }
+
+    // Handle File Uploads
+    if (req.files) {
+      if (req.files.avatar) {
+        user.avatar = `/uploads/avatars/${req.files.avatar[0].filename}`;
+      }
+      if (req.files.resume) {
+        user.resume = `/uploads/resumes/${req.files.resume[0].filename}`;
+      }
     }
 
     const updatedUser = await user.save();
@@ -192,6 +207,14 @@ exports.updateProfile = async (req, res) => {
       lname: updatedUser.lname,
       email: updatedUser.email,
       bio: updatedUser.bio,
+      dob: updatedUser.dob,
+      phone: updatedUser.phone,
+      experienceLevel: updatedUser.experienceLevel,
+      yearsOfExperience: updatedUser.yearsOfExperience,
+      isEmailVerified: updatedUser.isEmailVerified,
+      isPhoneVerified: updatedUser.isPhoneVerified,
+      hiringStatus: updatedUser.hiringStatus,
+      resume: updatedUser.resume,
       role: updatedUser.role,
       avatar: updatedUser.avatar,
       token: generateToken(updatedUser._id),

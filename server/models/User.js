@@ -16,6 +16,29 @@ const UserSchema = new mongoose.Schema({
   skills: [{ type: String }],
   savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
   profileViews: { type: Number, default: 0 },
+  
+  // Advanced Identity Fields
+  dob: { type: Date },
+  phone: { type: String },
+  isEmailVerified: { type: Boolean, default: false },
+  isPhoneVerified: { type: Boolean, default: false },
+  
+  // Talent Assets
+  resume: { type: String }, // Path to PDF
+  experienceLevel: { 
+    type: String, 
+    enum: ['fresher', 'experienced'], 
+    default: 'fresher' 
+  },
+  yearsOfExperience: { type: Number, default: 0 },
+  
+  // Recruitment Status
+  hiringStatus: { 
+    type: String, 
+    enum: ['pending', 'interviewing', 'hired', 'rejected'], 
+    default: 'pending' 
+  },
+
   status: { 
     type: String, 
     enum: ['active', 'suspended'], 

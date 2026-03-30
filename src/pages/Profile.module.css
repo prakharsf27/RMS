@@ -115,10 +115,15 @@
   font-weight: 700;
 }
 
+.statusHired { color: var(--success) !important; }
+.statusPending { color: var(--warning) !important; }
+.statusRejected { color: var(--danger) !important; }
+.statusInterviewing { color: var(--info) !important; }
+
 .main {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .formHeader {
@@ -143,6 +148,160 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+}
+
+.inputWithBadge {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.verifyBadge {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    font-size: 0.625rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: default;
+}
+
+.verified { background-color: var(--success-light); color: var(--success); }
+.unverified { background-color: var(--danger-light); color: var(--danger); cursor: pointer; }
+
+.sectionHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.sectionHeader h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.sectionHeader p {
+    font-size: 0.813rem;
+    color: var(--text-tertiary);
+}
+
+.uploadZone {
+    border: 2px dashed var(--border-color);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+    background-color: var(--bg-elevated-hover);
+    transition: all 0.3s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.uploadZone:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.uploadZoneActive {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.uploadIcon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    transition: all 0.3s;
+}
+
+.uploadZone:hover .uploadIcon {
+    color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+}
+
+.expLevelContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.expCard {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-elevated);
+}
+
+.expCard:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-elevated-hover);
+}
+
+.expCardActive {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.radioCircle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    position: relative;
+    transition: all 0.2s;
+}
+
+.expCardActive .radioCircle {
+    border-color: var(--primary);
+}
+
+.expCardActive .radioCircle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--primary);
+}
+
+.expContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.expContent strong {
+    font-size: 0.938rem;
+    font-weight: 700;
+}
+
+.expContent span {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
 }
 
 .bioGroup {

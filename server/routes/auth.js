@@ -13,12 +13,16 @@ const {
   bulkUserDelete
 } = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.post('/register', register);
 router.post('/login', login);
 router.route('/profile')
   .get(protect, getProfile)
-  .put(protect, updateProfile);
+  .put(protect, upload.fields([
+    { name: 'avatar', maxCount: 1 },
+    { name: 'resume', maxCount: 1 }
+  ]), updateProfile);
 
 // Admin Routes
 router.get('/users', protect, authorize('admin', 'recruiter'), getAllUsers);
