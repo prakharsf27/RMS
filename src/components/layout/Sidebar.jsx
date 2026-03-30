@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../lib/utils";
 import {
@@ -15,11 +15,12 @@ import {
   Building,
   User,
   Sun,
-  Moon
+  Moon,
+  X
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("rms_theme") || "light");
 
@@ -52,11 +53,19 @@ export const Sidebar = () => {
 
   const allowedLinks = navLinks.filter(link => link.roles.includes(user.role));
 
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
   return (
-    <aside className={styles.sidebar}>
+    <aside className={cn(styles.sidebar, isOpen && styles.open)}>
       <div className={styles.logo}>
         <div className={styles.logoIcon}>T</div>
         <span className={styles.logoText}>TalentFlow</span>
+        {/* Close button for mobile */}
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
+          <X size={20} />
+        </button>
       </div>
 
       <nav className={styles.nav}>
@@ -64,6 +73,7 @@ export const Sidebar = () => {
           <NavLink
             key={link.to}
             to={link.to}
+            onClick={handleNavClick}
             className={({ isActive }) => cn(styles.navItem, isActive && styles.active)}
           >
             <link.icon size={20} />

@@ -407,3 +407,35 @@
   .ctaCard { max-width: 100%; text-align: left; border-right: none; border-left: 4px solid var(--primary); }
   .dashboardGrid { grid-template-columns: 1fr; }
 }
+
+/* ─── Mobile Responsive ──────────────────────── */
+@media (max-width: 768px) {
+  .headerFlex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .ctaCard {
+    max-width: 100%;
+    text-align: left;
+    border-right: none;
+    border-left: 4px solid var(--primary);
+  }
+  .metricsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dashboardGrid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 1.25rem;
+  }
+}

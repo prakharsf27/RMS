@@ -43,3 +43,15 @@
   color: var(--text-tertiary) !important;
   padding: 2rem !important;
 }
+
+/* ─── Mobile Responsive ──────────────────────── */
+@media (max-width: 768px) {
+  .tableContainer {
+    -webkit-overflow-scrolling: touch;
+  }
+  .table th, .table td {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.813rem;
+    white-space: nowrap;
+  }
+}

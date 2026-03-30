@@ -7,7 +7,8 @@
   height: 100vh;
   position: sticky;
   top: 0;
-  transition: all 0.3s ease;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logo {
@@ -29,6 +30,7 @@
   border-radius: 8px;
   font-weight: 800;
   font-family: 'Outfit', sans-serif;
+  flex-shrink: 0;
 }
 
 .logoText {
@@ -37,6 +39,25 @@
   font-weight: 800;
   color: var(--text-primary);
   letter-spacing: -0.04em;
+  flex: 1;
+}
+
+/* Close button — only visible on mobile */
+.closeBtn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.closeBtn:hover {
+  background-color: var(--bg-elevated-hover);
+  color: var(--text-primary);
 }
 
 .nav {
@@ -117,6 +138,7 @@
   object-fit: cover;
   border: 2px solid var(--primary-light);
   box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .userDetails {
@@ -170,4 +192,31 @@
   background-color: rgba(220, 38, 38, 0.1);
   color: #f87171;
   border-color: #7f1d1d;
+}
+
+/* ─── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .closeBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navItem:hover {
+    transform: none;
+  }
 }
