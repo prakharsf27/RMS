@@ -78,25 +78,59 @@ export default function Dashboard() {
            <div className={styles.mncSlider}>
               <div className={styles.mncTrack}>
                 {[
-                  "Google", "Amazon", "Meta", "Microsoft", "Netflix", 
-                  "Apple", "Tesla", "NVIDIA", "Intel", "IBM", 
-                  "Adobe", "Salesforce", "Oracle", "Spotify", "Uber", 
-                  "Airbnb", "Stripe", "LinkedIn", "Twitter", "Reddit"
-                ].map(company => (
-                    <div key={company} className={styles.mncLogo}>
-                        <div className={styles.mncIcon}>{company[0]}</div>
-                        <span>{company}</span>
+                  { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
+                  { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
+                  { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
+                  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
+                  { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
+                  { name: "Apple", logo: "https://www.vectorlogo.zone/logos/apple/apple-icon.svg" },
+                  { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
+                  { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
+                  { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
+                  { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
+                  { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
+                  { name: "Oracle", logo: "https://www.vectorlogo.zone/logos/oracle/oracle-icon.svg" },
+                  { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
+                  { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
+                  { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" },
+                  { name: "Stripe", logo: "https://www.vectorlogo.zone/logos/stripe/stripe-icon.svg" },
+                  { name: "LinkedIn", logo: "https://www.vectorlogo.zone/logos/linkedin/linkedin-icon.svg" },
+                  { name: "Twitter", logo: "https://www.vectorlogo.zone/logos/twitter/twitter-official.svg" },
+                  { name: "Reddit", logo: "https://www.vectorlogo.zone/logos/reddit/reddit-icon.svg" }
+                ].map((company, i) => (
+                    <div key={i} className={styles.mncLogo}>
+                        <div className={styles.mncIcon}>
+                            <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                        <span>{company.name}</span>
                     </div>
                 ))}
                 {[
-                  "Google", "Amazon", "Meta", "Microsoft", "Netflix", 
-                  "Apple", "Tesla", "NVIDIA", "Intel", "IBM", 
-                  "Adobe", "Salesforce", "Oracle", "Spotify", "Uber", 
-                  "Airbnb", "Stripe", "LinkedIn", "Twitter", "Reddit"
-                ].map(company => (
-                    <div key={`${company}-dup`} className={styles.mncLogo}>
-                         <div className={styles.mncIcon}>{company[0]}</div>
-                        <span>{company}</span>
+                  { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
+                  { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
+                  { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
+                  { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
+                  { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
+                  { name: "Apple", logo: "https://www.vectorlogo.zone/logos/apple/apple-icon.svg" },
+                  { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
+                  { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
+                  { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
+                  { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
+                  { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
+                  { name: "Oracle", logo: "https://www.vectorlogo.zone/logos/oracle/oracle-icon.svg" },
+                  { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
+                  { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
+                  { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" },
+                  { name: "Stripe", logo: "https://www.vectorlogo.zone/logos/stripe/stripe-icon.svg" },
+                  { name: "LinkedIn", logo: "https://www.vectorlogo.zone/logos/linkedin/linkedin-icon.svg" },
+                  { name: "Twitter", logo: "https://www.vectorlogo.zone/logos/twitter/twitter-official.svg" },
+                  { name: "Reddit", logo: "https://www.vectorlogo.zone/logos/reddit/reddit-icon.svg" }
+                ].map((company, i) => (
+                    <div key={`${i}-dup`} className={styles.mncLogo}>
+                         <div className={styles.mncIcon}>
+                            <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                         </div>
+                        <span>{company.name}</span>
                     </div>
                 ))}
               </div>

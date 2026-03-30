@@ -102,7 +102,7 @@ export default function Jobs() {
     setIsApplyModalOpen(true);
   };
 
-  const headers = ["Role", "Department", "Location", "Status", "Applicants", "Date Posted", ""];
+  const headers = ["Company", "Role", "Department", "Location", "Status", "Applicants", "Date Posted", ""];
 
   return (
     <div className="animate-fade-in">
@@ -167,6 +167,23 @@ export default function Jobs() {
             data={jobs}
             renderRow={(job) => (
               <tr key={job._id}>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+                    <div className={styles.companyIcon}>
+                      {job.company?.logo ? (
+                        <img src={job.company.logo} alt={job.company.name} />
+                      ) : (
+                        <span>{job.company?.name?.[0] || 'C'}</span>
+                      )}
+                    </div>
+                    <div>
+                      <span style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>
+                        {job.company?.name || "TalentFlow Partner"}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || 'Technology'}</span>
+                    </div>
+                  </div>
+                </td>
                 <td>
                   <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.25rem' }}>{job.title}</strong>
                   <span style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{job.type}</span>
@@ -237,6 +254,7 @@ export default function Jobs() {
       >
         <ApplyForm 
             jobTitle={selectedJob?.title} 
+            company={selectedJob?.company}
             onSubmit={handleApply} 
             isSubmitting={isSubmitting} 
         />

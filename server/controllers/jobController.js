@@ -43,19 +43,54 @@ exports.getJobs = async (req, res) => {
     // Pagination
     const skip = (page - 1) * limit;
 
-    const jobs = await Job.find(query)
-      .sort(sort)
-      .limit(Number(limit))
-      .skip(skip)
-      .populate('recruiterId', 'fname lname avatar');
+    // Use aggregation to join with Company
+    const pipeline = [
+      { $match: query },
+      { $sort: { [sort.startsWith('-') ? sort.substring(1) : sort]: sort.startsWith('-') ? -1 : 1 } },
+      { $skip: skip },
+      { $limit: Number(limit) },
+      // Join with User (recruiter)
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'recruiterId',
+          foreignField: '_id',
+          as: 'recruiter'
+        }
+      },
+      { $unwind: '$recruiter' },
+      // Join with Company
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'recruiterId',
+          foreignField: 'recruiterId',
+          as: 'company'
+        }
+      },
+      { 
+        $addFields: { 
+          company: { $ifNull: [{ $arrayElemAt: ['$company', 0] }, null] } 
+        } 
+      },
+      {
+        $project: {
+          'recruiter.password': 0,
+          'recruiter.role': 0
+        }
+      }
+    ];
 
-    const total = await Job.countDocuments(query);
+    const [jobs, totalDocs] = await Promise.all([
+      Job.aggregate(pipeline),
+      Job.countDocuments(query)
+    ]);
 
     res.json({
       jobs,
       page: Number(page),
-      pages: Math.ceil(total / limit),
-      total
+      pages: Math.ceil(totalDocs / limit),
+      total: totalDocs
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
