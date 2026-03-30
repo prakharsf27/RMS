@@ -16,7 +16,8 @@ import {
   User,
   Sun,
   Moon,
-  X
+  X,
+  Zap
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
