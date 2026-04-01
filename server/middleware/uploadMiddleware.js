@@ -2,19 +2,30 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+// Use /tmp for Vercel, server/uploads for local development
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+const uploadBaseDir = isVercel ? '/tmp/uploads' : 'server/uploads';
+
 // Ensure upload directories exist
-const uploadDir = 'server/uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+const subDirs = ['avatars', 'resumes'];
+try {
+  if (!fs.existsSync(uploadBaseDir)) {
+    fs.mkdirSync(uploadBaseDir, { recursive: true });
+  }
+  subDirs.forEach(dir => {
+    const fullPath = path.join(uploadBaseDir, dir);
+    if (!fs.existsSync(fullPath)) {
+      fs.mkdirSync(fullPath, { recursive: true });
+    }
+  });
+} catch (err) {
+  console.warn('Warning: Could not create upload directories:', err.message);
 }
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === 'avatar') {
-      cb(null, 'server/uploads/avatars');
-    } else {
-      cb(null, 'server/uploads/resumes');
-    }
+    const subDir = file.fieldname === 'avatar' ? 'avatars' : 'resumes';
+    cb(null, path.join(uploadBaseDir, subDir));
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

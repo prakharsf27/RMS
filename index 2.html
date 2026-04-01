@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TalentFlow RMS</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit&family=DM+Sans&display=swap" rel="stylesheet">
+
+  <!-- Charts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen"></div>
+
+  <!-- MAIN APP -->
+  <div id="app"></div>
+
+  <!-- MODAL -->
+  <div id="modal-overlay"></div>
+
+  <!-- TOAST -->
+  <div id="toast-container"></div>
+
+  <!-- ========================= -->
+  <!-- SERVICES -->
+  <!-- ========================= -->
+  <script src="src/services/db.service.js"></script>
+  <script src="src/services/auth.service.js"></script>
+  <script src="src/services/notification.service.js"></script>
+  <script src="src/services/audit.service.js"></script>
+
+  <!-- ========================= -->
+  <!-- UTILS -->
+  <!-- ========================= -->
+  <script src="src/utils/helpers.js"></script>
+
+  <!-- ========================= -->
+  <!-- COMPONENTS -->
+  <!-- ========================= -->
+  <script src="src/components/sidebar/sidebar.js"></script>
+  <script src="src/components/topbar/topbar.js"></script>
+  <script src="src/components/modal/modal.js"></script>
+  <script src="src/components/toast/toast.js"></script>
+  <script src="src/components/notifications/notifications.js"></script>
+
+  <!-- ========================= -->
+  <!-- PAGES -->
+  <!-- ========================= -->
+  <script src="src/pages/auth/auth.js"></script>
+  <script src="src/pages/dashboard/dashboard.js"></script>
+  <script src="src/pages/users/users.js"></script>
+  <script src="src/pages/jobs/jobs.js"></script>
+  <script src="src/pages/applications/applications.js"></script>
+  <script src="src/pages/candidates/candidates.js"></script>
+  <script src="src/pages/interviews/interviews.js"></script>
+  <script src="src/pages/reports/reports.js"></script>
+  <script src="src/pages/audit/audit.js"></script>
+  <script src="src/pages/profile/profile.js"></script>
+
+  <!-- ========================= -->
+  <!-- MAIN APP ENTRY -->
+  <!-- ========================= -->
+  <script src="main.js"></script>
+
+</body>
+</html>

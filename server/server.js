@@ -33,7 +33,9 @@ app.use(cors({
 }));
 
 // Static Folders
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+const uploadPath = isVercel ? '/tmp/uploads' : path.join(__dirname, 'uploads');
+app.use('/uploads', express.static(uploadPath));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
