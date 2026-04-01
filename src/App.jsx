@@ -15,49 +15,35 @@ import Profile from "./pages/Profile";
 import Landing from "./pages/Landing";
 
 function App() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return null; // Or a global loading spinner
+  }
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-      
-      {/* Public Landing Page */}
+      {/* 1. Public Routes */}
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/landing" element={<Landing />} />
-      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
-      
-      {/* Protected Routes Wrapper */}
-      <Route path="/dashboard" element={<AppLayout />}>
-        <Route index element={<Dashboard />} />
-      </Route>
-      
-      <Route path="/apps" element={<AppLayout />}>
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="candidates" element={<Candidates />} />
-        <Route path="applications" element={<Applications />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="company" element={<Company />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="interviews" element={<Interviews />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="audit" element={<Audit />} />
-      </Route>
 
-      {/* Legacy/Utility mapping for existing link structure if needed */}
+      {/* 2. Protected Routes (Wrap all internal pages in AppLayout) */}
       <Route element={<AppLayout />}>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="jobs" element={<Jobs />} />
-        <Route path="candidates" element={<Candidates />} />
-        <Route path="applications" element={<Applications />} />
-        <Route path="notifications" element={<Notifications />} />
-        <Route path="company" element={<Company />} />
-        <Route path="profile" element={<Profile />} />
-        <Route path="interviews" element={<Interviews />} />
-        <Route path="reports" element={<Reports />} />
-        <Route path="audit" element={<Audit />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/candidates" element={<Candidates />} />
+        <Route path="/applications" element={<Applications />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/company" element={<Company />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/interviews" element={<Interviews />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/audit" element={<Audit />} />
       </Route>
       
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} />} />
+      {/* 3. Fallback */}
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
     </Routes>
   );
 }
