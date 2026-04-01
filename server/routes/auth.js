@@ -10,8 +10,10 @@ const {
   approveRecruiter,
   updateProfile,
   bulkUserStatus,
-  bulkUserDelete
+  bulkUserDelete,
+  getUserById
 } = require('../controllers/authController');
+
 const { protect, authorize } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -28,7 +30,9 @@ router.route('/profile')
 router.get('/users', protect, authorize('admin', 'recruiter'), getAllUsers);
 router.put('/users/bulk/status', protect, authorize('admin'), bulkUserStatus);
 router.delete('/users/bulk/delete', protect, authorize('admin'), bulkUserDelete);
+router.get('/users/:id', protect, getUserById);
 router.put('/users/:id/status', protect, authorize('admin'), toggleUserStatus);
+
 router.get('/pending-recruiters', protect, authorize('admin'), getPendingRecruiters);
 router.put('/approve-recruiter/:id', protect, authorize('admin'), approveRecruiter);
 
