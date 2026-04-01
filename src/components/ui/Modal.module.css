@@ -12,6 +12,7 @@
   align-items: flex-start;
   justify-content: center;
   padding: 4rem 1.5rem;
+  overflow-y: auto;
 }
 
 .modal {

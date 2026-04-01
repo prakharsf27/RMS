@@ -17,8 +17,10 @@ import {
   Sun,
   Moon,
   X,
-  Menu
+  Menu,
+  MessageSquare
 } from "lucide-react";
+
 import styles from "./Sidebar.module.css";
 
 export const Sidebar = ({ isOpen, onClose }) => {
@@ -46,11 +48,12 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
     { to: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
     { to: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/notifications", icon: Mail, label: "Messages", roles: ["admin", "recruiter", "candidate"] },
+    { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"] },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
-    { to: "/profile", icon: User, label: "Profile", roles: ["admin", "recruiter", "candidate"] }
+    { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
   ];
+
 
   const allowedLinks = navLinks.filter(link => link.roles.includes(user.role));
 

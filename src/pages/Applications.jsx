@@ -72,7 +72,9 @@ export default function Applications() {
   };
 
   const headers = [
-    <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>,
+    user.role !== "candidate" && (
+      <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>
+    ),
     <div style={{ minWidth: '200px' }}>{user.role === "candidate" ? "Company" : "Candidate"}</div>, 
     <div style={{ minWidth: '150px' }}>Job Role</div>, 
     <div style={{ minWidth: '120px' }}>Applied Date</div>, 
@@ -80,6 +82,7 @@ export default function Applications() {
     <div style={{ minWidth: '100px' }}>Status</div>, 
     user.role !== "candidate" && "Actions"
   ].filter(Boolean);
+
 
   return (
     <div className="animate-fade-in">
@@ -133,14 +136,17 @@ export default function Applications() {
 
               return (
                 <tr key={app._id} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
-                  <td className={tableStyles.selectionCell}>
-                    <button 
-                        onClick={() => toggleSelect(app._id)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
-                    >
-                        {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
-                    </button>
-                  </td>
+                  {user.role !== "candidate" && (
+                    <td className={tableStyles.selectionCell}>
+                      <button 
+                          onClick={() => toggleSelect(app._id)}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
+                      >
+                          {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
+                      </button>
+                    </td>
+                  )}
+
                   <td>
                     {user.role === "candidate" ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', minWidth: '200px' }}>
@@ -212,9 +218,10 @@ export default function Applications() {
                   {user.role !== "candidate" && (
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        <Button size="sm" variant="info" onClick={() => navigate('/notifications', { state: { recipient: candidate } })}>
+                        <Button size="sm" variant="info" onClick={() => navigate('/messages', { state: { recipient: candidate } })}>
                             <Mail size={14} />
                         </Button>
+
                         {app.status === "applied" && (
                           <>
                             <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>

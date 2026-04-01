@@ -12,6 +12,8 @@ import Audit from "./pages/Audit";
 import Notifications from "./pages/Notifications";
 import Company from "./pages/Company";
 import Profile from "./pages/Profile";
+import Messages from "./pages/Messages";
+
 
 function App() {
   const { user, loading } = useAuth();
@@ -33,8 +35,10 @@ function App() {
         <Route path="/candidates" element={<Candidates />} />
         <Route path="/applications" element={<Applications />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/messages" element={<Messages />} />
         <Route path="/company" element={<Company />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={user?.role === 'candidate' ? <Profile /> : <Navigate to="/dashboard" replace />} />
+
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/audit" element={<Audit />} />

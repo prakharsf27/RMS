@@ -55,6 +55,8 @@ const analyticsRoutes = require('./routes/analytics');
 const auditRoutes = require('./routes/audit');
 const companiesRoutes = require('./routes/companies');
 const notificationRoutes = require('./routes/notifications');
+const messageRoutes = require('./routes/messages');
+
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -65,6 +67,8 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/companies', companiesRoutes);
+app.use('/api/messages', messageRoutes);
+
 
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 5000;

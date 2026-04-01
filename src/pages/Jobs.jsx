@@ -44,9 +44,11 @@ export default function Jobs() {
           location: filters.location,
           type: filters.type,
           page,
-          limit: 10
+          limit: 10,
+          myJobs: user.role === 'recruiter' ? 'true' : 'false'
         }
       });
+
       setJobs(data.jobs);
       setTotalPages(data.pages);
       setTotalResults(data.total);

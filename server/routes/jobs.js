@@ -9,7 +9,7 @@ const {
 } = require('../controllers/jobController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.get('/', getJobs);
+router.get('/', protect, getJobs);
 router.post('/', protect, authorize('recruiter', 'admin'), createJob);
 router.put('/:id', protect, authorize('recruiter', 'admin'), updateJob);
 router.delete('/:id', protect, authorize('recruiter', 'admin'), deleteJob);

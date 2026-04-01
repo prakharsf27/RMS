@@ -206,9 +206,10 @@ export default function Dashboard() {
       <div className={styles.dashboardGrid}>
         <div className={styles.recentSection}>
           <div className={styles.sectionHeader}>
-            <h3>{user.role === "candidate" ? "Recommended for You" : "Recent Job Postings"}</h3>
+            <h3>Recommended for You</h3>
             <button className={styles.viewAll} onClick={() => navigate('/jobs')}>View All Opportunities</button>
           </div>
+
 
           <div className={styles.jobList}>
             {user.role === 'candidate' ? (

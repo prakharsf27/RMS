@@ -17,6 +17,11 @@ exports.getJobs = async (req, res) => {
 
     const query = {};
 
+    // Filter by recruiter if 'myJobs' is specified or as default for recruiters on certain pages
+    if (req.query.myJobs === 'true' && req.user && req.user.role === 'recruiter') {
+      query.recruiterId = req.user._id;
+    }
+
     // Search by title or department
     if (search) {
       query.$or = [
