@@ -149,7 +149,12 @@ export default function Jobs() {
       <div className={styles.header}>
         <div>
           <h1 className="text-gradient">Job Postings</h1>
-          <p>Explore all open opportunities across our global engineering locations.</p>
+          <p>
+            {user.role === "candidate" 
+              ? "Explore all open opportunities across our global engineering locations." 
+              : "Create, publish, and manage job postings across your organization."}
+          </p>
+
         </div>
         {user.role !== "candidate" && (
           <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
