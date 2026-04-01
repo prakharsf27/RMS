@@ -71,7 +71,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
         >
            <Menu size={18} className={isCollapsed ? styles.rotated : ""} />
         </button>
-        {/* <div className={styles.logoIcon}>T</div> */}
+        <div className={styles.logoIcon}>T</div>
         <span className={styles.logoText}>TalentFlow</span>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
           <X size={20} />

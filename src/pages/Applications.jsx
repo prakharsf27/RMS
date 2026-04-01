@@ -73,13 +73,13 @@ export default function Applications() {
 
   const headers = [
     <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>,
-    <div style={{ minWidth: '200px' }}>Candidate</div>, 
+    <div style={{ minWidth: '200px' }}>{user.role === "candidate" ? "Company" : "Candidate"}</div>, 
     <div style={{ minWidth: '150px' }}>Job Role</div>, 
     <div style={{ minWidth: '120px' }}>Applied Date</div>, 
     <div style={{ minWidth: '100px' }}>Match Score</div>,
     <div style={{ minWidth: '100px' }}>Status</div>, 
-    "Actions"
-  ];
+    user.role !== "candidate" && "Actions"
+  ].filter(Boolean);
 
   return (
     <div className="animate-fade-in">
@@ -142,13 +142,41 @@ export default function Applications() {
                     </button>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '200px' }}>
-                      <img src={candidate.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
-                      <div>
-                        <div style={{ fontWeight: 600 }}>{candidate.fname} {candidate.lname}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{candidate.email}</div>
+                    {user.role === "candidate" ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', minWidth: '200px' }}>
+                         <div style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '8px', 
+                            background: 'var(--bg-elevated-hover)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                        }}>
+                            {job.company?.logo ? (
+                                <img src={job.company.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
+                            ) : (
+                                <span style={{ fontWeight: 800, fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
+                                  {job.company?.name?.[0] || 'C'}
+                                </span>
+                            )}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{job.company?.name || "TalentFlow Partner"}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || "Technology"}</div>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '200px' }}>
+                        <img src={candidate.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{candidate.fname} {candidate.lname}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{candidate.email}</div>
+                        </div>
+                      </div>
+                    )}
                   </td>
                   <td>
                     <div style={{ fontWeight: 600, minWidth: '150px' }}>{job.title}</div>
@@ -181,30 +209,30 @@ export default function Applications() {
                       {app.status}
                     </Badge>
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      {user.role !== "candidate" && (
-                         <Button size="sm" variant="info" onClick={() => navigate('/notifications', { state: { recipient: candidate } })}>
+                  {user.role !== "candidate" && (
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <Button size="sm" variant="info" onClick={() => navigate('/notifications', { state: { recipient: candidate } })}>
                             <Mail size={14} />
-                         </Button>
-                      )}
-                      {user.role !== "candidate" && app.status === "applied" && (
-                        <>
-                          <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
-                            <CheckCircle2 size={16} /> Hire
-                          </Button>
-                          <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(app._id, "rejected")}>
-                            <XCircle size={16} /> Reject
-                          </Button>
-                        </>
-                      )}
-                      {user.role === 'admin' && (
-                        <Button size="sm" variant="ghost" onClick={() => handleBulkDelete()} style={{ color: 'var(--danger)' }}>
-                          <Trash2 size={16} />
                         </Button>
-                      )}
-                    </div>
-                  </td>
+                        {app.status === "applied" && (
+                          <>
+                            <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
+                              <CheckCircle2 size={16} /> Hire
+                            </Button>
+                            <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(app._id, "rejected")}>
+                              <XCircle size={16} /> Reject
+                            </Button>
+                          </>
+                        )}
+                        {user.role === 'admin' && (
+                          <Button size="sm" variant="ghost" onClick={() => handleBulkDelete()} style={{ color: 'var(--danger)' }}>
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               );
             }} 
