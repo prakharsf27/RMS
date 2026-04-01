@@ -27,8 +27,8 @@
 .logoIcon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--primary), var(--info));
-  color: white;
+  background-color: #000000;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -36,17 +36,29 @@
   font-weight: 800;
   font-family: 'Outfit', sans-serif;
   flex-shrink: 0;
+  transition: all 0.3s ease;
 }
+
+:global(.dark) .logoIcon {
+  background-color: #ffffff;
+  color: #000000;
+}
+
 
 .logoText {
   font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #000000;
   letter-spacing: -0.04em;
   flex: 1;
-  transition: opacity 0.2s, width 0.2s;
+  transition: opacity 0.2s, width 0.2s, color 0.3s;
 }
+
+:global(.dark) .logoText {
+  color: #ffffff;
+}
+
 
 .collapsed .logoText {
     opacity: 0;
@@ -57,7 +69,7 @@
 .collapseToggle {
     background: var(--bg-elevated-hover);
     border: 1px solid var(--border-color);
-    color: var(--text-tertiary);
+    color: #000000;
     width: 28px;
     height: 28px;
     border-radius: 6px;
@@ -67,6 +79,11 @@
     cursor: pointer;
     transition: all 0.2s;
 }
+
+:global(.dark) .collapseToggle {
+    color: #ffffff;
+}
+
 
 .collapseToggle:hover {
     color: var(--primary);
@@ -83,13 +100,18 @@
   display: none;
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: #000000;
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 8px;
   transition: all 0.2s;
   margin-left: auto;
 }
+
+:global(.dark) .closeBtn {
+  color: #ffffff;
+}
+
 
 .closeBtn:hover {
   background-color: var(--bg-elevated-hover);
