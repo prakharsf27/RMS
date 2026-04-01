@@ -12,6 +12,7 @@ import Audit from "./pages/Audit";
 import Notifications from "./pages/Notifications";
 import Company from "./pages/Company";
 import Profile from "./pages/Profile";
+import Landing from "./pages/Landing";
 
 function App() {
   const { user } = useAuth();
@@ -20,9 +21,29 @@ function App() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       
+      {/* Public Landing Page */}
+      <Route path="/landing" element={<Landing />} />
+      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
+      
       {/* Protected Routes Wrapper */}
-      <Route path="/" element={<AppLayout />}>
-        <Route index element={<Navigate to="/dashboard" />} />
+      <Route path="/dashboard" element={<AppLayout />}>
+        <Route index element={<Dashboard />} />
+      </Route>
+      
+      <Route path="/apps" element={<AppLayout />}>
+        <Route path="jobs" element={<Jobs />} />
+        <Route path="candidates" element={<Candidates />} />
+        <Route path="applications" element={<Applications />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="company" element={<Company />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="interviews" element={<Interviews />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="audit" element={<Audit />} />
+      </Route>
+
+      {/* Legacy/Utility mapping for existing link structure if needed */}
+      <Route element={<AppLayout />}>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="jobs" element={<Jobs />} />
         <Route path="candidates" element={<Candidates />} />
@@ -36,7 +57,7 @@ function App() {
       </Route>
       
       {/* Fallback */}
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} />} />
     </Routes>
   );
 }

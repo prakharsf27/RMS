@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Dynamic Light Theme - Indigo/Slate Palette */
@@ -225,4 +229,61 @@ button {
 
 .animate-count {
   animation: countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Landing Page Theme ──────────────────────── */
+.landing-theme {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 96%;
+  --card: 222 40% 10%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 40% 10%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 187 80% 52%;
+  --primary-foreground: 222 47% 6%;
+  --secondary: 222 30% 16%;
+  --secondary-foreground: 210 40% 90%;
+  --muted: 222 30% 14%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 260 60% 58%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 222 20% 18%;
+  --input: 222 20% 18%;
+  --ring: 187 80% 52%;
+  --radius: 0.75rem;
+
+  /* Custom tokens */
+  --glow-primary: 187 80% 52%;
+  --glow-accent: 260 60% 58%;
+  --surface-glass: 222 40% 12%;
+  
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  min-height: 100vh;
+}
+
+.landing-theme .glass-card {
+  background-color: hsla(var(--card), 0.4);
+  backdrop-filter: blur(24px);
+  border: 1px solid hsla(var(--border), 0.5);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px hsla(var(--glow-primary), 0.05),
+              inset 0 1px 0 hsla(var(--foreground), 0.05);
+}
+
+.landing-theme .gradient-text {
+  background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-theme .section-container {
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
