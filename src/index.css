@@ -205,7 +205,9 @@ button {
 }
 
 .glass-card-hover {
-  @apply glass-card transition-all duration-500 hover:border-primary/30;
+  @apply bg-card/40 backdrop-blur-xl border border-border/50 rounded-2xl transition-all duration-500 hover:border-primary/30;
+  box-shadow: 0 8px 32px hsl(var(--glow-primary, 187 80% 52%) / 0.05),
+              inset 0 1px 0 hsl(var(--foreground, 210 40% 96%) / 0.05);
 }
 .glass-card-hover:hover {
   box-shadow: 0 12px 40px hsl(var(--glow-primary, 187 80% 52%) / 0.12),
