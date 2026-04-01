@@ -12,7 +12,6 @@ import Audit from "./pages/Audit";
 import Notifications from "./pages/Notifications";
 import Company from "./pages/Company";
 import Profile from "./pages/Profile";
-import Landing from "./pages/Landing";
 
 function App() {
   const { user, loading } = useAuth();
@@ -24,9 +23,8 @@ function App() {
   return (
     <Routes>
       {/* 1. Public Routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/landing" element={<Landing />} />
+      <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
 
       {/* 2. Protected Routes (Wrap all internal pages in AppLayout) */}
       <Route element={<AppLayout />}>
@@ -43,7 +41,7 @@ function App() {
       </Route>
       
       {/* 3. Fallback */}
-      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );
 }
