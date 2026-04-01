@@ -173,7 +173,35 @@
 }
 
 .verified { background-color: var(--success-light); color: var(--success); }
-.unverified { background-color: var(--danger-light); color: var(--danger); cursor: pointer; }
+.unverified { 
+    background-color: var(--danger-light); 
+    color: var(--danger); 
+    cursor: pointer; 
+    transition: all 0.2s;
+}
+.unverified:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.otpContainer {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.otpInput {
+    flex: 1;
+    letter-spacing: 0.5em;
+    text-align: center;
+    font-weight: 700;
+}
 
 .sectionHeader {
     display: flex;
@@ -302,6 +330,100 @@
 .expContent span {
     font-size: 0.75rem;
     color: var(--text-tertiary);
+}
+
+.skillsSection {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.skillTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.skillTag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background-color: var(--bg-elevated-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.813rem;
+    font-weight: 600;
+}
+
+.suggestionHeader {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-bottom: 0.5rem;
+}
+
+.suggestionTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.suggestionTag {
+    padding: 0.35rem 0.75rem;
+    background-color: transparent;
+    border: 1px dashed var(--primary);
+    color: var(--primary);
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.suggestionTag:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.atsScore {
+    margin-top: -0.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--success-rgb), 0.1));
+    border-radius: 12px;
+    border: 1px solid var(--primary-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.2); }
+    70% { box-shadow: 0 0 0 10px rgba(var(--primary-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0); }
+}
+
+.dobWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.dobInput {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem !important;
+    font-size: 1rem !important;
+    height: 3.5rem !important;
+}
+
+.dobIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
 }
 
 .bioGroup {

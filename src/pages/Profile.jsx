@@ -1,11 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { User, Mail, Shield, Camera, Save, LogOut, CheckCircle, AlertCircle, FilePlus, Phone, Calendar, Briefcase, GraduationCap } from "lucide-react";
+import { User, Mail, Shield, Camera, Save, LogOut, CheckCircle, AlertCircle, FilePlus, Phone, Calendar, Briefcase, X, Plus, Zap, Search } from "lucide-react";
 import styles from "./Profile.module.css";
 import { cn } from "../lib/utils";
 
@@ -32,6 +32,17 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // New states for OTP, Skills, and ATS
+  const [otpFlow, setOtpFlow] = useState({
+    email: { sent: false, code: "", loading: false },
+    phone: { sent: false, code: "", loading: false }
+  });
+  const [skills, setSkills] = useState(user?.skills || ["React", "JavaScript", "CSS3", "Git"]);
+  const [atsScore, setAtsScore] = useState(user?.atsScore || 0);
+  const [isScanning, setIsScanning] = useState(false);
+  
+  const skillSuggestions = ["TypeScript", "Node.js", "Python", "Docker", "AWS", "SQL", "MongoDB", "Redux", "GraphQL"];
+
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,16 +57,66 @@ export default function Profile() {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
       setResumeFile(file);
+      simulateScan();
     } else {
       alert("Please select a PDF file.");
     }
+  };
+
+  const simulateScan = () => {
+    setIsScanning(true);
+    // Mimic deep scanning process
+    setTimeout(() => {
+      const randomScore = Math.floor(Math.random() * (98 - 75 + 1)) + 75;
+      setAtsScore(randomScore);
+      setIsScanning(false);
+      alert(`Resume analysis complete! ATS Score: ${randomScore}/100. Based on our analysis, we recommend highlighting your project achievements more clearly.`);
+    }, 2500);
+  };
+
+  const handleSendOTP = async (type) => {
+    setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], loading: true } }));
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], sent: true, loading: false } }));
+      alert(`A 6-digit verification code has been sent to your ${type === 'email' ? 'email address' : 'mobile number'}. (Simulated code: 123456)`);
+    } catch (err) {
+      alert("Failed to send OTP.");
+      setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], loading: false } }));
+    }
+  };
+
+  const handleVerifyOTP = async (type) => {
+    if (otpFlow[type].code !== "123456") return alert("Invalid verification code. Please try again.");
+    
+    setIsLoading(true);
+    try {
+      // Simulate verification update
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} verified successfully!`);
+      window.location.reload(); // Refresh to show verified state
+    } catch (err) {
+      alert("Verification failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addSkill = (skill) => {
+    if (!skills.includes(skill)) {
+      setSkills([...skills, skill]);
+    }
+  };
+
+  const removeSkill = (skill) => {
+    setSkills(skills.filter(s => s !== skill));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Use FormData for file uploads
     const data = new FormData();
     Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
@@ -63,6 +124,8 @@ export default function Profile() {
     
     if (newAvatarFile) data.append('avatar', newAvatarFile);
     if (resumeFile) data.append('resume', resumeFile);
+    data.append('skills', JSON.stringify(skills));
+    data.append('atsScore', atsScore);
 
     try {
       await api.put("/auth/profile", data, {
@@ -124,7 +187,20 @@ export default function Profile() {
                 <span>Identity Score</span>
                 <strong style={{ color: 'var(--primary)' }}>92/100</strong>
              </div>
+             {atsScore > 0 && (
+                <div className={styles.statLine}>
+                    <span>ATS Resume Score</span>
+                    <strong style={{ color: 'var(--success)' }}>{atsScore}/100</strong>
+                </div>
+             )}
           </Card>
+
+          {isScanning && (
+            <div className={cn(styles.atsScore, "animate-fade-in")}>
+               <LoadingSpinner label="Decoding Resume Structure..." />
+               <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', color: 'var(--primary)' }}>Calculating semantic match...</p>
+            </div>
+          )}
 
           <Button variant="secondary" icon={LogOut} onClick={logout} style={{ width: '100%', marginTop: '0.5rem', color: 'var(--danger)' }}>
             Sign Out
@@ -164,9 +240,23 @@ export default function Profile() {
                         value={formData.email} 
                         disabled={true}
                     />
-                    <div className={cn(styles.verifyBadge, user?.isEmailVerified ? styles.verified : styles.unverified)}>
-                        {user?.isEmailVerified ? <><CheckCircle size={10} /> Verified</> : <><AlertCircle size={10} /> Verify</>}
+                    <div 
+                      className={cn(styles.verifyBadge, user?.isEmailVerified ? styles.verified : styles.unverified)}
+                      onClick={() => !user?.isEmailVerified && !otpFlow.email.sent && handleSendOTP('email')}
+                    >
+                        {user?.isEmailVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.email.sent ? "Verifying..." : "Verify"}
                     </div>
+                    {otpFlow.email.sent && (
+                      <div className={styles.otpContainer}>
+                        <Input 
+                          placeholder="Code" 
+                          className={styles.otpInput} 
+                          value={otpFlow.email.code}
+                          onChange={(e) => setOtpFlow({...otpFlow, email: {...otpFlow.email, code: e.target.value}})}
+                        />
+                        <Button size="sm" onClick={() => handleVerifyOTP('email')}>Submit</Button>
+                      </div>
+                    )}
                 </div>
                 <div className={styles.inputWithBadge}>
                     <Input 
@@ -177,21 +267,40 @@ export default function Profile() {
                         placeholder="+91 00000 00000"
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
-                    <div className={cn(styles.verifyBadge, user?.isPhoneVerified ? styles.verified : styles.unverified)}>
-                        {user?.isPhoneVerified ? <><CheckCircle size={10} /> Verified</> : <><AlertCircle size={10} /> Verify</>}
+                    <div 
+                      className={cn(styles.verifyBadge, user?.isPhoneVerified ? styles.verified : styles.unverified)}
+                      onClick={() => !user?.isPhoneVerified && !otpFlow.phone.sent && handleSendOTP('phone')}
+                    >
+                        {user?.isPhoneVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.phone.sent ? "Verifying..." : "Verify"}
                     </div>
+                    {otpFlow.phone.sent && (
+                      <div className={styles.otpContainer}>
+                        <Input 
+                          placeholder="Code" 
+                          className={styles.otpInput} 
+                          value={otpFlow.phone.code}
+                          onChange={(e) => setOtpFlow({...otpFlow, phone: {...otpFlow.phone, code: e.target.value}})}
+                        />
+                        <Button size="sm" onClick={() => handleVerifyOTP('phone')}>Submit</Button>
+                      </div>
+                    )}
                 </div>
                </div>
 
                <div className={styles.grid}>
-                  <Input 
-                    label="Date of Birth" 
-                    type="date"
-                    icon={Calendar} 
-                    value={formData.dob} 
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                  />
+                  <div className={styles.bioGroup}>
+                      <label>Date of Birth</label>
+                      <div className={styles.dobWrapper}>
+                        <input 
+                            type="date"
+                            className={cn(styles.textarea, styles.dobInput)}
+                            value={formData.dob} 
+                            disabled={!isEditing}
+                            onChange={(e) => setFormData({...formData, dob: e.target.value})}
+                        />
+                        <Calendar size={18} className={styles.dobIcon} />
+                      </div>
+                  </div>
                   <Input 
                     label="Portfolio / Web URL" 
                     icon={Shield} 
@@ -211,19 +320,54 @@ export default function Profile() {
                   />
                </div>
 
+               <div className={styles.skillsSection}>
+                  <div className={styles.sectionHeader}>
+                    <h3>Skills & Expertise</h3>
+                    <p>Highlight your technical toolkit and domain expertise.</p>
+                  </div>
+                  <div className={styles.skillTags}>
+                    {skills.map(skill => (
+                      <div key={skill} className={styles.skillTag}>
+                        {skill}
+                        {isEditing && <X size={14} style={{ cursor: 'pointer' }} onClick={() => removeSkill(skill)} />}
+                      </div>
+                    ))}
+                    {isEditing && (
+                      <div className={styles.skillTag} style={{ borderStyle: 'dashed', cursor: 'pointer' }}>
+                        <Plus size={14} /> Add Skill
+                      </div>
+                    )}
+                  </div>
+                  {isEditing && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <div className={styles.suggestionHeader}>Recommended for you</div>
+                      <div className={styles.suggestionTags}>
+                        {skillSuggestions.map(s => (
+                          <div key={s} className={styles.suggestionTag} onClick={() => addSkill(s)}>
+                             + {s}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+               </div>
+
                <div className={styles.sectionHeader} style={{ marginTop: '1rem' }}>
                   <h3>Talent Assets & Experience</h3>
                   <p>Provide your resume and detail your professional background.</p>
                </div>
 
                <div className={styles.grid}>
-                  <div className={styles.uploadZone} onClick={() => isEditing && resumeInputRef.current.click()}>
+                  <div 
+                    className={cn(styles.uploadZone, isScanning && styles.uploadZoneActive)} 
+                    onClick={() => isEditing && !isScanning && resumeInputRef.current.click()}
+                  >
                      <div className={styles.uploadIcon}>
-                        {resumeFile || user?.resume ? <CheckCircle size={24} className="text-success" /> : <FilePlus size={24} />}
+                        {isScanning ? <Zap size={24} className="text-primary animate-pulse" /> : (resumeFile || user?.resume ? <CheckCircle size={24} className="text-success" /> : <FilePlus size={24} />)}
                      </div>
                      <div>
-                        <strong>{resumeFile ? resumeFile.name : user?.resume ? "Resume_Updated.pdf" : "Upload PDF Resume"}</strong>
-                        <p>Format: PDF only (Max 5MB)</p>
+                        <strong>{isScanning ? "Scanning Profile..." : resumeFile ? resumeFile.name : user?.resume ? "Resume_Updated.pdf" : "Upload PDF Resume"}</strong>
+                        <p>{isScanning ? "Extracting ATS data points..." : "Format: PDF only (Max 5MB)"}</p>
                      </div>
                      <input type="file" ref={resumeInputRef} hidden accept=".pdf" onChange={handleResumeSelect} />
                   </div>
@@ -237,8 +381,8 @@ export default function Profile() {
                         >
                            <div className={styles.radioCircle} />
                            <div className={styles.expContent}>
-                              <strong>Fresher</strong>
-                              <span>Student/Junior</span>
+                               <strong>Fresher</strong>
+                               <span>Student/Junior</span>
                            </div>
                         </div>
                         <div 
@@ -247,8 +391,8 @@ export default function Profile() {
                         >
                            <div className={styles.radioCircle} />
                            <div className={styles.expContent}>
-                              <strong>Experienced</strong>
-                              <span>Professional</span>
+                               <strong>Experienced</strong>
+                               <span>Professional</span>
                            </div>
                         </div>
                      </div>
@@ -272,7 +416,7 @@ export default function Profile() {
                {isEditing && (
                   <div className={styles.footerActions}>
                      <Button type="button" variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
-                     <Button type="submit" disabled={isLoading}>
+                     <Button type="submit" disabled={isLoading || isScanning}>
                         {isLoading ? "Synchronizing..." : <><Save size={18} /> Update Professional Identity</>}
                      </Button>
                   </div>
