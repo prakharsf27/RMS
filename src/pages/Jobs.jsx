@@ -22,6 +22,7 @@ export default function Jobs() {
     location: "all",
     type: "all"
   });
+  const [appliedJobIds, setAppliedJobIds] = useState(new Set());
   
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -49,6 +50,13 @@ export default function Jobs() {
       setJobs(data.jobs);
       setTotalPages(data.pages);
       setTotalResults(data.total);
+
+      // Fetch user's applied status if candidate
+      if (user.role === 'candidate') {
+        const appsRes = await api.get('/applications');
+        const appliedIds = new Set(appsRes.data.map(app => app.jobId?._id).filter(Boolean));
+        setAppliedJobIds(appliedIds);
+      }
     } catch (err) {
       console.error("Fetch jobs error:", err);
     } finally {
@@ -220,9 +228,19 @@ export default function Jobs() {
                 <td>{format(new Date(job.createdAt), "MMM d, yyyy")}</td>
                 <td style={{ textAlign: 'right' }}>
                   {user.role === "candidate" ? (
-                    <Button size="sm" onClick={() => openApply(job)} disabled={job.status !== "active"}>
-                        {job.status === "active" ? "Apply Now" : "Closed"}
-                    </Button>
+                    (() => {
+                      const hasApplied = appliedJobIds.has(job._id);
+                      return (
+                        <Button 
+                          size="sm" 
+                          onClick={() => !hasApplied && openApply(job)} 
+                          disabled={job.status !== "active" || hasApplied}
+                          variant={hasApplied ? "secondary" : "primary"}
+                        >
+                          {hasApplied ? "Applied" : job.status === "active" ? "Apply Now" : "Closed"}
+                        </Button>
+                      );
+                    })()
                   ) : (
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                       <Button variant="secondary" size="sm" onClick={() => openEdit(job)}>Edit</Button>

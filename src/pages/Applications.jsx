@@ -72,12 +72,12 @@ export default function Applications() {
   };
 
   const headers = [
-    <Square size={16} />,
-    "Candidate", 
-    "Job Role", 
-    "Applied Date", 
-    "Match Score",
-    "Status", 
+    <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>,
+    <div style={{ minWidth: '200px' }}>Candidate</div>, 
+    <div style={{ minWidth: '150px' }}>Job Role</div>, 
+    <div style={{ minWidth: '120px' }}>Applied Date</div>, 
+    <div style={{ minWidth: '100px' }}>Match Score</div>,
+    <div style={{ minWidth: '100px' }}>Status</div>, 
     "Actions"
   ];
 
