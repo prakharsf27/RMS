@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import api from "../lib/api";
 import { Card } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
@@ -10,23 +12,74 @@ import styles from "./Profile.module.css";
 import { cn } from "../lib/utils";
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user: authUser, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const viewingUserId = location.state?.userId;
+  const [viewedUser, setViewedUser] = useState(null);
+  const [isViewingOthers, setIsViewingOthers] = useState(!!viewingUserId);
+
+  useEffect(() => {
+    if (viewingUserId) {
+        const fetchViewedUser = async () => {
+            setIsLoading(true);
+            try {
+                const { data } = await api.get(`/auth/users/${viewingUserId}`);
+                setViewedUser(data);
+                setIsViewingOthers(true);
+            } catch (err) {
+                console.error("Fetch viewed user error:", err);
+                setIsViewingOthers(false);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchViewedUser();
+    } else {
+        setViewedUser(authUser);
+        setIsViewingOthers(false);
+    }
+  }, [viewingUserId, authUser]);
+
+  const user = viewedUser || authUser;
+
   const avatarInputRef = useRef(null);
+
   const resumeInputRef = useRef(null);
   
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fname: user.fname || "",
+        lname: user.lname || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : "",
+        phone: user.phone || "",
+        experienceLevel: user.experienceLevel || "fresher",
+        yearsOfExperience: user.yearsOfExperience || 0,
+        password: ""
+      });
+      setAvatarPreview(user.avatar);
+      setSkills(user.skills || []);
+      setAtsScore(user.atsScore || 0);
+    }
+  }, [user]);
+
   const [formData, setFormData] = useState({
-    fname: user?.fname || "",
-    lname: user?.lname || "",
-    email: user?.email || "",
-    bio: user?.bio || "",
-    dob: user?.dob ? new Date(user.dob).toISOString().split('T')[0] : "",
-    phone: user?.phone || "",
-    experienceLevel: user?.experienceLevel || "fresher",
-    yearsOfExperience: user?.yearsOfExperience || 0,
+    fname: "",
+    lname: "",
+    email: "",
+    bio: "",
+    dob: "",
+    phone: "",
+    experienceLevel: "fresher",
+    yearsOfExperience: 0,
     password: ""
   });
-  
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatar);
+
+  const [avatarPreview, setAvatarPreview] = useState(null);
+
   const [resumeFile, setResumeFile] = useState(null);
   const [newAvatarFile, setNewAvatarFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -202,19 +255,33 @@ export default function Profile() {
             </div>
           )}
 
-          <Button variant="secondary" icon={LogOut} onClick={logout} style={{ width: '100%', marginTop: '0.5rem', color: 'var(--danger)' }}>
-            Sign Out
-          </Button>
+          {!isViewingOthers && (
+            <Button variant="secondary" icon={LogOut} onClick={logout} style={{ width: '100%', marginTop: '0.5rem', color: 'var(--danger)' }}>
+              Sign Out
+            </Button>
+          )}
+          {isViewingOthers && (
+             <Button variant="secondary" onClick={() => navigate(-1)} style={{ width: '100%', marginTop: '0.5rem' }}>
+                Back to Directory
+             </Button>
+          )}
         </aside>
+
 
         <main className={styles.main}>
           <Card premium>
             <div className={styles.formHeader}>
-               <h2>General Information</h2>
-               {!isEditing && (
+               <h2>{isViewingOthers ? `${user?.fname}'s Identity` : 'General Information'}</h2>
+               {!isEditing && !isViewingOthers && (
                  <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>Edit Details</Button>
                )}
+               {isViewingOthers && user?.resume && (
+                  <Button size="sm" variant="success" onClick={() => window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.resume}`, '_blank')}>
+                     Download Resume
+                  </Button>
+               )}
             </div>
+
 
             <form onSubmit={handleSubmit} className={styles.form}>
                <div className={styles.grid}>

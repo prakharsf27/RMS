@@ -37,7 +37,8 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/company" element={<Company />} />
-        <Route path="/profile" element={user?.role === 'candidate' ? <Profile /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/profile" element={<Profile />} />
+
 
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/reports" element={<Reports />} />
