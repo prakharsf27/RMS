@@ -21,7 +21,9 @@ export default function Interviews() {
   const [applications, setApplications] = useState([]);
   
   const [formData, setFormData] = useState({
+    applicationId: "",
     candidateId: "",
+    candidateName: "",
     jobTitle: "",
     date: "",
     time: "",
@@ -29,6 +31,7 @@ export default function Interviews() {
     location: "", // link or address
     notes: ""
   });
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -169,11 +172,14 @@ export default function Interviews() {
                     if (app) {
                         setFormData({
                             ...formData,
+                            applicationId: app._id,
                             candidateId: app.candidateId._id,
+                            candidateName: `${app.candidateId.fname} ${app.candidateId.lname}`,
                             jobTitle: app.jobId.title
                         });
                     }
                 }}
+
                 required
               >
                 <option value="">Choose a candidate application...</option>

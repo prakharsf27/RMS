@@ -44,6 +44,8 @@ const UserSchema = new mongoose.Schema({
     enum: ['active', 'suspended'], 
     default: 'active' 
   },
+  isEngaged: { type: Boolean, default: false },
+
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 }, { timestamps: true });

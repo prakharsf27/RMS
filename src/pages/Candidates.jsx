@@ -80,11 +80,21 @@ export default function Candidates() {
     }
   };
 
-  const toggleSelect = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+  const toggleSelect = async (id) => {
+    try {
+      await api.put(`/auth/users/${id}/engaged`);
+      setCandidates(prev => prev.map(c => 
+        c._id === id ? { ...c, isEngaged: !c.isEngaged } : c
+      ));
+      // For admins, still keep bulk selection sync
+      if (user.role === 'admin') {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+      }
+    } catch (err) {
+      console.error("Toggle engaged error:", err);
+    }
   };
+
 
   const candidateHeaders = [
     "Engaged",
@@ -175,8 +185,7 @@ export default function Candidates() {
                 headers={candidateHeaders} 
                 data={candidates} 
                 renderRow={(candidate, i) => {
-                  const isBlocked = candidate.status === 'suspended';
-                  const isSelected = selectedIds.includes(candidate._id);
+                  const isSelected = user.role === 'admin' ? selectedIds.includes(candidate._id) : candidate.isEngaged;
                   // Mock match score for directory if not present
                   const mockScore = candidate.matchScore || (80 + (i % 15));
                   
@@ -190,6 +199,7 @@ export default function Candidates() {
                             {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
                         </button>
                       </td>
+
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px' }}>
                           <img src={candidate.avatar} style={{ width: '40px', height: '40px', borderRadius: '12px' }} alt="" />

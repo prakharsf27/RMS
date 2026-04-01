@@ -75,6 +75,7 @@ export default function Applications() {
     user.role !== "candidate" && (
       <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>
     ),
+    user.role !== "candidate" && "Engaged",
     <div style={{ minWidth: '200px' }}>{user.role === "candidate" ? "Company" : "Candidate"}</div>, 
     user.role === "candidate" && <div style={{ minWidth: '150px' }}>Job Role</div>, 
     <div style={{ minWidth: '120px' }}>Applied Date</div>, 
@@ -146,7 +147,22 @@ export default function Applications() {
                     </td>
                   )}
 
+                  {user.role !== "candidate" && (
+                    <td>
+                      {candidate.isEngaged ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--primary)' }}>
+                          <CheckSquare size={18} />
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-tertiary)', opacity: 0.3 }}>
+                          <Square size={18} />
+                        </div>
+                      )}
+                    </td>
+                  )}
+
                   <td>
+
                     {user.role === "candidate" ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', minWidth: '200px' }}>
                          <div style={{ 

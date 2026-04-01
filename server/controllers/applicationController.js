@@ -85,8 +85,9 @@ exports.getApplications = async (req, res) => {
 
     const applications = await Application.find(query)
       .populate('jobId', 'title department location')
-      .populate('candidateId', 'fname lname email avatar bio')
+      .populate('candidateId', 'fname lname email avatar bio isEngaged')
       .sort('-createdAt');
+
 
     res.json(applications);
   } catch (error) {

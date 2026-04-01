@@ -170,7 +170,24 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// @desc    Toggle candidate's engaged status
+// @route   PUT /api/auth/users/:id/engaged
+// @access  Private (Recruiter/Admin)
+exports.toggleEngaged = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.isEngaged = !user.isEngaged;
+    await user.save();
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get current user profile
+
 
 // @route   GET /api/auth/profile
 // @access  Private
