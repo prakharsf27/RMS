@@ -9,7 +9,8 @@ import { Modal } from "../components/ui/Modal";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { Calendar, Clock, Video, MapPin, Plus, CheckCircle, XCircle, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
+import { DatePicker } from "../components/ui/DatePicker";
+import { TimePicker } from "../components/ui/TimePicker";
 import styles from "./Interviews.module.css";
 
 export default function Interviews() {
@@ -118,20 +119,59 @@ export default function Interviews() {
                   </div>
                   
                   <div className={styles.intFooter}>
-                     <div className={styles.locationBox}>
-                        <strong>{int.type === 'virtual' ? "Meeting Link:" : "Address:"}</strong>
-                        <span className={styles.locValue}>{int.location}</span>
-                     </div>
-                     {user.role !== 'candidate' && int.status === 'scheduled' && (
-                        <div className={styles.actions}>
-                           <Button size="sm" variant="success" onClick={() => handleUpdateStatus(int._id, 'completed')}>
-                             <CheckCircle size={14} /> Complete
-                           </Button>
-                           <Button size="sm" variant="ghost" className="text-danger" onClick={() => handleUpdateStatus(int._id, 'cancelled')}>
-                             <XCircle size={14} /> Cancel
-                           </Button>
-                        </div>
-                     )}
+                      <div className={styles.footerInfo}>
+                         <div className={styles.locationBox}>
+                            <strong>{int.type === 'virtual' ? "Meeting Link:" : "Address:"}</strong>
+                            {int.type === 'virtual' ? (
+                               <a href={int.location} target="_blank" rel="noopener noreferrer" className={styles.locLink}>
+                                 {int.location}
+                               </a>
+                            ) : (
+                               <span className={styles.locValue}>{int.location}</span>
+                            )}
+                         </div>
+                         <div className={styles.calendarOptions}>
+                            <span className={styles.calLabel}>Add to:</span>
+                            <a 
+                               href={`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${int.candidateId?.fname} ${int.candidateId?.lname} - ${int.jobTitle}`)}&dates=${format(new Date(`${int.date.split('T')[0]}T${int.time}`), "yyyyMMdd'T'HHmm00")}/${format(new Date(new Date(`${int.date.split('T')[0]}T${int.time}`).getTime() + 3600000), "yyyyMMdd'T'HHmm00")}&details=${encodeURIComponent(`Interview scheduled via TalentFlow.\nNotes: ${int.notes || 'N/A'}`)}&location=${encodeURIComponent(int.location)}`}
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               className={styles.calLink}
+                               title="Google Calendar"
+                            >
+                               Google
+                            </a>
+                            <a 
+                               href={`data:text/calendar;charset=utf8,${encodeURIComponent([
+                                 "BEGIN:VCALENDAR",
+                                 "VERSION:2.0",
+                                 "BEGIN:VEVENT",
+                                 `DTSTART:${format(new Date(`${int.date.split('T')[0]}T${int.time}`), "yyyyMMdd'T'HHmm00")}`,
+                                 `DTEND:${format(new Date(new Date(`${int.date.split('T')[0]}T${int.time}`).getTime() + 3600000), "yyyyMMdd'T'HHmm00")}`,
+                                 `SUMMARY:Interview: ${int.candidateId?.fname} ${int.candidateId?.lname} - ${int.jobTitle}`,
+                                 `DESCRIPTION:Interview scheduled via TalentFlow.\\nNotes: ${int.notes || 'N/A'}`,
+                                 `LOCATION:${int.location}`,
+                                 "END:VEVENT",
+                                 "END:VCALENDAR"
+                               ].join("\n"))}`}
+                               download="interview.ics"
+                               className={styles.calLink}
+                               title="Apple/Outlook Calendar"
+                            >
+                               Apple / Outlook
+                            </a>
+                         </div>
+                      </div>
+                      {user.role !== 'candidate' && int.status === 'scheduled' && (
+                         <div className={styles.actions}>
+                            <Button size="sm" variant="success" onClick={() => handleUpdateStatus(int._id, 'completed')}>
+                              <CheckCircle size={14} /> Complete
+                            </Button>
+                            <Button size="sm" variant="ghost" className="text-danger" onClick={() => handleUpdateStatus(int._id, 'cancelled')}>
+                              <XCircle size={14} /> Cancel
+                            </Button>
+                         </div>
+                      )}
                   </div>
                </Card>
              ))
@@ -192,18 +232,16 @@ export default function Interviews() {
            </div>
 
            <div className={styles.formRow}>
-              <Input 
+              <DatePicker 
                 label="Interview Date" 
-                type="date"
                 value={formData.date}
-                onChange={(e) => setFormData({...formData, date: e.target.value})}
+                onChange={(val) => setFormData({...formData, date: val})}
                 required
               />
-              <Input 
-                label="Time" 
-                type="time"
+              <TimePicker 
+                label="Meeting Time" 
                 value={formData.time}
-                onChange={(e) => setFormData({...formData, time: e.target.value})}
+                onChange={(val) => setFormData({...formData, time: val})}
                 required
               />
            </div>

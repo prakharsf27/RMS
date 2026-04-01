@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../lib/api";
 import { cn } from "../../lib/utils";
 import {
   LayoutDashboard,
@@ -26,17 +27,33 @@ import styles from "./Sidebar.module.css";
 export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("rms_theme") || "light");
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(JSON.parse(localStorage.getItem("rms_sidebar_collapsed") || "false"));
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("rms_theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("rms_sidebar_collapsed", JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      try {
+        const { data } = await api.get("/messages/conversations");
+        const total = data.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0);
+        setUnreadMessages(total);
+      } catch (err) {
+        console.error("Fetch unread messages error:", err);
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === "light" ? "dark" : "light");
@@ -48,12 +65,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
     { to: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
     { to: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"] },
+    { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
     { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
   ];
-
 
   const allowedLinks = navLinks.filter(link => link.roles.includes(user.role));
 
@@ -89,8 +105,13 @@ export const Sidebar = ({ isOpen, onClose }) => {
             onClick={handleNavClick}
             className={({ isActive }) => cn(styles.navItem, isActive && styles.active)}
           >
-            <link.icon size={20} />
-            <span>{link.label}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+              <link.icon size={20} />
+              <span className={styles.linkText}>{link.label}</span>
+            </div>
+            {link.badge > 0 && (
+              <span className={styles.navBadge}>{link.badge}</span>
+            )}
           </NavLink>
         ))}
       </nav>

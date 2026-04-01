@@ -186,6 +186,7 @@ export default function Candidates() {
                 data={candidates} 
                 renderRow={(candidate, i) => {
                   const isSelected = user.role === 'admin' ? selectedIds.includes(candidate._id) : candidate.isEngaged;
+                  const isBlocked = candidate.status === 'suspended';
                   // Mock match score for directory if not present
                   const mockScore = candidate.matchScore || (80 + (i % 15));
                   

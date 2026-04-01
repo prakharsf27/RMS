@@ -52,7 +52,16 @@ exports.applyForJob = async (req, res) => {
     job.applicantsCount += 1;
     await job.save();
 
+    // Create Notification for Recruiter
+    await Notification.create({
+      userId: job.recruiterId,
+      subject: 'New Talent Applied',
+      message: `${req.user.fname} ${req.user.lname} applied for your "${job.title}" position.`,
+      sender: 'TalentFlow Recruitment'
+    });
+
     // Send Confirmation Email
+
     sendEmail({
       email: req.user.email,
       type: 'APPLICATION_CONFIRM',

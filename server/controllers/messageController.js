@@ -1,5 +1,7 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
+
 
 // @desc    Get all unique conversations for the current user
 // @route   GET /api/messages/conversations
@@ -89,7 +91,16 @@ exports.sendMessage = async (req, res) => {
       content
     });
 
+    // Create Notification for Receiver
+    await Notification.create({
+      userId: receiverId,
+      subject: 'New Message Received',
+      message: `${req.user.fname} ${req.user.lname} sent you a new message.`,
+      sender: 'TalentFlow Messenger'
+    });
+
     res.status(201).json(message);
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
