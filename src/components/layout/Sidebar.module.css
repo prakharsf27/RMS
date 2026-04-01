@@ -74,6 +74,10 @@
     background: var(--primary-light);
 }
 
+.rotated {
+    transform: rotate(180deg);
+}
+
 /* Close button — only visible on mobile */
 .closeBtn {
   display: none;

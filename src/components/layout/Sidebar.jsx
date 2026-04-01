@@ -17,7 +17,7 @@ import {
   Sun,
   Moon,
   X,
-  Zap
+  Menu
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
@@ -71,7 +71,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
            className={styles.collapseToggle} 
            onClick={() => setIsCollapsed(!isCollapsed)}
         >
-           <Zap size={16} className={isCollapsed ? "rotate-180" : ""} />
+           <Menu size={18} className={isCollapsed ? styles.rotated : ""} />
         </button>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
           <X size={20} />
