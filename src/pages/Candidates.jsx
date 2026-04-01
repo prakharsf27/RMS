@@ -5,6 +5,7 @@ import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
+import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -140,8 +141,8 @@ export default function Candidates() {
                    <Table 
                      headers={recruiterHeaders}
                      data={pendingRecruiters}
-                     renderRow={(rec) => (
-                        <>
+                     renderRow={(rec, i) => (
+                        <tr key={rec._id || i}>
                            <td>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                  <img src={rec.avatar} style={{ width: '32px', height: '32px', borderRadius: '8px' }} alt="" />
@@ -158,7 +159,7 @@ export default function Candidates() {
                                  </Button>
                               </div>
                            </td>
-                        </>
+                        </tr>
                      )}
                    />
                 </Card>
@@ -171,12 +172,12 @@ export default function Candidates() {
               <Table 
                 headers={candidateHeaders} 
                 data={candidates} 
-                renderRow={(candidate) => {
+                renderRow={(candidate, i) => {
                   const isBlocked = candidate.status === 'suspended';
                   const isSelected = selectedIds.includes(candidate._id);
                   return (
-                    <>
-                      <td>
+                    <tr key={candidate._id || i} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
+                      <td className={tableStyles.selectionCell}>
                         <button 
                             onClick={() => toggleSelect(candidate._id)}
                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
@@ -208,7 +209,7 @@ export default function Candidates() {
                            </Button>
                         </div>
                       </td>
-                    </>
+                    </tr>
                   );
                 }} 
               />

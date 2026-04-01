@@ -5,6 +5,7 @@ import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
+import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail } from "lucide-react";
 import { format } from "date-fns";
@@ -132,7 +133,7 @@ export default function Applications() {
 
               return (
                 <tr key={app._id} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
-                  <td>
+                  <td className={tableStyles.selectionCell}>
                     <button 
                         onClick={() => toggleSelect(app._id)}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
