@@ -1,11 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
+/* Dynamic Light Theme - Indigo/Slate Palette */
 :root {
-  /* Dynamic Light Theme - Indigo/Slate Palette */
   --bg-color: #f8fafc;
   --bg-elevated: #ffffff;
   --bg-elevated-hover: #f1f5f9;
@@ -16,11 +14,11 @@
   
   --border-color: #e2e8f0;
   
-  --primary: #6366f1; /* Premium SaaS Indigo */
+  --primary: #6366f1;
   --primary-hover: #4f46e5;
   --primary-light: #e0e7ff;
   
-  --secondary: #8b5cf6; /* Violet */
+  --secondary: #8b5cf6;
   --secondary-hover: #7c3aed;
   
   --success: #10b981;
@@ -43,7 +41,6 @@
 }
 
 .dark {
-  /* Premium Dark Theme - Slate/Indigo */
   --bg-color: #020617;
   --bg-elevated: #0f172a;
   --bg-elevated-hover: #1e293b;
@@ -94,23 +91,52 @@ body {
   min-height: 100vh;
 }
 
-::selection {
-  background-color: var(--primary-light);
-  color: var(--primary);
+/* ────────────────────────────────────────────────────────── */
+/* Tailwind v4 CSS Theme Extension */
+@theme {
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
 }
 
-.dark ::selection {
-  background-color: var(--primary);
-  color: #fff;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', 'Inter', sans-serif;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.025em;
-}
-
+/* ─── Global Base Styles ──────────────────────── */
 a {
   color: var(--primary);
   text-decoration: none;
@@ -118,127 +144,23 @@ a {
   font-weight: 500;
 }
 
-a:hover {
-  color: var(--primary-hover);
-  text-decoration: none;
-}
-
 button {
   font-family: inherit;
   cursor: pointer;
 }
 
-/* Base Layout Config */
 #root {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
 }
 
-/* Glassmorphism Utilities */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-}
-
-/* Premium Scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 20px;
-  border: 3px solid var(--bg-color);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.hover-glow:hover {
-  box-shadow: var(--shadow-glow);
-  transform: translateY(-1px);
-}
-
-/* Card Style Extension */
-.card-premium {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-premium:hover {
-  box-shadow: var(--shadow-lg);
-  border-color: var(--primary);
-}
-
-.text-gradient {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-success {
-  background: linear-gradient(135deg, #10b981, #059669);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.hover-premium {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-premium:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-xl);
-}
-
-.shimmer {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-count {
-  animation: countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* ─── Landing Page Theme ──────────────────────── */
+/* ─── Landing Page Theme Variables ──────────────────────── */
 .landing-theme {
   --background: 222 47% 6%;
   --foreground: 210 40% 96%;
   --card: 222 40% 10%;
   --card-foreground: 210 40% 96%;
-  --popover: 222 40% 10%;
-  --popover-foreground: 210 40% 96%;
   --primary: 187 80% 52%;
   --primary-foreground: 222 47% 6%;
   --secondary: 222 30% 16%;
@@ -247,43 +169,45 @@ button {
   --muted-foreground: 215 20% 55%;
   --accent: 260 60% 58%;
   --accent-foreground: 210 40% 98%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
   --border: 222 20% 18%;
   --input: 222 20% 18%;
   --ring: 187 80% 52%;
   --radius: 0.75rem;
 
-  /* Custom tokens */
   --glow-primary: 187 80% 52%;
   --glow-accent: 260 60% 58%;
-  --surface-glass: 222 40% 12%;
   
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
 }
 
-.landing-theme .glass-card {
-  background-color: hsla(var(--card), 0.4);
-  backdrop-filter: blur(24px);
-  border: 1px solid hsla(var(--border), 0.5);
-  border-radius: 1.25rem;
-  box-shadow: 0 8px 32px hsla(var(--glow-primary), 0.05),
-              inset 0 1px 0 hsla(var(--foreground), 0.05);
+/* ─── Shared Utilities ──────────────────────── */
+.glass-card {
+  @apply bg-card/40 backdrop-blur-xl border border-border/50 rounded-2xl;
+  box-shadow: 0 8px 32px hsl(var(--glow-primary, 187 80% 52%) / 0.05),
+              inset 0 1px 0 hsl(var(--foreground, 210 40% 96%) / 0.05);
 }
 
-.landing-theme .gradient-text {
-  background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, hsl(var(--primary, 187 80% 52%)), hsl(var(--accent, 260 60% 58%)));
 }
 
-.landing-theme .section-container {
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+.section-container {
+  @apply max-w-7xl mx-auto px-6 lg:px-8;
+}
+
+.glow-border {
+  box-shadow: 0 0 20px hsl(var(--glow-primary, 187 80% 52%) / 0.15),
+              0 0 60px hsl(var(--glow-primary, 187 80% 52%) / 0.05);
+}
+
+.glass-card-hover {
+  @apply glass-card transition-all duration-500 hover:border-primary/30;
+}
+.glass-card-hover:hover {
+  box-shadow: 0 12px 40px hsl(var(--glow-primary, 187 80% 52%) / 0.12),
+              inset 0 1px 0 hsl(var(--foreground, 210 40% 96%) / 0.08);
 }
