@@ -76,13 +76,12 @@ export default function Applications() {
       <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>
     ),
     <div style={{ minWidth: '200px' }}>{user.role === "candidate" ? "Company" : "Candidate"}</div>, 
-    <div style={{ minWidth: '150px' }}>Job Role</div>, 
+    user.role === "candidate" && <div style={{ minWidth: '150px' }}>Job Role</div>, 
     <div style={{ minWidth: '120px' }}>Applied Date</div>, 
-    <div style={{ minWidth: '100px' }}>Match Score</div>,
+    user.role === "candidate" && <div style={{ minWidth: '100px' }}>Match Score</div>,
     <div style={{ minWidth: '100px' }}>Status</div>, 
     user.role !== "candidate" && "Actions"
   ].filter(Boolean);
-
 
   return (
     <div className="animate-fade-in">
@@ -184,28 +183,32 @@ export default function Applications() {
                       </div>
                     )}
                   </td>
-                  <td>
-                    <div style={{ fontWeight: 600, minWidth: '150px' }}>{job.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.department}</div>
-                  </td>
+                  {user.role === "candidate" && (
+                    <td>
+                      <div style={{ fontWeight: 600, minWidth: '150px' }}>{job.title}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.department}</div>
+                    </td>
+                  )}
                   <td>{app.appliedAt ? format(new Date(app.appliedAt), "MMM d, yyyy") : 'N/A'}</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ 
-                            width: '40px', 
-                            height: '40px', 
-                            borderRadius: '50%', 
-                            border: `3px solid ${app.matchScore > 70 ? 'var(--success)' : app.matchScore > 40 ? 'var(--warning)' : 'var(--danger)'}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '0.75rem',
-                            fontWeight: 800
-                        }}>
-                            {app.matchScore || 0}%
-                        </div>
-                    </div>
-                  </td>
+                  {user.role === "candidate" && (
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <div style={{ 
+                              width: '40px', 
+                              height: '40px', 
+                              borderRadius: '50%', 
+                              border: `3px solid ${app.matchScore > 70 ? 'var(--success)' : app.matchScore > 40 ? 'var(--warning)' : 'var(--danger)'}`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.75rem',
+                              fontWeight: 800
+                          }}>
+                              {app.matchScore || 0}%
+                          </div>
+                      </div>
+                    </td>
+                  )}
                   <td>
                     <Badge variant={
                       app.status === "offered" ? "success" : 
@@ -218,10 +221,6 @@ export default function Applications() {
                   {user.role !== "candidate" && (
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        <Button size="sm" variant="info" onClick={() => navigate('/messages', { state: { recipient: candidate } })}>
-                            <Mail size={14} />
-                        </Button>
-
                         {app.status === "applied" && (
                           <>
                             <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
