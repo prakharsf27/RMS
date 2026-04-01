@@ -163,45 +163,48 @@ export default function Jobs() {
         )}
       </div>
 
-      <div className={styles.toolbar}>
-         <div className={styles.searchBox}>
-            <Search size={18} className={styles.searchIcon} />
-            <input 
-               type="text" 
-               placeholder="Search by role, department..." 
-               value={searchTerm}
-               onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-            />
-         </div>
-         <div className={styles.filters}>
-            <div className={styles.filterGroup}>
-               <Filter size={14} />
-               <select 
-                  value={filters.location} 
-                  onChange={(e) => { setFilters({...filters, location: e.target.value}); setPage(1); }}
-               >
-                  <option value="all">All Locations</option>
-                  <option value="Remote">Remote</option>
-                  <option value="New York">New York</option>
-                  <option value="San Francisco">San Francisco</option>
-               </select>
-            </div>
-            <div className={styles.filterGroup}>
-               <select 
-                  value={filters.type} 
-                  onChange={(e) => { setFilters({...filters, type: e.target.value}); setPage(1); }}
-               >
-                  <option value="all">All Types</option>
-                  <option value="Full-time">Full-time</option>
-                  <option value="Contract">Contract</option>
-                  <option value="Internship">Internship</option>
-               </select>
-            </div>
-         </div>
-         <div className={styles.resultCount}>
-            Found <strong>{totalResults}</strong> roles
-         </div>
-      </div>
+      {user.role !== "recruiter" && (
+        <div className={styles.toolbar}>
+           <div className={styles.searchBox}>
+              <Search size={18} className={styles.searchIcon} />
+              <input 
+                 type="text" 
+                 placeholder="Search by role, department..." 
+                 value={searchTerm}
+                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+              />
+           </div>
+           <div className={styles.filters}>
+              <div className={styles.filterGroup}>
+                 <Filter size={14} />
+                 <select 
+                    value={filters.location} 
+                    onChange={(e) => { setFilters({...filters, location: e.target.value}); setPage(1); }}
+                 >
+                    <option value="all">All Locations</option>
+                    <option value="Remote">Remote</option>
+                    <option value="New York">New York</option>
+                    <option value="San Francisco">San Francisco</option>
+                 </select>
+              </div>
+              <div className={styles.filterGroup}>
+                 <select 
+                    value={filters.type} 
+                    onChange={(e) => { setFilters({...filters, type: e.target.value}); setPage(1); }}
+                 >
+                    <option value="all">All Types</option>
+                    <option value="Full-time">Full-time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                 </select>
+              </div>
+           </div>
+           <div className={styles.resultCount}>
+              Found <strong>{totalResults}</strong> roles
+           </div>
+        </div>
+      )}
+
 
       {loading ? (
         <LoadingSpinner label="Querying opportunities..." />

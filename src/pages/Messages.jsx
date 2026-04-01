@@ -25,7 +25,8 @@ export default function Messages() {
     const init = async () => {
       setLoading(true);
       try {
-        const { data: convos } = await api.get("/api/messages/conversations");
+        const { data: convos } = await api.get("/messages/conversations");
+
         setConversations(convos);
         
         // If navigated from elsewhere with a specific user to chat with
@@ -55,7 +56,8 @@ export default function Messages() {
     if (!activeChat?._id && !activeChat?.id) return;
     const fetchMessages = async () => {
       try {
-        const { data } = await api.get(`/api/messages/${activeChat._id || activeChat.id}`);
+        const { data } = await api.get(`/messages/${activeChat._id || activeChat.id}`);
+
         setMessages(data);
       } catch (err) {
         console.error("Fetch messages error:", err);
@@ -79,10 +81,11 @@ export default function Messages() {
 
     setSending(true);
     try {
-      const { data } = await api.post("/api/messages", {
+      const { data } = await api.post("/messages", {
         receiverId: activeChat._id || activeChat.id,
         content: newMessage
       });
+
       setMessages(prev => [...prev, data]);
       setNewMessage("");
       
