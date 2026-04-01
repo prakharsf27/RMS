@@ -125,6 +125,54 @@
   display: flex;
   padding: 2rem 0;
   mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  overflow: hidden;
+  position: relative;
+}
+
+.mncTrack {
+  display: flex;
+  gap: 4rem;
+  animation: scroll 40s linear infinite;
+  width: max-content;
+  align-items: center;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(-50% - 2rem)); }
+}
+
+.mncLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--text-tertiary);
+  opacity: 0.6;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.mncLogo:hover {
+  opacity: 1;
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+.mncIcon {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 
 .jobList {
