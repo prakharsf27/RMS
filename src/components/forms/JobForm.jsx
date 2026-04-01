@@ -24,8 +24,8 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', padding: '0.5rem 0' }}>
-      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '0.5rem' }}>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '0.5rem 0' }}>
+      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '0.25rem' }}>
         <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Role Essentials</h3>
         <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>Define the core parameters of this recruitment requirement.</p>
       </div>
@@ -87,7 +87,7 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
         </div>
       </div>
 
-      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginTop: '0.5rem' }}>
+      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginTop: '0.25rem' }}>
         <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Compensation & Details</h3>
         <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>Set the expectations for potential candidates.</p>
       </div>
@@ -109,8 +109,8 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
           onChange={handleChange}
           required
           style={{
-            minHeight: '180px',
-            padding: '1.25rem',
+            minHeight: '120px',
+            padding: '1rem',
             borderRadius: '16px',
             border: '1px solid var(--border-color)',
             backgroundColor: 'var(--bg-elevated)',
@@ -123,6 +123,7 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
           }}
         />
       </div>
+
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
         <Button variant="ghost" type="button" onClick={onCancel} style={{ fontSize: '1rem' }}>Cancel</Button>
