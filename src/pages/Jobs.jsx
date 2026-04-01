@@ -115,6 +115,17 @@ export default function Jobs() {
     }
   };
 
+  const handleToggleStatus = async (jobId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'active' ? 'closed' : 'active';
+      await api.put(`/jobs/${jobId}`, { status: newStatus });
+      fetchJobs();
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
+
   const openApply = (job) => {
     setSelectedJob(job);
     setIsApplyModalOpen(true);
@@ -247,8 +258,16 @@ export default function Jobs() {
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                       <Button variant="secondary" size="sm" onClick={() => openEdit(job)}>Edit</Button>
                       <Button variant="secondary" size="sm" onClick={() => openView(job)}>View</Button>
+                      <Button 
+                        variant={job.status === 'active' ? 'danger' : 'success'} 
+                        size="sm" 
+                        onClick={() => handleToggleStatus(job._id, job.status)}
+                      >
+                        {job.status === 'active' ? 'Close' : 'Open'}
+                      </Button>
                     </div>
                   )}
+
                 </td>
               </tr>
             )}
@@ -285,9 +304,11 @@ export default function Jobs() {
       >
         <JobForm 
             onSubmit={handleCreateJob} 
+            onCancel={() => setIsPostModalOpen(false)}
             isSubmitting={isSubmitting} 
             initialData={isEditing ? selectedJob : null} 
         />
+
       </Modal>
 
       <Modal
