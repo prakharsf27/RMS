@@ -24,13 +24,8 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '0.5rem 0' }}>
-      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '0.25rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Role Essentials</h3>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>Define the core parameters of this recruitment requirement.</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0.25rem 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Input
           label="Job Title"
           name="title"
@@ -49,7 +44,7 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
         />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <Input
           label="Work Location"
           name="location"
@@ -71,12 +66,11 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
                     backgroundColor: 'var(--bg-elevated)',
                     color: 'var(--text-primary)',
                     fontFamily: 'inherit',
-                    fontSize: '0.95rem',
-                    height: '52px',
+                    fontSize: '0.9rem',
+                    height: '48px',
                     width: '100%',
                     appearance: 'none',
-                    cursor: 'pointer',
-                    transition: 'border-color 0.2s'
+                    cursor: 'pointer'
                 }}
             >
                 <option value="Full-Time">Full-Time</option>
@@ -87,29 +81,29 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
         </div>
       </div>
 
-      <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginTop: '0.25rem' }}>
-        <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)' }}>Compensation & Details</h3>
-        <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)' }}>Set the expectations for potential candidates.</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'flex-end' }}>
+        <Input
+          label="Salary Range (Optional)"
+          name="salary"
+          placeholder="e.g. $140k - $180k"
+          value={formData.salary}
+          onChange={handleChange}
+        />
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', paddingBottom: '0.75rem' }}>
+          * Shown to candidates during initial screening.
+        </div>
       </div>
 
-      <Input
-        label="Salary Range (Optional)"
-        name="salary"
-        placeholder="e.g. $140,000 - $180,000"
-        value={formData.salary}
-        onChange={handleChange}
-      />
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Detailed Job Narrative</label>
+        <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Job Narrative</label>
         <textarea
           name="description"
-          placeholder="Outline the mission, technical stack, responsibilities, and benefits of joining TalentFlow..."
+          placeholder="Outline the mission, technical stack, and responsibilities..."
           value={formData.description}
           onChange={handleChange}
           required
           style={{
-            minHeight: '120px',
+            minHeight: '100px',
             padding: '1rem',
             borderRadius: '16px',
             border: '1px solid var(--border-color)',
@@ -117,19 +111,16 @@ export const JobForm = ({ onSubmit, onCancel, initialData = null, isSubmitting =
             color: 'var(--text-primary)',
             fontFamily: 'inherit',
             resize: 'vertical',
-            lineHeight: '1.6',
-            fontSize: '0.95rem',
-            transition: 'border-color 0.2s'
+            lineHeight: '1.5',
+            fontSize: '0.9rem'
           }}
         />
       </div>
 
-
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
-        <Button variant="ghost" type="button" onClick={onCancel} style={{ fontSize: '1rem' }}>Cancel</Button>
-        <Button type="submit" disabled={isSubmitting} style={{ padding: '0 2rem', fontSize: '1rem', fontWeight: 600 }}>
-
-          {isSubmitting ? "Syncing..." : (initialData ? "Apply Changes" : "Post Opportunity")}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '0.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)' }}>
+        <Button variant="ghost" type="button" onClick={onCancel}>Cancel</Button>
+        <Button type="submit" disabled={isSubmitting} style={{ padding: '0 1.5rem' }}>
+          {isSubmitting ? "Syncing..." : (initialData ? "Update Job" : "Post Job")}
         </Button>
       </div>
     </form>

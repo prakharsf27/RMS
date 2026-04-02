@@ -4,17 +4,18 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.4); /* Clean, transparent tint */
-  z-index: 9999; /* Ensure it stays on top */
-  padding: 2rem 1rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+  padding: 1rem; /* Desktop breathing room */
   overflow-y: auto;
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  overscroll-behavior: contain;
 }
 
 .modal {
-  margin: auto; /* Robust centering */
+  margin: auto;
   background-color: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: 20px;
@@ -23,10 +24,10 @@
   box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  max-height: 90vh; /* Re-enforce height limit */
+  max-height: calc(100vh - 2rem); /* Dynamic height */
   position: relative;
   z-index: 1001;
-  overflow: hidden; /* Content div handles internal scroll */
+  overflow: hidden;
 }
 
 .header {
@@ -79,20 +80,22 @@
 }
 
 /* ─── Mobile Responsive ──────────────────────── */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .overlay {
     padding: 0;
-    align-items: flex-end;
+    align-items: flex-end; /* Bottom sheet style on mobile */
   }
   .modal {
     max-width: 100%;
     border-radius: 20px 20px 0 0;
-    max-height: 92vh;
+    max-height: 100vh; /* Allow full height on mobile */
+    height: auto;
+    margin: 0;
   }
   .content {
-    padding: 1.25rem;
+    padding: 1.5rem 1.25rem 3rem; /* Extra bottom padding for mobile safe area */
   }
   .header {
-    padding: 1rem 1.25rem;
+    padding: 1.25rem;
   }
 }

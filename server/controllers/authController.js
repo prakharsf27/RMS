@@ -178,9 +178,12 @@ exports.toggleEngaged = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.isEngaged = !user.isEngaged;
-    await user.save();
-    res.json(user);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: { isEngaged: !user.isEngaged } },
+      { new: true }
+    );
+    res.json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

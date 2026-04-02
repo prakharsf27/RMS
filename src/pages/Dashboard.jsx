@@ -52,34 +52,34 @@ export default function Dashboard() {
   // Ensure there's always something in the recommended section for candidates
   const finalRecommendations = (user.role === 'candidate' && (!recommendedJobs || recommendedJobs.length === 0))
     ? [
-        {
-          _id: "rec_1",
-          title: "Senior Product Designer",
-          company: { name: "DesignHaus" },
-          location: "Remote",
-          type: "Full-time",
-          salary: "$140k - $180k",
-          matchScore: 94
-        },
-        {
-          _id: "rec_2",
-          title: "Staff Software Engineer",
-          company: { name: "Nebula Systems" },
-          location: "Bangalore",
-          type: "Full-time",
-          salary: "₹45L - ₹65L",
-          matchScore: 88
-        },
-        {
-          _id: "rec_3",
-          title: "Cloud Infrastructure Architect",
-          company: { name: "Azurea Tech" },
-          location: "San Francisco",
-          type: "Contract",
-          salary: "$200k+",
-          matchScore: 82
-        }
-      ]
+      {
+        _id: "rec_1",
+        title: "Senior Product Designer",
+        company: { name: "DesignHaus" },
+        location: "Remote",
+        type: "Full-time",
+        salary: "$140k - $180k",
+        matchScore: 94
+      },
+      {
+        _id: "rec_2",
+        title: "Staff Software Engineer",
+        company: { name: "Nebula Systems" },
+        location: "Bangalore",
+        type: "Full-time",
+        salary: "₹45L - ₹65L",
+        matchScore: 88
+      },
+      {
+        _id: "rec_3",
+        title: "Cloud Infrastructure Architect",
+        company: { name: "Azurea Tech" },
+        location: "San Francisco",
+        type: "Contract",
+        salary: "$200k+",
+        matchScore: 82
+      }
+    ]
     : recommendedJobs;
 
   const getCandidateMetrics = () => [
@@ -159,7 +159,7 @@ export default function Dashboard() {
                 { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
                 { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
                 { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
-                { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
+                { name: "Uber", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRans05n-lascdg4-G9CPspq_djrQ-Q9DpwPg&s" },
                 { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" }
               ].map((company, i) => (
                 <div key={i} className={styles.mncLogo}>
@@ -315,8 +315,8 @@ export default function Dashboard() {
                 ].map((skill, i) => (
                   <div key={i} className={styles.skillItem}>
                     <span>{skill.name}</span>
-                    <button 
-                      className={styles.ctaLink} 
+                    <button
+                      className={styles.ctaLink}
                       onClick={() => handleAddSkill(skill.name)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
