@@ -3,6 +3,7 @@ const Job = require('../models/Job');
 const Notification = require('../models/Notification');
 const { cloudinary } = require('../config/cloudinary');
 const sendEmail = require('../config/emailService');
+const mongoose = require('mongoose');
 
 // Utility to calculate match score based on simple keyword matching
 const calculateMatchScore = (jobRequirements, userBio = "") => {
@@ -84,12 +85,12 @@ exports.getApplications = async (req, res) => {
   try {
     const match = {};
     if (req.user.role === 'candidate') {
-      match.candidateId = req.user._id;
+      match.candidateId = new mongoose.Types.ObjectId(req.user._id);
     }
 
     if (req.user.role === 'recruiter') {
       const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
-      match.jobId = { $in: recruiterJobs.map(j => j._id) };
+      match.jobId = { $in: recruiterJobs.map(j => new mongoose.Types.ObjectId(j._id)) };
     }
 
     const applications = await Application.aggregate([
@@ -127,8 +128,10 @@ exports.getApplications = async (req, res) => {
       { 
         $addFields: { 
           jobId: {
-            ...('$job'),
-            company: { $ifNull: [{ $arrayElemAt: ['$company', 0] }, null] }
+            $mergeObjects: [
+              "$job",
+              { company: { $ifNull: [{ $arrayElemAt: ['$company', 0] }, null] } }
+            ]
           },
           candidateId: '$candidate'
         } 

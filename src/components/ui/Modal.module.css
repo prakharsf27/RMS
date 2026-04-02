@@ -11,11 +11,12 @@
   padding: 1.5rem;
   overflow-y: auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Better for tall content */
   justify-content: center;
 }
 
 .modal {
+  margin: auto; /* Robust centering */
   background-color: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: 20px;
