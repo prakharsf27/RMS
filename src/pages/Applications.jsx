@@ -186,7 +186,7 @@ export default function Applications() {
                         </div>
                         <div>
                           <div style={{ fontWeight: 600 }}>{job.company?.name || "TalentFlow Partner"}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || "Technology"}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || job.department || "Technology"}</div>
                         </div>
                       </div>
                     ) : (

@@ -5,7 +5,7 @@ import api from "../lib/api";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { Send, Search, User, MoreVertical, Phone, Video, Info } from "lucide-react";
+import { Send, Search, User, Phone, Video, Info, MessageSquare, ShieldAlert } from "lucide-react";
 import styles from "./Messages.module.css";
 import { format } from "date-fns";
 
@@ -124,8 +124,10 @@ export default function Messages() {
           
           <div className={styles.conversationList}>
             {conversations.length === 0 ? (
-              <div className={styles.emptyState}>
+              <div className={styles.sidebarEmpty}>
+                <MessageSquare size={40} className={styles.emptyIcon} />
                 <p>No conversations yet</p>
+                <span>Reach out to candidates or recruiters from the pipeline to start chatting.</span>
               </div>
             ) : (
               conversations.map(convo => (
@@ -217,11 +219,16 @@ export default function Messages() {
             </>
           ) : (
             <div className={styles.noChat}>
-              <div className={styles.noChatIcon}>
-                <MoreVertical size={48} style={{ transform: 'rotate(90deg)', opacity: 0.2 }} />
+              <div className={styles.noChatContent}>
+                 <div className={styles.noChatIconWrapper}>
+                    <MessageSquare size={48} />
+                 </div>
+                 <h3>TalentFlow Messenger</h3>
+                 <p>Select a candidate or recruiter from your list to begin a professional recruitment conversation.</p>
+                 <span className={styles.encryptionNotice}>
+                    <ShieldAlert size={12} /> Messages are secure and private
+                 </span>
               </div>
-              <h3>TalentFlow Messenger</h3>
-              <p>Select a candidate or recruiter to start business conversation</p>
             </div>
           )}
         </main>

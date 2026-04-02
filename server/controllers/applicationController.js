@@ -82,21 +82,66 @@ exports.applyForJob = async (req, res) => {
 // @access  Private (Admin/Recruiter see all, Candidate see own)
 exports.getApplications = async (req, res) => {
   try {
-    let query = {};
+    const match = {};
     if (req.user.role === 'candidate') {
-      query.candidateId = req.user._id;
+      match.candidateId = req.user._id;
     }
 
     if (req.user.role === 'recruiter') {
       const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
-      query.jobId = { $in: recruiterJobs.map(j => j._id) };
+      match.jobId = { $in: recruiterJobs.map(j => j._id) };
     }
 
-    const applications = await Application.find(query)
-      .populate('jobId', 'title department location')
-      .populate('candidateId', 'fname lname email avatar bio isEngaged')
-      .sort('-createdAt');
-
+    const applications = await Application.aggregate([
+      { $match: match },
+      { $sort: { createdAt: -1 } },
+      // Join with Job
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'jobId',
+          foreignField: '_id',
+          as: 'job'
+        }
+      },
+      { $unwind: '$job' },
+      // Join with Candidate (User)
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'candidateId',
+          foreignField: '_id',
+          as: 'candidate'
+        }
+      },
+      { $unwind: '$candidate' },
+      // Join with Company matching recruiterId of the job
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'job.recruiterId',
+          foreignField: 'recruiterId',
+          as: 'company'
+        }
+      },
+      { 
+        $addFields: { 
+          jobId: {
+            ...('$job'),
+            company: { $ifNull: [{ $arrayElemAt: ['$company', 0] }, null] }
+          },
+          candidateId: '$candidate'
+        } 
+      },
+      {
+        $project: {
+          job: 0,
+          candidate: 0,
+          company: 0,
+          'candidateId.password': 0
+        }
+      }
+    ]);
 
     res.json(applications);
   } catch (error) {

@@ -287,17 +287,83 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  padding: 3rem;
+  background-color: var(--bg-elevated);
+}
+
+.noChatContent {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.noChatIconWrapper {
+  width: 96px;
+  height: 96px;
+  background: var(--bg-elevated-hover);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-light);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0.5rem;
 }
 
 .noChat h3 {
-  margin: 1.5rem 0 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .noChat p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.encryptionNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
   color: var(--text-tertiary);
-  max-width: 300px;
+  background: var(--bg-elevated-hover);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.sidebarEmpty {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-tertiary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  opacity: 0.2;
+}
+
+.sidebarEmpty p {
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0.25rem;
+}
+
+.sidebarEmpty span {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {

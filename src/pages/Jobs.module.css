@@ -171,3 +171,143 @@
   font-weight: 600;
   color: var(--text-secondary);
 }
+
+/* ─── Job Specification Modal Content ──────────────── */
+
+.jobViewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.jobViewHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.jobCompanyIconLarge {
+  width: 80px;
+  height: 80px;
+  background: var(--bg-elevated-hover);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.jobCompanyIconLarge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.5rem;
+}
+
+.jobHeaderText h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.jobCompanySubtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.jobBadges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.jobDetailsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.detailCard {
+  background: var(--bg-elevated-hover);
+  padding: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detailLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  font-weight: 700;
+}
+
+.detailValue {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.jobBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.jobSection h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary-light);
+  display: inline-block;
+  padding-bottom: 0.25rem;
+}
+
+.jobSection p {
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.reqList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reqList li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.reqList li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.jobViewFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}

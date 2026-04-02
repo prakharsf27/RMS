@@ -8,12 +8,11 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
+  padding: 1.5rem;
+  overflow-y: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
-
 }
 
 .modal {
@@ -22,13 +21,13 @@
   border-radius: 20px;
   width: 100%;
   max-width: 720px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 4rem);
-
+  max-height: 90vh; /* Re-enforce height limit */
   position: relative;
   z-index: 1001;
+  overflow: hidden; /* Content div handles internal scroll */
 }
 
 .header {
@@ -60,10 +59,11 @@
 }
 
 .content {
-  padding: 1.75rem;
+  padding: 2rem;
   overflow-y: auto;
   scrollbar-width: thin;
   flex: 1;
+  overscroll-behavior: contain;
 }
 
 .content::-webkit-scrollbar {

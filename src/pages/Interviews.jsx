@@ -12,6 +12,17 @@ import { useNavigate } from "react-router-dom";
 import { DatePicker } from "../components/ui/DatePicker";
 import { TimePicker } from "../components/ui/TimePicker";
 import styles from "./Interviews.module.css";
+import { format, isValid, parseISO } from "date-fns";
+
+const safeFormat = (dateStr, formatStr) => {
+  if (!dateStr) return "TBD";
+  try {
+    const date = typeof dateStr === 'string' ? parseISO(dateStr) : new Date(dateStr);
+    return isValid(date) ? format(date, formatStr) : "Invalid Date";
+  } catch (err) {
+    return "TBD";
+  }
+};
 
 export default function Interviews() {
   const { user } = useAuth();
@@ -103,8 +114,8 @@ export default function Interviews() {
                        <h3>{int.candidateId?.fname || 'Unknown'} {int.candidateId?.lname || 'Candidate'}</h3>
                        <p className={styles.jobText}>{int.jobTitle}</p>
                        <div className={styles.metaRow}>
-                          <span className={styles.metaItem}><Calendar size={14} /> {format(new Date(int.date), "MMM d, yyyy")}</span>
-                          <span className={styles.metaItem}><Clock size={14} /> {int.time}</span>
+                          <span className={styles.metaItem}><Calendar size={14} /> {safeFormat(int.date, "MMM d, yyyy")}</span>
+                          <span className={styles.metaItem}><Clock size={14} /> {int.time || 'TBD'}</span>
                           <span className={styles.metaItem}>
                              {int.type === 'virtual' ? <Video size={14} /> : <MapPin size={14} />} 
                              {int.type === 'virtual' ? "Virtual Call" : "On-Site"}
@@ -132,15 +143,17 @@ export default function Interviews() {
                          </div>
                          <div className={styles.calendarOptions}>
                             <span className={styles.calLabel}>Add to:</span>
-                            <a 
-                               href={`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${int.candidateId?.fname} ${int.candidateId?.lname} - ${int.jobTitle}`)}&dates=${format(new Date(`${int.date.split('T')[0]}T${int.time}`), "yyyyMMdd'T'HHmm00")}/${format(new Date(new Date(`${int.date.split('T')[0]}T${int.time}`).getTime() + 3600000), "yyyyMMdd'T'HHmm00")}&details=${encodeURIComponent(`Interview scheduled via TalentFlow.\nNotes: ${int.notes || 'N/A'}`)}&location=${encodeURIComponent(int.location)}`}
-                               target="_blank" 
-                               rel="noopener noreferrer"
-                               className={styles.calLink}
-                               title="Google Calendar"
-                            >
-                               Google
-                            </a>
+                            {int.date && int.time ? (
+                              <a 
+                                href={`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Interview: ${int.candidateId?.fname || 'Candidate'} ${int.candidateId?.lname || ''} - ${int.jobTitle || 'Role'}`)}&dates=${safeFormat(int.date, "yyyyMMdd")}${(int.time || "00:00").replace(':', '')}00/${safeFormat(int.date, "yyyyMMdd")}${(int.time || "00:00").replace(':', '')}00&details=${encodeURIComponent(`Interview scheduled via TalentFlow.\nNotes: ${int.notes || 'N/A'}`)}&location=${encodeURIComponent(int.location || '')}`}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={styles.calLink}
+                                title="Google Calendar"
+                              >
+                                 Google
+                              </a>
+                            ) : <span className={styles.calLinkDisabled}>N/A</span>}
                             <a 
                                href={`data:text/calendar;charset=utf8,${encodeURIComponent([
                                  "BEGIN:VCALENDAR",

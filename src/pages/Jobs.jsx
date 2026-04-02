@@ -322,47 +322,76 @@ export default function Jobs() {
       <Modal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
-        title="Job Details View"
+        title="Job Specification"
       >
         {selectedJob && (
-          <div style={{ padding: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                <div className={styles.companyIcon} style={{ width: '64px', height: '64px', fontSize: '1.5rem' }}>
+          <div className={styles.jobViewContent}>
+            {/* Header Section */}
+            <header className={styles.jobViewHeader}>
+                <div className={styles.jobCompanyIconLarge}>
                     {selectedJob.company?.logo ? (
-                        <img src={selectedJob.company.logo} alt="" />
+                        <img src={selectedJob.company.logo} alt={selectedJob.company.name} />
                     ) : (
                         <span>{selectedJob.company?.name?.[0] || 'C'}</span>
                     )}
                 </div>
-                <div>
-                    <h2 style={{ margin: 0 }}>{selectedJob.title}</h2>
-                    <p style={{ color: 'var(--text-secondary)', margin: '0.25rem 0' }}>{selectedJob.company?.name} · {selectedJob.location}</p>
-                    <Badge variant="success">{selectedJob.type}</Badge>
+                <div className={styles.jobHeaderText}>
+                    <h2>{selectedJob.title}</h2>
+                    <p className={styles.jobCompanySubtitle}>
+                       {selectedJob.company?.name || 'TalentFlow Partner'} · {selectedJob.location}
+                    </p>
+                    <div className={styles.jobBadges}>
+                       <Badge variant="info">{selectedJob.type}</Badge>
+                       <Badge variant="neutral">{selectedJob.department}</Badge>
+                    </div>
                 </div>
-            </div>
+            </header>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                <div>
-                    <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Department</h4>
-                    <p style={{ fontWeight: 600 }}>{selectedJob.department}</p>
+            {/* Details Grid */}
+            <div className={styles.jobDetailsGrid}>
+                <div className={styles.detailCard}>
+                    <span className={styles.detailLabel}>Compensation</span>
+                    <span className={styles.detailValue}>{selectedJob.salary || 'Competitive'}</span>
                 </div>
-                <div>
-                    <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Salary Range</h4>
-                    <p style={{ fontWeight: 600 }}>{selectedJob.salary || 'Competitive'}</p>
+                <div className={styles.detailCard}>
+                    <span className={styles.detailLabel}>Experience</span>
+                    <span className={styles.detailValue}>{selectedJob.experienceLevel || 'Mid-Level'}</span>
+                </div>
+                <div className={styles.detailCard}>
+                    <span className={styles.detailLabel}>Application Deadline</span>
+                    <span className={styles.detailValue}>{selectedJob.deadline ? format(new Date(selectedJob.deadline), "MMM d, yyyy") : 'Open'}</span>
                 </div>
             </div>
 
-            <div style={{ marginBottom: '2rem' }}>
-                <h4 style={{ color: 'var(--text-tertiary)', textTransform: 'uppercase', fontSize: '0.75rem', marginBottom: '0.5rem' }}>Job Description</h4>
-                <p style={{ lineHeight: 1.6, color: 'var(--text-primary)' }}>{selectedJob.description}</p>
+            {/* Content Sections */}
+            <div className={styles.jobBody}>
+                <section className={styles.jobSection}>
+                    <h4>Description</h4>
+                    <p>{selectedJob.description}</p>
+                </section>
+
+                {selectedJob.requirements?.length > 0 && (
+                   <section className={styles.jobSection}>
+                       <h4>Requirements</h4>
+                       <ul className={styles.reqList}>
+                          {selectedJob.requirements.map((req, i) => <li key={i}>{req}</li>)}
+                       </ul>
+                   </section>
+                )}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem' }}>
-                 <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close Review</Button>
+            {/* Footer Actions */}
+            <footer className={styles.jobViewFooter}>
+                 <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close Specifications</Button>
                  {user.role === 'candidate' && (
-                     <Button onClick={() => { setIsViewModalOpen(false); openApply(selectedJob); }}>Apply Now</Button>
+                     <Button 
+                       onClick={() => { setIsViewModalOpen(false); openApply(selectedJob); }}
+                       disabled={appliedJobIds.has(selectedJob._id)}
+                     >
+                       {appliedJobIds.has(selectedJob._id) ? "Already Applied" : "Quick Apply Now"}
+                     </Button>
                  )}
-            </div>
+            </footer>
           </div>
         )}
       </Modal>
