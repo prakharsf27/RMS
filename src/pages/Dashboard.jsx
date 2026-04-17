@@ -21,14 +21,16 @@ function useCounter(target, duration = 1400) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!target) { setCount(0); return; }
+    let rafId;
     const start = performance.now();
     const animate = (now) => {
       const t = Math.min((now - start) / duration, 1);
       const ease = 1 - Math.pow(1 - t, 3);
       setCount(Math.round(target * ease));
-      if (t < 1) requestAnimationFrame(animate);
+      if (t < 1) rafId = requestAnimationFrame(animate);
     };
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, [target, duration]);
   return count;
 }
