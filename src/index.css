@@ -75,6 +75,11 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
   --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.15);
+
+  /* Premium Design Tokens */
+  --premium-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --premium-bg: #080d1a;
+  --card-gradient: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
 }
 
 *, *::before, *::after {
@@ -84,7 +89,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.6;

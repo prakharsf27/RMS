@@ -2,32 +2,116 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
-import { Card } from "../components/ui/Card";
-import { Button } from "../components/ui/Button";
+import { 
+  LayoutDashboard, Briefcase, FileText, MessageSquare, 
+  CalendarDays, User, Bell, Search, ChevronLeft, ChevronRight, 
+  TrendingUp, Eye, Zap, Award, LogOut, Settings, Sparkles, 
+  ArrowRight, Clock, CheckCircle, MapPin, Building2, Menu,
+  Bot, Star, Bookmark, BarChart3, CheckSquare, ChevronDown,
+  ArrowUpRight, Flame, Target, X, Send
+} from "lucide-react";
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { Badge } from "../components/ui/Badge";
-import { format } from "date-fns";
-import { Users, Briefcase, FileText, CheckCircle, TrendingUp, Award, Eye, Heart, Zap, BookOpen, Clock, MapPin } from "lucide-react";
-import illustration from "../assets/recruitment_illustration.png";
 import styles from "./Dashboard.module.css";
+
+/* ─── ANIMATED COUNTER ───────────────────────────────────────── */
+function useCounter(target, duration = 1400) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!target) { setCount(0); return; }
+    const start = performance.now();
+    const animate = (now) => {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      setCount(Math.round(target * ease));
+      if (t < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [target, duration]);
+  return count;
+}
+
+/* ─── COMPONENTS ─────────────────────────────────────────────── */
+
+function StatCardItem({ label, value, icon: Icon, color, bg, trend, up, delay }) {
+  const count = useCounter(value);
+  return (
+    <div className={`${styles.statCard} anim-${delay}`}>
+      <div className={styles.statIconWrap} style={{ background: bg }}>
+        <Icon size={20} style={{ color: color }} />
+      </div>
+      <div className={styles.statLabel}>{label}</div>
+      <div className={styles.statValue}>{count.toLocaleString()}</div>
+      {trend && (
+        <div className={`${styles.statTrend} ${up ? styles.up : ""}`}>
+          {up && <ArrowUpRight size={13} />}
+          {trend}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{ background: "rgba(10,15,30,0.97)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 12, padding: "10px 14px" }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#818cf8", marginBottom: 6 }}>{label}</div>
+      {payload.map((p) => (
+        <div key={p.name} style={{ fontSize: 12, color: p.color, display: "flex", justifyContent: "space-between", gap: 16 }}>
+          <span>{p.name}</span><span style={{ fontWeight: 600 }}>{p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/* ─── DATA ───────────────────────────────────────────────────── */
+const CHART_DATA = [
+  { month: "Nov", Applications: 8, Interviews: 2, Hired: 0 },
+  { month: "Dec", Applications: 12, Interviews: 3, Hired: 1 },
+  { month: "Jan", Applications: 18, Interviews: 5, Hired: 1 },
+  { month: "Feb", Applications: 15, Interviews: 4, Hired: 0 },
+  { month: "Mar", Applications: 22, Interviews: 7, Hired: 1 },
+  { month: "Apr", Applications: 24, Interviews: 8, Hired: 2 },
+];
+
+const COMPANIES = ["Amazon", "Meta", "Microsoft", "Netflix", "Tesla", "NVIDIA", "IBM", "Apple", "Google", "Salesforce", "Adobe", "Spotify"];
+
+const PROFILE_ITEMS = [
+  { label: "Basic Info", done: true },
+  { label: "Work Experience", done: true },
+  { label: "Skills & Expertise", done: true },
+  { label: "Resume Uploaded", done: true },
+  { label: "Portfolio Link", done: false },
+  { label: "References", done: false },
+];
+
+const RECRUITER_TASKS = [
+  { label: "Review 5 Pending Applications", done: false },
+  { label: "Schedule Interviews for Senior Dev", done: false },
+  { label: "Post New Job Opening", done: true },
+  { label: "Verify Candidate References", done: true },
+];
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [recommendedJobs, setRecommendedJobs] = useState([]);
+  const [dataList, setDataList] = useState([]); // Jobs for candidates, Recent Applications for recruiters
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, recRes] = await Promise.all([
+        const [statsRes, listRes] = await Promise.all([
           api.get('/analytics'),
-          user.role === 'candidate' ? api.get('/jobs/recommended') : api.get('/jobs?limit=4')
+          user.role === 'candidate' ? api.get('/jobs/recommended') : api.get('/applications?limit=5')
         ]);
-
         setStats(statsRes.data.summary);
-        setRecommendedJobs(user.role === 'candidate' ? recRes.data : recRes.data.jobs);
+        setDataList(user.role === 'candidate' ? listRes.data : listRes.data.applications);
       } catch (err) {
         console.error("Dashboard error:", err);
       } finally {
@@ -37,316 +121,259 @@ export default function Dashboard() {
     fetchData();
   }, [user.role]);
 
-  const handleAddSkill = async (skill) => {
-    try {
-      // Simulate adding to profile for now since the full skills model might not be implemented
-      // In a real app, this would be api.put('/auth/profile', { skills: [...user.skills, skill] });
-      alert(`Skill \"${skill}\" has been integrated into your professional identity! Your profile strength should increase by 15%.`);
-    } catch (err) {
-      alert("Verification failed: " + err.message);
-    }
-  };
+  if (isLoading) return <LoadingSpinner label="Personalizing your workspace..." />;
 
-  if (isLoading) return <LoadingSpinner label="Synchronizing with TalentFlow..." />;
+  const isCandidate = user.role === 'candidate';
 
-  // Ensure there's always something in the recommended section for candidates
-  const finalRecommendations = (user.role === 'candidate' && (!recommendedJobs || recommendedJobs.length === 0))
-    ? [
-      {
-        _id: "rec_1",
-        title: "Senior Product Designer",
-        company: { name: "DesignHaus" },
-        location: "Remote",
-        type: "Full-time",
-        salary: "$140k - $180k",
-        matchScore: 94
-      },
-      {
-        _id: "rec_2",
-        title: "Staff Software Engineer",
-        company: { name: "Nebula Systems" },
-        location: "Bangalore",
-        type: "Full-time",
-        salary: "₹45L - ₹65L",
-        matchScore: 88
-      },
-      {
-        _id: "rec_3",
-        title: "Cloud Infrastructure Architect",
-        company: { name: "Azurea Tech" },
-        location: "San Francisco",
-        type: "Contract",
-        salary: "$200k+",
-        matchScore: 82
-      }
-    ]
-    : recommendedJobs;
-
-  const getCandidateMetrics = () => [
-    { label: "Applied", count: stats?.applications || 0, icon: FileText, color: "var(--primary)" },
-    { label: "Interviews", count: stats?.interviews || 0, icon: Zap, color: "var(--warning)" },
-    { label: "Offers", count: stats?.offers || 0, icon: Award, color: "var(--success)" },
-    { label: "Profile Views", count: stats?.profileViews || 0, icon: Eye, color: "var(--info)" }
+  const dashboardStats = isCandidate ? [
+    { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "+3 this week", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "1 upcoming", up: true },
+    { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Under review", up: false },
+    { label: "PROFILE VIEWS", value: stats?.profileViews || 147, icon: Eye, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "+12 today", up: true },
+  ] : [
+    { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "+15 new", up: true },
+    { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "2 closing soon", up: false },
+    { label: "APPLICATIONS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "+8 today", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "4 today", up: true },
   ];
 
-  const getAdminMetrics = () => [
-    { label: "Active Jobs", count: stats?.jobs || 0, icon: Briefcase, color: "var(--primary)" },
-    { label: "Total Candidates", count: stats?.candidates || 0, icon: Users, color: "var(--info)" },
-    { label: "Applications", count: stats?.applications || 0, icon: FileText, color: "var(--warning)" },
-    { label: "Hired", count: 0, icon: CheckCircle, color: "var(--success)" }
-  ];
-
-  const metrics = user.role === "candidate" ? getCandidateMetrics() : getAdminMetrics();
+  const profileTasks = isCandidate ? PROFILE_ITEMS : RECRUITER_TASKS;
+  const doneTasks = profileTasks.filter(t => t.done).length;
+  const taskPct = Math.round((doneTasks / profileTasks.length) * 100);
 
   return (
-    <div className={styles.container}>
-      <header className={styles.header}>
-        <div className={styles.headerIllustration}>
-          <img src={illustration} alt="Recruitment Illustration" />
-        </div>
-        <div className={styles.headerFlex}>
-          <div>
-            <h1 className={styles.title}>Welcome back, {user.fname}! 👋</h1>
-            <p className={styles.subtitle}>
-              {user.role === 'candidate'
-                ? "You have 3 new matching jobs since yesterday."
-                : "Here's the recruiter activity for today."}
-            </p>
+    <div className={styles.page}>
+      {/* ─── Hero Section ─── */}
+      <div className={`${styles.hero} anim-0`}>
+        <div className={styles.heroContent}>
+          <div className={styles.heroGreeting}>Welcome back, {user.fname}! 👋</div>
+          <div className={styles.heroSub}>
+            {isCandidate 
+              ? "You have 3 new matching jobs and 1 interview scheduled this week."
+              : `You have ${dataList?.length || 0} new applications to review today.`}
           </div>
-          {user.role === "candidate" && (
-            <div className={styles.ctaCard}>
-              <h3 className="text-gradient">Ready for more?</h3>
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <Button size="sm" onClick={() => navigate('/jobs')}>Browse Jobs</Button>
-                <Button size="sm" variant="ghost">Get AI Help</Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
-
-      <div className={styles.metricsGrid}>
-        {metrics.map((m, i) => (
-          <Card key={m.label} className={styles.metricCard} premium style={{ animationDelay: `${i * 0.1}s` }}>
-            <div className={styles.metricIcon} style={{ backgroundColor: `${m.color}20`, color: m.color }}>
-              <m.icon size={24} />
-            </div>
-            <div className={styles.metricInfo}>
-              <span className={styles.statLabel}>{m.label}</span>
-              <h3 className={`${styles.statValue} animate-count`}>{m.count}</h3>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {user.role === "candidate" && (
-        <section className={styles.mncSection}>
-          <div className={styles.mncHeader}>
-            <h2 className="text-gradient">Get hired in the top MNCs</h2>
-            <p>Trusted by industry leaders worldwide for talent acquisition.</p>
-          </div>
-          <div className={styles.mncSlider}>
-            <div className={styles.mncTrack}>
-              {[
-                { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
-                { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
-                { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
-                { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
-                { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
-                { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
-                { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
-                { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
-                { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
-                { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
-                { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
-                { name: "Uber", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRans05n-lascdg4-G9CPspq_djrQ-Q9DpwPg&s" },
-                { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" }
-              ].map((company, i) => (
-                <div key={i} className={styles.mncLogo}>
-                  <div className={styles.mncIcon}>
-                    <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  </div>
-                  <span>{company.name}</span>
-                </div>
-              ))}
-              {[
-                { name: "Google", logo: "https://www.vectorlogo.zone/logos/google/google-icon.svg" },
-                { name: "Amazon", logo: "https://www.vectorlogo.zone/logos/amazon/amazon-icon.svg" },
-                { name: "Meta", logo: "https://www.vectorlogo.zone/logos/facebook/facebook-official.svg" },
-                { name: "Microsoft", logo: "https://www.vectorlogo.zone/logos/microsoft/microsoft-icon.svg" },
-                { name: "Netflix", logo: "https://www.vectorlogo.zone/logos/netflix/netflix-icon.svg" },
-                { name: "Tesla", logo: "https://www.vectorlogo.zone/logos/tesla/tesla-icon.svg" },
-                { name: "NVIDIA", logo: "https://www.vectorlogo.zone/logos/nvidia/nvidia-icon.svg" },
-                { name: "IBM", logo: "https://www.vectorlogo.zone/logos/ibm/ibm-icon.svg" },
-                { name: "Adobe", logo: "https://www.vectorlogo.zone/logos/adobe/adobe-icon.svg" },
-                { name: "Salesforce", logo: "https://www.vectorlogo.zone/logos/salesforce/salesforce-icon.svg" },
-                { name: "Spotify", logo: "https://www.vectorlogo.zone/logos/spotify/spotify-icon.svg" },
-                { name: "Uber", logo: "https://www.vectorlogo.zone/logos/uber/uber-icon.svg" },
-                { name: "Airbnb", logo: "https://www.vectorlogo.zone/logos/airbnb/airbnb-icon.svg" }
-              ].map((company, i) => (
-                <div key={`${i}-dup`} className={styles.mncLogo}>
-                  <div className={styles.mncIcon}>
-                    <img src={company.logo} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                  </div>
-                  <span>{company.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {user.role === "candidate" && (
-        <Card className={styles.candidateWelcome} premium glow style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Ready for your next opportunity?</h2>
-          <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>Browse open jobs and track your applications easily.</p>
-        </Card>
-      )}
-
-      <div className={styles.dashboardGrid}>
-        <div className={styles.recentSection}>
-          <div className={styles.sectionHeader}>
-            <h3>Recommended for You</h3>
-            <button className={styles.viewAll} onClick={() => navigate('/jobs')}>View All Opportunities</button>
-          </div>
-
-
-          <div className={styles.jobList}>
-            {user.role === 'candidate' ? (
-              finalRecommendations.map((job, i) => (
-                <Card key={job._id} className={styles.recommendationCard} premium glow style={{ animationDelay: `${i * 0.15}s` }}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.companyInfo}>
-                      <div className={styles.companyLogo}>
-                        {job.company?.name?.[0] || job.title[0]}
-                      </div>
-                      <div>
-                        <h4 style={{ fontSize: '1.25rem' }}>{job.title}</h4>
-                        <p style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{job.company?.name || 'Top Tier Company'}</p>
-                      </div>
-                    </div>
-                    <div className={`${styles.matchBadge} ${job.matchScore > 85 ? styles.matchHigh : job.matchScore > 70 ? styles.matchMed : styles.matchLow}`}>
-                      {job.matchScore}% Match
-                    </div>
-                  </div>
-
-                  <div className={styles.tags}>
-                    <span className={styles.tag}><MapPin size={12} /> {job.location}</span>
-                    <span className={styles.tag}><Clock size={12} /> {job.type}</span>
-                    {job.salary && <span className={styles.tag}><TrendingUp size={12} /> {job.salary}</span>}
-                  </div>
-
-                  <div className={styles.cardFooter}>
-                    <span className={styles.salary}>{job.salary || "Competitive Pay"}</span>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
-                      <Button variant="ghost" size="sm" style={{ padding: '0.5rem' }}><Heart size={18} /></Button>
-                      <Button size="sm" onClick={() => navigate(`/jobs/${job._id}`)}>Quick Apply</Button>
-                    </div>
-                  </div>
-                </Card>
-              ))
+          <div className={styles.heroChips}>
+            {isCandidate ? (
+              <>
+                <div className={styles.heroChip}><Flame size={12} /> 96% match at Stripe</div>
+                <div className={styles.heroChip}><CalendarDays size={12} /> Interview · Apr 20</div>
+                <div className={styles.heroChip}><TrendingUp size={12} /> Profile views up 12%</div>
+              </>
             ) : (
-              recommendedJobs.map(job => (
-                <Card key={job._id} className={styles.jobCard} premium>
-                  <div className={styles.jobInfo}>
-                    <h4>{job.title}</h4>
-                    <p>{job.department} · {job.location}</p>
-                  </div>
-                  <div className={styles.jobMeta}>
-                    <span>{format(new Date(job.createdAt), "MMM d")}</span>
-                    <span className={styles.applicantBadge}>{job.applicantsCount} applied</span>
-                  </div>
-                </Card>
-              ))
+              <>
+                <div className={styles.heroChip}><Target size={12} /> 12 candidates shortlisted</div>
+                <div className={styles.heroChip}><MessageSquare size={12} /> 5 unread messages</div>
+                <div className={styles.heroChip}><CheckCircle size={12} /> 2 offers accepted</div>
+              </>
             )}
           </div>
         </div>
+        <div className={styles.heroRight}>
+          <button className={styles.heroCta} onClick={() => navigate(isCandidate ? '/jobs' : '/applications')}>
+            {isCandidate ? <Briefcase size={15} /> : <FileText size={15} />} 
+            {isCandidate ? 'Browse Jobs' : 'Review Apps'} <ArrowRight size={14} />
+          </button>
+          <button className={styles.heroCtaSecondary}>
+            <Sparkles size={14} /> AI Insights
+          </button>
+        </div>
+      </div>
 
-        <div className={styles.insightsPanel}>
-          <div className={styles.sectionHeader}>
-            <h3>AI Talent Match</h3>
+      {/* ─── Stats Grid ─── */}
+      <div className={styles.statsGrid}>
+        {dashboardStats.map((s, i) => <StatCardItem key={s.label} {...s} delay={i + 1} />)}
+      </div>
+
+      {/* ─── Main Content Grid ─── */}
+      <div className={styles.twoCol}>
+        {/* Left Column */}
+        <div className={styles.leftCol}>
+          <div className={`${styles.card} anim-3`}>
+            <div className={styles.cardHeader}>
+              <div>
+                <div className={styles.cardTitle}>{isCandidate ? 'Recommended Jobs' : 'Recent Applications'}</div>
+                <div className={styles.cardSubtitle}>
+                  {isCandidate ? 'Based on your professional identity' : 'Latest candidates joining the pipeline'}
+                </div>
+              </div>
+              <span className={styles.sectionLink} onClick={() => navigate(isCandidate ? '/jobs' : '/applications')}>
+                View all <ArrowRight size={12} />
+              </span>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.jobList}>
+                {isCandidate ? (
+                  dataList?.map((job, i) => {
+                    const match = job.matchScore || (80 + (i * 4) % 15);
+                    return (
+                      <div className={styles.jobCard} key={job._id || i} onClick={() => navigate(`/jobs/${job._id}`)}>
+                        <div className={styles.jobLogo} style={{ background: 'var(--premium-gradient)', opacity: 0.9 }}>
+                          {job.company?.name?.[0] || 'J'}
+                        </div>
+                        <div className={styles.jobInfo}>
+                          <div className={styles.jobRole}>{job.title}</div>
+                          <div className={styles.jobMeta}>
+                            <span className={styles.jobMetaItem}><Building2 size={11} />{job.company?.name || 'MNC'}</span>
+                            <span className={styles.jobMetaItem}><MapPin size={11} />{job.location}</span>
+                            <span className={styles.typeTag}>{job.type || 'Full-time'}</span>
+                          </div>
+                        </div>
+                        <div className={styles.jobRight}>
+                          <div className={`${styles.matchBadge} ${match >= 90 ? styles.matchHigh : styles.matchMed}`} style={{ 
+                            background: match >= 90 ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.15)',
+                            color: match >= 90 ? '#34d399' : '#818cf8'
+                          }}>
+                            {match}% match
+                          </div>
+                          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                            <button className={styles.applyBtn}>Quick Apply</button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  dataList?.map((app, i) => (
+                    <div className={styles.jobCard} key={app._id || i} onClick={() => navigate(`/applications/${app._id}`)}>
+                      <div className={styles.jobLogo} style={{ background: 'var(--premium-gradient)', opacity: 0.8 }}>
+                        {app.candidate?.fname?.[0] || 'C'}
+                      </div>
+                      <div className={styles.jobInfo}>
+                        <div className={styles.jobRole}>{app.candidate?.fname} {app.candidate?.lname}</div>
+                        <div className={styles.jobMeta}>
+                          <span className={styles.jobMetaItem}><Briefcase size={11} />{app.job?.title}</span>
+                          <span className={styles.typeTag} style={{ background: 'rgba(56,189,248,0.15)', color: '#38bdf8' }}>{app.status}</span>
+                        </div>
+                      </div>
+                      <div className={styles.jobRight}>
+                        <div className={styles.jobMetaItem}><Clock size={11} />{new Date(app.createdAt).toLocaleDateString()}</div>
+                        <button className={styles.applyBtn} style={{ background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)' }}>Details</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
 
-          {user.role === 'candidate' && (
-            <Card className={styles.insightCard} premium glow style={{ marginBottom: '1.5rem', background: 'linear-gradient(to bottom right, var(--bg-elevated), var(--primary-light))' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ padding: '0.5rem', background: 'var(--primary)', color: 'white', borderRadius: '8px' }}>
-                  <Zap size={20} />
-                </div>
-                <div style={{ fontWeight: 700 }}>AI Resume Matcher</div>
+          <div className={styles.card} style={{ marginTop: 20 }}>
+            <div className={styles.cardHeader}>
+              <div>
+                <div className={styles.cardTitle}>Recent Activity</div>
+                <div className={styles.cardSubtitle}>Your latest system interactions</div>
               </div>
-              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>92%</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>OVERALL PROFILE STRENGTH</div>
-              </div>
-              <div style={{ marginTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.813rem', marginBottom: '0.25rem' }}>
-                  <span>Matching Skills</span>
-                  <span style={{ color: 'var(--success)', fontWeight: 700 }}>8/10</span>
-                </div>
-                <div style={{ height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: '80%', background: 'var(--primary)', borderRadius: '10px' }} />
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" fullWidth style={{ marginTop: '1.25rem', border: '1px dashed var(--primary)' }}>
-                Re-scan Resume
-              </Button>
-            </Card>
-          )}
-
-          <div className={styles.sectionHeader}>
-            <h3>Intelligence & Trends</h3>
-          </div>
-
-          {user.role === 'candidate' && (
-            <Card className={styles.insightCard} glow>
-              <div className={styles.insightHeader}>
-                <BookOpen size={18} color="var(--primary)" />
-                <span>Improve your chances</span>
-              </div>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                Based on jobs you match with, adding these skills could increase your visibility by 40%.
-              </p>
-              <div className={styles.suggestedSkills}>
-                {[
-                  { name: 'System Design', demand: 'High' },
-                  { name: 'AWS Cloud', demand: 'Medium' },
-                  { name: 'Redux State Management', demand: 'High' }
-                ].map((skill, i) => (
-                  <div key={i} className={styles.skillItem}>
-                    <span>{skill.name}</span>
-                    <button
-                      className={styles.ctaLink}
-                      onClick={() => handleAddSkill(skill.name)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
-                      Add to Profile
-                    </button>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.activityFeed}>
+                {(isCandidate ? [
+                  { icon: FileText, text: "Applied to Senior Frontend Engineer at Stripe", time: "2h ago", color: "#6366f1" },
+                  { icon: CalendarDays, text: "Interview scheduled with Linear · Apr 20, 2:00 PM", time: "5h ago", color: "#f59e0b" },
+                  { icon: Eye, text: "Notion viewed your profile", time: "1d ago", color: "#c084fc" },
+                ] : [
+                  { icon: CheckCircle, text: "Sent offer to Alex Rivera for Backend Lead", time: "1h ago", color: "#10b981" },
+                  { icon: CalendarDays, text: "4 interviews scheduled for today", time: "3h ago", color: "#f59e0b" },
+                  { icon: Users, text: "New application received for Product Manager", time: "4h ago", color: "#6366f1" },
+                ]).map((act, i) => (
+                  <div className={styles.activityItem} key={i}>
+                    <div className={styles.activityDot} style={{ background: act.color }} />
+                    <div className={styles.activityContent}>
+                      <p className={styles.activityAction}>{act.text}</p>
+                      <span className={styles.activityTime}>{act.time}</span>
+                    </div>
                   </div>
                 ))}
               </div>
-            </Card>
-          )}
-
-          <Card className={styles.insightCard}>
-            <div className={styles.insightHeader}>
-              <TrendingUp size={18} color="var(--success)" />
-              <span>Global Market Trends</span>
             </div>
-            <div className={styles.newsGrid} style={{ border: 'none' }}>
-              {[
-                { title: "Generative AI in Recruitment", trend: "Up 45%", detail: "AI-driven screening is becoming the standard for 2024." },
-                { title: "Remote-First Stability", trend: "Steady", detail: "MNCs are standardizing hybrid models across EU/US." },
-                { title: "FinTech Hiring Surge", trend: "High Demand", detail: "Massive scaling in embedded finance sectors." }
-              ].map((news, i) => (
-                <div key={i} className={styles.newsItem} style={{ border: 'none', padding: '0.75rem 0' }}>
-                  <h4 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>{news.title}</h4>
-                  <p style={{ fontSize: '0.813rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>{news.detail}</p>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--success)', fontWeight: 700 }}>{news.trend}</span>
-                </div>
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className={styles.rightCol}>
+          <div className={`${styles.card} anim-4`}>
+            <div className={styles.cardHeader}>
+              <div>
+                <div className={styles.cardTitle}>{isCandidate ? 'Application Activity' : 'Hiring Pipeline'}</div>
+                <div className={styles.cardSubtitle}>Monthly performance overview</div>
+              </div>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.chartLegend}>
+                <div className={styles.legendItem}><div className={styles.legendDot} style={{ background: "#6366f1" }} />Apps</div>
+                <div className={styles.legendItem}><div className={styles.legendDot} style={{ background: "#f59e0b" }} />Interviews</div>
+                <div className={styles.legendItem}><div className={styles.legendDot} style={{ background: "#10b981" }} />Placements</div>
+              </div>
+              <div style={{ height: 200 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={CHART_DATA} margin={{ top: 0, right: 0, bottom: 0, left: -24 }}>
+                    <defs>
+                      <linearGradient id="gApp" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="gInt" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="gOff" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="month" tick={{ fill: "#475569", fontSize: 11, fontFamily: "Outfit" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "#475569", fontSize: 10, fontFamily: "Outfit" }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="Applications" stroke="#6366f1" strokeWidth={2} fill="url(#gApp)" dot={false} />
+                    <Area type="monotone" dataKey="Interviews" stroke="#f59e0b" strokeWidth={2} fill="url(#gInt)" dot={false} />
+                    <Area type="monotone" dataKey="Hired" stroke="#10b981" strokeWidth={2} fill="url(#gOff)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          <div className={`${styles.card} anim-5`} style={{ marginTop: 20 }}>
+            <div className={styles.cardHeader}>
+              <div>
+                <div className={styles.cardTitle}>{isCandidate ? 'Profile Strength' : 'Recruitment Health'}</div>
+                <div className={styles.cardSubtitle}>{doneTasks} of {profileTasks.length} objectives met</div>
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 800, background: "linear-gradient(135deg,#818cf8,#c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{taskPct}%</div>
+            </div>
+            <div className={styles.cardBody}>
+              <div className={styles.progressBar} style={{ marginBottom: 14 }}>
+                <div className={styles.progressFill} style={{ width: `${taskPct}%` }} />
+              </div>
+              <div className={styles.profileItems}>
+                {profileTasks.map((item) => (
+                  <div key={item.label} className={`${styles.profileItem} ${item.done ? styles.done : styles.pending}`}>
+                    {item.done
+                      ? <CheckSquare size={14} style={{ color: "#6366f1", flexShrink: 0 }} />
+                      : <div style={{ width: 14, height: 14, borderRadius: 4, border: "1.5px solid #334155", flexShrink: 0 }} />}
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`${styles.card} anim-5`} style={{ marginTop: 24 }}>
+        <div className={styles.cardHeader}>
+          <div>
+            <div className={styles.cardTitle}>Top {isCandidate ? 'Hiring Companies' : 'Talent Partners'}</div>
+            <div className={styles.cardSubtitle}>Industry leaders within the TalentFlow system</div>
+          </div>
+        </div>
+        <div className={styles.cardBody}>
+          <div className={styles.marqueeOuter}>
+            <div className={styles.marqueeTrack}>
+              {[...COMPANIES, ...COMPANIES].map((c, i) => (
+                <span className={styles.companyTag} key={i}>{c}</span>
               ))}
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>
