@@ -181,6 +181,26 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <div className={`${styles.card} anim-1`} style={{ marginTop: 24, marginBottom: 24 }}>
+        <div className={styles.cardHeader}>
+          <div>
+            <div className={styles.cardTitle}>Top {isCandidate ? 'Hiring Companies' : 'Talent Partners'}</div>
+            <div className={styles.cardSubtitle}>Industry leaders within the TalentFlow system</div>
+          </div>
+        </div>
+        <div className={styles.cardBody}>
+          <div className={styles.marqueeOuter}>
+            <div className={styles.marqueeTrack}>
+              {[...COMPANIES, ...COMPANIES].map((c, i) => (
+                <span className={styles.companyTag} key={i}>{c}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
       {/* ─── Stats Grid ─── */}
       <div className={styles.statsGrid}>
         {dashboardStats.map((s, i) => <StatCardItem key={s.label} {...s} delay={i + 1} />)}
@@ -361,23 +381,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className={`${styles.card} anim-5`} style={{ marginTop: 24 }}>
-        <div className={styles.cardHeader}>
-          <div>
-            <div className={styles.cardTitle}>Top {isCandidate ? 'Hiring Companies' : 'Talent Partners'}</div>
-            <div className={styles.cardSubtitle}>Industry leaders within the TalentFlow system</div>
-          </div>
-        </div>
-        <div className={styles.cardBody}>
-          <div className={styles.marqueeOuter}>
-            <div className={styles.marqueeTrack}>
-              {[...COMPANIES, ...COMPANIES].map((c, i) => (
-                <span className={styles.companyTag} key={i}>{c}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }
