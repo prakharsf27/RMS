@@ -7,6 +7,8 @@ import styles from "./AppLayout.module.css";
 import { Bell, Search, Menu } from "lucide-react";
 import { Input } from "../ui/Input";
 import { NotificationDropdown } from "../ui/NotificationDropdown";
+import { AIWidget } from "../ui/AIWidget";
+
 
 export const AppLayout = () => {
   const { user } = useAuth();
@@ -99,8 +101,10 @@ export const AppLayout = () => {
         <div className={styles.content}>
           <Outlet />
         </div>
+        <AIWidget />
       </main>
     </div>
+
   );
 };
 
