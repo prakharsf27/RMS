@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { 
   LayoutDashboard, Briefcase, FileText, MessageSquare, 
-  CalendarDays, User, Bell, Search, ChevronLeft, ChevronRight, 
+  CalendarDays, User, Users, Bell, Search, ChevronLeft, ChevronRight, 
   TrendingUp, Eye, Zap, Award, LogOut, Settings, Sparkles, 
   ArrowRight, Clock, CheckCircle, MapPin, Building2, Menu,
   Bot, Star, Bookmark, BarChart3, CheckSquare, ChevronDown,
