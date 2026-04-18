@@ -189,7 +189,7 @@ Output improved JSON with atsScore. Focus on: strong action verbs (Led, Architec
 /* ─── UTILS ─────────────────────────────────────────────────── */
 const fmt = (t) =>
   t.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-   .replace(/\`(.*?)\`/g, '<code style="background:rgba(99,102,241,.2);padding:1px 5px;border-radius:4px;font-size:11px;color:#a5b4fc;font-family:monospace">$1</code>')
+   .replace(/`(.*?)`/g, '<code style="background:rgba(99,102,241,.2);padding:1px 5px;border-radius:4px;font-size:11px;color:#a5b4fc;font-family:monospace">$1</code>')
    .replace(/^[-•]\s(.+)/gm, "<li>$1</li>")
    .replace(/<li>/g, "</ul><ul><li>")
    .replace("</ul>", "")
@@ -332,7 +332,7 @@ export default function ResumeAIChatbot() {
   const callAI = useCallback(async (userMsg, extraContext = "") => {
     setStreaming(true);
 
-    const fullMsg = extraContext ? userMsg + "\\n\\n" + extraContext : userMsg;
+    const fullMsg = extraContext ? userMsg + "\n\n" + extraContext : userMsg;
     const newHistory = [...historyRef.current, { role: "user", content: fullMsg }];
     setHistory(newHistory);
 
@@ -347,7 +347,7 @@ export default function ResumeAIChatbot() {
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 4000,
-          system: SYSTEM_PROMPTS[mode] + (userResume ? \`\\n\\nUser's existing resume:\\n\${userResume}\` : ""),
+          system: SYSTEM_PROMPTS[mode] + (userResume ? `\n\nUser's existing resume:\n${userResume}` : ""),
           messages: newHistory,
         }),
       });
@@ -358,7 +358,7 @@ export default function ResumeAIChatbot() {
       setMsgs(prev => prev.filter(m => m.id !== typingId));
 
       if (data.error) {
-        addMsg("bot", \`⚠️ API error: \${data.error.message}\`);
+        addMsg("bot", `⚠️ API error: ${data.error.message}`);
         setStreaming(false);
         return;
       }
@@ -367,8 +367,8 @@ export default function ResumeAIChatbot() {
       setHistory(h => [...h, { role: "assistant", content: fullText }]);
 
       // Extract JSON
-      const jsonMatch = fullText.match(/\`\`\`resume-json\\n([\\s\\S]*?)\\n\`\`\`/);
-      let displayText = fullText.replace(/\`\`\`resume-json\\n[\\s\\S]*?\\n\`\`\`/, "").trim();
+      const jsonMatch = fullText.match(/```resume-json\n([\s\S]*?)\n```/);
+      let displayText = fullText.replace(/```resume-json\n[\s\S]*?\n```/, "").trim();
       if (!displayText) displayText = "✅ Your resume has been updated! Check the preview →";
 
       if (jsonMatch) {
@@ -400,7 +400,7 @@ export default function ResumeAIChatbot() {
 
     } catch (err) {
       setMsgs(prev => prev.filter(m => m.id !== typingId));
-      addMsg("bot", \`⚠️ Connection error: \${err.message}\\n\\nMake sure your Anthropic API key is configured.\`);
+      addMsg("bot", `⚠️ Connection error: ${err.message}\n\nMake sure your Anthropic API key is configured.`);
       setStreaming(false);
     }
   }, [mode, userResume, addMsg]);
@@ -418,16 +418,16 @@ export default function ResumeAIChatbot() {
     setUserResume(pasteText.trim());
     setPasteText("");
     setShowPaste(false);
-    addMsg("user", \`[Pasted resume — \${pasteText.split("\\n").length} lines]\`);
-    callAI("I pasted my existing resume. Please analyze it and show me an improved version. My resume:\\n\\n" + pasteText);
+    addMsg("user", `[Pasted resume — ${pasteText.split("\n").length} lines]`);
+    callAI("I pasted my existing resume. Please analyze it and show me an improved version. My resume:\n\n" + pasteText);
   };
 
   const tailorWithJD = () => {
     if (!jdText.trim()) return;
     setShowJD(false);
     const msg = resumeData
-      ? "Please tailor my resume for this job description:\\n\\n" + jdText
-      : "I want to target this role. Build/optimize my resume for:\\n\\n" + jdText;
+      ? "Please tailor my resume for this job description:\n\n" + jdText
+      : "I want to target this role. Build/optimize my resume for:\n\n" + jdText;
     addMsg("user", "[Job Description pasted]");
     callAI(msg);
     setJdText("");
@@ -436,11 +436,11 @@ export default function ResumeAIChatbot() {
   const copyResume = () => {
     if (!resumeData) return;
     const { name, tagline, email, phone, location, summary, experience = [], education = [], skills = {} } = resumeData;
-    let t = \`\${name}\\n\${tagline}\\n\${email} | \${phone} | \${location}\\n\\nSUMMARY\\n\${summary}\\n\\nEXPERIENCE\\n\`;
-    experience.forEach(e => { t += \`\${e.role} — \${e.company} (\${e.date})\\n\`; (e.bullets||[]).forEach(b => t += \`• \${b}\\n\`); t += "\\n"; });
-    education.forEach(e => t += \`\${e.degree}, \${e.school} (\${e.date})\\n\`);
+    let t = `${name}\n${tagline}\n${email} | ${phone} | ${location}\n\nSUMMARY\n${summary}\n\nEXPERIENCE\n`;
+    experience.forEach(e => { t += `${e.role} — ${e.company} (${e.date})\n`; (e.bullets||[]).forEach(b => t += `• ${b}\n`); t += "\n"; });
+    education.forEach(e => t += `${e.degree}, ${e.school} (${e.date})\n`);
     const allSkills = [...(skills.highlighted||[]), ...(skills.regular||[])];
-    if (allSkills.length) t += \`\\nSKILLS\\n\${allSkills.join(" • ")}\`;
+    if (allSkills.length) t += `\nSKILLS\n${allSkills.join(" • ")}`;
     navigator.clipboard.writeText(t).then(() => alert("Resume copied to clipboard!"));
   };
 
@@ -461,7 +461,7 @@ export default function ResumeAIChatbot() {
           </div>
           <div className="rai-tabs">
             {MODES.map(m => (
-              <div key={m.id} className={\`rai-tab\${mode === m.id ? " active" : ""}\`} onClick={() => !streaming && setMode(m.id)}>
+              <div key={m.id} className={`rai-tab${mode === m.id ? " active" : ""}`} onClick={() => !streaming && setMode(m.id)}>
                 {m.label}
               </div>
             ))}
@@ -471,8 +471,8 @@ export default function ResumeAIChatbot() {
         {/* Messages */}
         <div className="rai-msgs" ref={msgsRef}>
           {msgs.map(msg => (
-            <div key={msg.id} className={\`rai-msg\${msg.role === "user" ? " user" : ""}\`}>
-              <div className={\`rai-msg-av \${msg.role}\`}>{msg.role === "bot" ? "✨" : "PS"}</div>
+            <div key={msg.id} className={`rai-msg${msg.role === "user" ? " user" : ""}`}>
+              <div className={`rai-msg-av ${msg.role}`}>{msg.role === "bot" ? "✨" : "PS"}</div>
               <div>
                 {msg.typing ? (
                   <div className="rai-bubble bot">
@@ -480,13 +480,13 @@ export default function ResumeAIChatbot() {
                   </div>
                 ) : (
                   <div
-                    className={\`rai-bubble \${msg.role}\${msg.streaming ? " streaming" : ""}\`}
+                    className={`rai-bubble ${msg.role}${msg.streaming ? " streaming" : ""}`}
                     dangerouslySetInnerHTML={msg.role === "bot" ? { __html: fmt(msg.text) } : undefined}
                   >
                     {msg.role === "user" ? esc(msg.text) : undefined}
                   </div>
                 )}
-                <div className={\`rai-time\${msg.role === "user" ? " " : ""}\`} style={msg.role === "user" ? { textAlign: "right" } : {}}>
+                <div className={`rai-time${msg.role === "user" ? " " : ""}`} style={msg.role === "user" ? { textAlign: "right" } : {}}>
                   {msg.time}
                 </div>
               </div>
@@ -550,13 +550,13 @@ export default function ResumeAIChatbot() {
             <div>
               <div className="rai-resume-title">Live Resume Preview</div>
               <div className="rai-resume-sub">
-                {lastUpdated ? \`Last updated · \${lastUpdated}\` : "Start chatting to generate your resume"}
+                {lastUpdated ? `Last updated · ${lastUpdated}` : "Start chatting to generate your resume"}
               </div>
             </div>
             {atsScore && (
               <div className="rai-ats" style={{
                 background: atsScore >= 80 ? "rgba(16,185,129,.15)" : atsScore >= 60 ? "rgba(245,158,11,.15)" : "rgba(239,68,68,.15)",
-                border: \`1px solid \${atsScore >= 80 ? "rgba(16,185,129,.3)" : atsScore >= 60 ? "rgba(245,158,11,.3)" : "rgba(239,68,68,.3)"}\`,
+                border: `1px solid ${atsScore >= 80 ? "rgba(16,185,129,.3)" : atsScore >= 60 ? "rgba(245,158,11,.3)" : "rgba(239,68,68,.3)"}`,
                 color: atsScore >= 80 ? "#34d399" : atsScore >= 60 ? "#fbbf24" : "#f87171",
               }}>
                 <CheckCircle size={11} /> ATS: {atsScore}%
@@ -592,7 +592,7 @@ export default function ResumeAIChatbot() {
               </div>
               <textarea
                 className="rai-jd-ta"
-                placeholder={\`Senior Frontend Engineer at Stripe\\n\\nRequirements:\\n• 5+ years React / TypeScript\\n• Performance optimization experience\\n• Strong CSS & testing skills\\n\\nResponsibilities:\\n• Build scalable web applications\\n• Collaborate with design...\`}
+                placeholder={`Senior Frontend Engineer at Stripe\n\nRequirements:\n• 5+ years React / TypeScript\n• Performance optimization experience\n• Strong CSS & testing skills\n\nResponsibilities:\n• Build scalable web applications\n• Collaborate with design...`}
                 value={jdText}
                 onChange={e => setJdText(e.target.value)}
               />
