@@ -13,6 +13,7 @@ import Notifications from "./pages/Notifications";
 import Company from "./pages/Company";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
+import ResumeAI from "./pages/ResumeAI";
 
 
 function App() {
@@ -38,7 +39,7 @@ function App() {
         <Route path="/messages" element={<Messages />} />
         <Route path="/company" element={<Company />} />
         <Route path="/profile" element={<Profile />} />
-
+        <Route path="/resume-ai" element={<ResumeAI />} />
 
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/reports" element={<Reports />} />

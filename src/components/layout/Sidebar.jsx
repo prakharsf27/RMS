@@ -18,8 +18,8 @@ import {
   Sun,
   Moon,
   X,
-  Menu,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -66,6 +66,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
     { to: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
     { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
+    { to: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
     { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
