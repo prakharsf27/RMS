@@ -269,7 +269,7 @@ export default function Dashboard() {
                       </div>
                       <div className={styles.jobRight}>
                         <div className={styles.jobMetaItem}><Clock size={11} />{new Date(app.createdAt).toLocaleDateString()}</div>
-                        <button className={styles.applyBtn} style={{ background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)' }}>Details</button>
+                        <button className={styles.applyBtn} style={{ background: 'var(--bg-elevated-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}>Details</button>
                       </div>
                     </div>
                   ))
