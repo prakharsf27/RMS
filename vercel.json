@@ -3,6 +3,10 @@
   "framework": "nextjs",
   "rewrites": [
     {
+      "source": "/favicon.ico",
+      "destination": "/favicon.png"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
     }

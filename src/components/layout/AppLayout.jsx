@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from 'next/navigation';
 ;
 import { Sidebar } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
@@ -12,11 +13,18 @@ import { AIWidget } from "../ui/AIWidget";
 
 
 export const AppLayout = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading, router]);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -44,7 +52,7 @@ export const AppLayout = ({ children }) => {
     }
   };
 
-  if (!user) {
+  if (loading || !user) {
     return null;
   }
 

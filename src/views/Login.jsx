@@ -9,10 +9,10 @@ import styles from "./Login.module.css";
 import heroImage from '../assets/media__1774505635430.jpg';
 import { cn } from "../lib/utils";
 
-export default function Login() {
+export default function Login({ initialMode = "login" }) {
   const { login, register } = useAuth();
   
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(initialMode === "register");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fname, setFname] = useState("");
@@ -26,13 +26,23 @@ export default function Login() {
     setIsLoggingIn(true);
     setError("");
     
+    // Safety timeout to prevent infinite "Authenticating" state
+    const authTimeout = setTimeout(() => {
+        if (isLoggingIn) {
+            setIsLoggingIn(false);
+            setError("Server response taking too long. Please try again or check your connection.");
+        }
+    }, 15000);
+
     try {
       if (isRegister) {
         await register({ fname, lname, email, password, role });
       } else {
         await login(email, password);
       }
+      clearTimeout(authTimeout);
     } catch (err) {
+      clearTimeout(authTimeout);
       setError(err.response?.data?.message || err.message);
     } finally {
       setIsLoggingIn(false);
@@ -56,7 +66,7 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.leftPanel}>
         <img 
-          src={heroImage} 
+          src={heroImage.src || heroImage} 
           alt="TalentFlow RMS Hero" 
           className={styles.heroImage} 
         />
