@@ -110,7 +110,7 @@ const LandingPage = () => {
           ) : (
             <>
               <Link href="/login" className={cn(styles.btnGhost, styles.hideMobile)}>Sign in</Link>
-              <Link href="/login" className={cn(styles.btnPrimary, styles.hideMobile)}>
+              <Link href="/register" className={cn(styles.btnPrimary, styles.hideMobile)}>
                 Get started free
                 <ArrowRight size={14} strokeWidth={2.5} />
               </Link>
@@ -150,7 +150,7 @@ const LandingPage = () => {
                   ) : (
                     <>
                       <Link href="/login" className={styles.btnGhostFull} onClick={closeMenu}>Sign in</Link>
-                      <Link href="/login" className={styles.btnPrimaryFull} onClick={closeMenu}>
+                      <Link href="/register" className={styles.btnPrimaryFull} onClick={closeMenu}>
                         Get started free
                         <ArrowRight size={16} />
                       </Link>
@@ -184,7 +184,7 @@ const LandingPage = () => {
         </p>
 
         <div className={styles.heroCtas}>
-          <Link href="/login" className={cn(styles.btnHero, styles.primary)}>
+          <Link href="/register" className={cn(styles.btnHero, styles.primary)}>
             <Rocket size={16} />
             Start for free — no card needed
           </Link>

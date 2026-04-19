@@ -22,24 +22,13 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS Configuration - Loosened for Vercel production debugging
-const allowedOrigins = [
-  'http://localhost:5173',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow if no origin (like mobile apps/curl) or if matches allowed list or is a Vercel subdomain
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      callback(null, true);
-    } else {
-      console.warn(`Blocked by CORS: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true, // Allow all origins in production for debugging the 500 error
   credentials: true
 }));
+
+// Heartbeat route
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 // Ensure DB is connected before handling any requests
 app.use(dbMiddleware);

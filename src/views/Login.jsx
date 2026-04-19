@@ -66,7 +66,7 @@ export default function Login({ initialMode = "login" }) {
     <div className={styles.container}>
       <div className={styles.leftPanel}>
         <img 
-          src={heroImage.src || heroImage} 
+          src={typeof heroImage === 'string' ? heroImage : (heroImage?.src || heroImage?.default?.src || "/favicon.png")} 
           alt="TalentFlow RMS Hero" 
           className={styles.heroImage} 
         />
