@@ -20,8 +20,10 @@ import {
   DollarSign, 
   Check, 
   X,
-  Plus
+  Plus,
+  Menu
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
 import styles from "./LandingPage.module.css";
 
@@ -54,44 +56,109 @@ const Reveal = ({ children, delay = 0 }) => {
 const LandingPage = () => {
   const { user } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeHash, setActiveHash] = useState("");
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      
+      // Update active hash
+      const sections = ["features", "how", "pricing"];
+      const current = sections.find(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+      if (current) setActiveHash(`#${current}`);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <div className={styles.container}>
       {/* --- NAV --- */}
       <nav className={cn(styles.nav, scrolled && styles.navScrolled)}>
-        <Link className={styles.navLogo} to="/">
+        <Link className={styles.navLogo} to="/" onClick={closeMenu}>
           <div className={styles.navLogoIcon}>T</div>
           <span className={styles.navLogoText}>TalentFlow</span>
         </Link>
         <div className={styles.navLinks}>
-          <a href="#features">Features</a>
-          <a href="#how">How it works</a>
-          <a href="#pricing">Pricing</a>
+          <a href="#features" className={activeHash === "#features" ? styles.active : ""}>Features</a>
+          <a href="#how" className={activeHash === "#how" ? styles.active : ""}>How it works</a>
+          <a href="#pricing" className={activeHash === "#pricing" ? styles.active : ""}>Pricing</a>
           <a href="#">Blog</a>
         </div>
         <div className={styles.navCtas}>
-          <ThemeToggle />
+          <div className={styles.themeToggleDesktop}>
+            <ThemeToggle />
+          </div>
           {user ? (
-            <Link to="/dashboard" className={styles.btnPrimary}>
+            <Link to="/dashboard" className={cn(styles.btnPrimary, styles.hideMobile)}>
               Back to Dashboard
               <ArrowRight size={14} strokeWidth={2.5} />
             </Link>
           ) : (
             <>
-              <Link to="/login" className={styles.btnGhost}>Sign in</Link>
-              <Link to="/login" className={styles.btnPrimary}>
+              <Link to="/login" className={cn(styles.btnGhost, styles.hideMobile)}>Sign in</Link>
+              <Link to="/login" className={cn(styles.btnPrimary, styles.hideMobile)}>
                 Get started free
                 <ArrowRight size={14} strokeWidth={2.5} />
               </Link>
             </>
           )}
+          
+          <div className={styles.mobileNavActions}>
+             <ThemeToggle />
+             <button className={styles.menuBtn} onClick={toggleMenu} aria-label="Toggle Menu">
+               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+             </button>
+          </div>
         </div>
+
+        {/* Mobile Drawer */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div 
+              className={styles.mobileDrawer}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className={styles.mobileLinks}>
+                <a href="#features" onClick={closeMenu}>Features</a>
+                <a href="#how" onClick={closeMenu}>How it works</a>
+                <a href="#pricing" onClick={closeMenu}>Pricing</a>
+                <a href="#" onClick={closeMenu}>Blog</a>
+                
+                <div className={styles.mobileDrawerCtas}>
+                  {user ? (
+                    <Link to="/dashboard" className={styles.btnPrimaryFull} onClick={closeMenu}>
+                      Back to Dashboard
+                      <ArrowRight size={16} />
+                    </Link>
+                  ) : (
+                    <>
+                      <Link to="/login" className={styles.btnGhostFull} onClick={closeMenu}>Sign in</Link>
+                      <Link to="/login" className={styles.btnPrimaryFull} onClick={closeMenu}>
+                        Get started free
+                        <ArrowRight size={16} />
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* --- HERO --- */}

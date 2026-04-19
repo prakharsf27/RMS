@@ -22,40 +22,41 @@
 }
 
 .header {
-  height: 64px;
+  height: 70px;
   background-color: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 0 2.5rem;
   position: sticky;
   top: 0;
-  z-index: 10;
-  gap: 1rem;
+  z-index: 50;
+  gap: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
 .hamburger {
   display: none;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
-  color: #000000;
+  color: var(--text-primary);
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 10px;
-  transition: all 0.2s;
+  padding: 0.625rem;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 }
-
-:global(.dark) .hamburger {
-  color: #ffffff;
-}
-
 
 .hamburger:hover {
-  background-color: var(--bg-elevated-hover);
-  color: var(--text-primary);
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .searchBar {
@@ -65,6 +66,12 @@
 
 .searchInput {
   margin-bottom: 0 !important;
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus-within {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
 }
 
 .actions {
@@ -75,27 +82,24 @@
 }
 
 .iconBtn {
-  background: transparent;
-  border: none;
-  color: #000000;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   cursor: pointer;
   position: relative;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: background-color 0.2s;
+  padding: 0.625rem;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-:global(.dark) .iconBtn {
-  color: #ffffff;
-}
-
-
 .iconBtn:hover {
   background-color: var(--bg-elevated-hover);
-  color: var(--text-primary);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .badge {
@@ -146,13 +150,14 @@
   }
 
   .header {
-    height: 60px;
-    padding: 0 1rem;
+    height: 70px;
+    padding: 0 1.25rem;
     justify-content: flex-start;
   }
 
   .actions {
     margin-left: auto;
+    gap: 0.75rem;
   }
 
   .content {

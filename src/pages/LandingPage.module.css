@@ -111,6 +111,7 @@
   cursor: pointer;
   transition: all 0.2s;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .btnGhost:hover {
@@ -132,11 +133,103 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
 }
 
 .btnPrimary:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 28px rgba(99, 102, 241, 0.4);
+}
+
+.hideMobile {
+  display: inline-flex !important;
+}
+
+.themeToggleDesktop {
+  display: flex;
+}
+
+.mobileNavActions {
+  display: none;
+  align-items: center;
+  gap: 12px;
+}
+
+.menuBtn {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.mobileDrawer {
+  position: fixed;
+  top: 80px; /* Below nav */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--bg-rgb), 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  z-index: 99;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.navScrolled + .mobileDrawer {
+  top: 64px;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.mobileLinks a {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.mobileDrawerCtas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.btnPrimaryFull, .btnGhostFull {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.btnPrimaryFull {
+  background: var(--premium-gradient);
+  color: white;
+}
+
+.btnGhostFull {
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
 /* --- HERO --- */
@@ -886,6 +979,10 @@
 @media (max-width: 768px) {
   .nav { padding: 0 24px; }
   .navLinks { display: none; }
+  .hideMobile { display: none !important; }
+  .themeToggleDesktop { display: none; }
+  .mobileNavActions { display: flex; }
+  
   .hero, .section, .spotlight, .howSection, .testiSection, .pricingSection, .finalCta { padding-left: 24px; padding-right: 24px; }
   .heroStatDivider { display: none; }
   .heroStats { flex-direction: column; gap: 24px; }

@@ -8,9 +8,11 @@
   position: sticky;
   top: 0;
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 50;
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .sidebar.collapsed {
@@ -155,9 +157,10 @@
 }
 
 .navItem.active {
-  background: rgba(99, 102, 241, 0.18);
+  background: rgba(99, 102, 241, 0.15);
   color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .navItem.active::before {
@@ -280,15 +283,14 @@
   gap: 0.75rem;
   width: 100%;
   padding: 0.75rem;
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
-  color: #000000;
-  border-radius: 10px;
+  color: var(--text-primary);
+  border-radius: 12px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :global(.dark) .logoutBtn {
