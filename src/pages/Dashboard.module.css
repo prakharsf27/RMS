@@ -537,14 +537,33 @@
   .twoCol { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 992px) {
+  .hero { 
+    flex-direction: column; 
+    align-items: flex-start; 
+    padding: 32px;
+    gap: 32px;
+  }
+  .heroRight { 
+    align-items: flex-start; 
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 768px) {
-  .page { padding: 16px; }
-  .hero { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
-  .heroRight { align-items: flex-start; }
+  .page { padding: 16px; gap: 16px; }
+  .hero { padding: 24px 20px; }
+  .heroGreeting { font-size: 24px; }
+  .heroRight { flex-direction: column; gap: 12px; }
+  .heroCta, .heroCtaSecondary { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 480px) {
   .statsGrid { grid-template-columns: 1fr; }
-  .jobCard { flex-direction: column; align-items: flex-start; }
+  .jobCard { flex-direction: column; align-items: flex-start; gap: 12px; }
   .jobRight { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; }
+  .statValue { font-size: 28px; }
+  .marqueeTrack { gap: 24px; }
 }

@@ -339,10 +339,19 @@
   padding-bottom: 12px;
 }
 
-.scoreGrid {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+@media (max-width: 640px) {
+  .scoreGrid {
+    flex-direction: column;
+  }
+  .scoreBox {
+    width: 100%;
+  }
+  .debriefPane {
+    padding: 16px;
+  }
+  .workspace {
+    gap: 12px;
+  }
 }
 
 .scoreBox {

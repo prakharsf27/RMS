@@ -126,12 +126,19 @@
 @media (max-width: 768px) {
   .overlay {
     display: block;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
   }
 
   .hamburger {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 0.5rem;
   }
 
   .searchBar {
@@ -139,11 +146,17 @@
   }
 
   .header {
+    height: 60px;
     padding: 0 1rem;
+    justify-content: flex-start;
+  }
+
+  .actions {
+    margin-left: auto;
   }
 
   .content {
-    padding: 1rem;
+    padding: 1.25rem 1rem;
   }
 }
 
@@ -153,7 +166,11 @@
     padding: 0 0.75rem;
   }
 
+  .actions {
+     gap: 0.5rem;
+  }
+
   .content {
-    padding: 0.75rem;
+    padding: 1rem 0.75rem;
   }
 }

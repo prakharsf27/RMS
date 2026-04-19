@@ -9,6 +9,11 @@ const css = `
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap');
 
 .rai-root { display:flex; height:calc(100vh - 100px); border-radius: 16px; overflow:hidden; background:#080d1a; font-family:'Outfit',sans-serif; color:#e2e8f0; }
+@media (max-width: 1024px) { 
+  .rai-root { flex-direction: column; height: auto; min-height: calc(100vh - 80px); }
+  .rai-chat { width: 100% !important; min-width: 0 !important; border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.07); height: 500px; }
+  .rai-resume-panel { width: 100%; height: 600px; }
+}
 .rai-root *,:before,:after { box-sizing:border-box; margin:0; padding:0; }
 .rai-root ::-webkit-scrollbar { width:4px; }
 .rai-root ::-webkit-scrollbar-thumb { background:rgba(99,102,241,.4); border-radius:2px; }
