@@ -22,7 +22,8 @@ import {
   Sparkles,
   Inbox,
   Video,
-  Menu
+  Menu,
+  Map
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -72,6 +73,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
     { to: "/recruiter-inbox", icon: Inbox, label: "ATS Validator", roles: ["candidate"] },
     { to: "/interview-simulator", icon: Video, label: "Mock Interview", roles: ["candidate"] },
+    { to: "/career-path", icon: Map, label: "Career Path", roles: ["candidate"] },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
     { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }

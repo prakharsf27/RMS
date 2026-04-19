@@ -9,9 +9,11 @@ import { Modal } from "../components/ui/Modal";
 import { JobForm } from "../components/forms/JobForm";
 import { ApplyForm } from "../components/forms/ApplyForm";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { Plus, Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, Filter, ChevronLeft, ChevronRight, Rocket } from "lucide-react";
 import { format } from "date-fns";
 import styles from "./Jobs.module.css";
+import SalaryCoach from "../components/features/SalaryCoach";
+import AutoPilotModal from "../components/features/AutoPilotModal";
 
 export default function Jobs() {
   const { user } = useAuth();
@@ -31,6 +33,7 @@ export default function Jobs() {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isAutoPilotOpen, setIsAutoPilotOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -156,6 +159,11 @@ export default function Jobs() {
           </p>
 
         </div>
+        {user.role === "candidate" && (
+          <Button onClick={() => setIsAutoPilotOpen(true)} variant="primary">
+            <Rocket size={18} /> Application Auto-Pilot
+          </Button>
+        )}
         {user.role !== "candidate" && (
           <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
             <Plus size={18} /> Post New Job
@@ -378,6 +386,10 @@ export default function Jobs() {
                        </ul>
                    </section>
                 )}
+
+                {user.role === "candidate" && (
+                    <SalaryCoach job={selectedJob} />
+                )}
             </div>
 
             {/* Footer Actions */}
@@ -408,6 +420,14 @@ export default function Jobs() {
             isSubmitting={isSubmitting} 
         />
       </Modal>
+
+      {user.role === 'candidate' && (
+         <AutoPilotModal 
+            isOpen={isAutoPilotOpen} 
+            onClose={() => setIsAutoPilotOpen(false)} 
+            selectedJobs={jobs.filter(j => !appliedJobIds.has(j._id))} 
+         />
+      )}
     </div>
   );
 }

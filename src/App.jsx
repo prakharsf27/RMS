@@ -16,6 +16,7 @@ import Messages from "./pages/Messages";
 import ResumeAI from "./pages/ResumeAI";
 import RecruiterInbox from "./pages/RecruiterInbox";
 import InterviewSimulator from "./pages/InterviewSimulator";
+import CareerPath from "./pages/CareerPath";
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         <Route path="/resume-ai" element={<ResumeAI />} />
         <Route path="/recruiter-inbox" element={<RecruiterInbox />} />
         <Route path="/interview-simulator" element={<InterviewSimulator />} />
+        <Route path="/career-path" element={<CareerPath />} />
 
         <Route path="/interviews" element={<Interviews />} />
         <Route path="/reports" element={<Reports />} />
