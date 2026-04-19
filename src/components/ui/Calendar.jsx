@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameMonth, isSameDay, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";

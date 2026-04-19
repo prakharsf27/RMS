@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { Bot, Sparkles, X, Send } from "lucide-react";
 import styles from "./AIWidget.module.css";

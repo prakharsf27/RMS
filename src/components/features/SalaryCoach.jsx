@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { DollarSign, MessageCircle, AlertCircle, RefreshCw, Briefcase } from "lucide-react";

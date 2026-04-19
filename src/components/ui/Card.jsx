@@ -1,3 +1,4 @@
+'use client';
 import { cn } from "../../lib/utils";
 import styles from "./Card.module.css";
 

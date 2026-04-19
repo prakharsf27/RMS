@@ -1,3 +1,4 @@
+'use client';
 import styles from "./LoadingSpinner.module.css";
 
 export const LoadingSpinner = ({ size = "md", label = "Loading data..." }) => {

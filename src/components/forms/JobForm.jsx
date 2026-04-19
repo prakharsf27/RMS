@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";

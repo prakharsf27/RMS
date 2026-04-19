@@ -1,3 +1,4 @@
+'use client';
 import { formatDistanceToNow } from "date-fns";
 import { Bell, Check, Trash2, X } from "lucide-react";
 import styles from "./NotificationDropdown.module.css";

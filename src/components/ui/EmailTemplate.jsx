@@ -1,3 +1,4 @@
+'use client';
 import { Mail, Calendar, CheckCircle, XCircle, Info } from "lucide-react";
 import { format } from "date-fns";
 import styles from "./EmailTemplate.module.css";

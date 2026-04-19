@@ -1,3 +1,4 @@
+'use client';
 import { Sun, Moon } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import styles from "./ThemeToggle.module.css";

@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/interviews/layout,_N_T_/interviews/page,_N_T_/interviews"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/interviews/__PAGE__",
+    "/interviews",
+    "/_index",
+    "/_head"
+  ]
+}

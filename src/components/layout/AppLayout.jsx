@@ -1,5 +1,6 @@
+'use client';
 import { useState, useEffect, useCallback } from "react";
-import { Outlet, Navigate } from "react-router-dom";
+;
 import { Sidebar } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../lib/api";
@@ -44,7 +45,7 @@ export const AppLayout = () => {
   };
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return /* redirect to "/login" replace  handled manually */ null;
   }
 
   return (

@@ -1,3 +1,4 @@
+'use client';
 import { useState, useRef, useEffect } from "react";
 import { Clock, ChevronDown } from "lucide-react";
 import { cn } from "../../lib/utils";
