@@ -9,6 +9,7 @@ import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail } from "lucide-react";
 import { format } from "date-fns";
+import CandidateCRM from "./CandidateCRM";
 
 export default function Applications() {
   const { user } = useAuth();
@@ -85,14 +86,17 @@ export default function Applications() {
   ].filter(Boolean);
 
   return (
+    user.role === "candidate" ? (
+       <CandidateCRM />
+    ) : (
     <div className="animate-fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>
-            {user.role === "candidate" ? "My Applications" : "Hiring Pipeline"}
+            Hiring Pipeline
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-            {user.role === "candidate" ? "Track your active job applications." : "Manage candidate progression and hiring decisions."}
+            Manage candidate progression and hiring decisions.
           </p>
         </div>
       </div>
@@ -267,5 +271,6 @@ export default function Applications() {
         )}
       </Card>
     </div>
+    )
   );
 }

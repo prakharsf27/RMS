@@ -19,7 +19,9 @@ import {
   Moon,
   X,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Inbox,
+  Video
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
@@ -67,6 +69,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { to: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
     { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
     { to: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
+    { to: "/recruiter-inbox", icon: Inbox, label: "ATS Validator", roles: ["candidate"] },
+    { to: "/interview-simulator", icon: Video, label: "Mock Interview", roles: ["candidate"] },
     { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
     { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
