@@ -13,6 +13,7 @@ createRoot(document.getElementById("root")).render(
       <ThemeProvider>
         <BrowserRouter>
           <App />
+          <Analytics />
         </BrowserRouter>
       </ThemeProvider>
     </AuthProvider>
