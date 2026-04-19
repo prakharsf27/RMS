@@ -88,7 +88,7 @@ const LandingPage = () => {
     <div className={styles.container}>
       {/* --- NAV --- */}
       <nav className={cn(styles.nav, scrolled && styles.navScrolled)}>
-        <Link className={styles.navLogo} to="/" onClick={closeMenu}>
+        <Link className={styles.navLogo} href="/" onClick={closeMenu}>
           <div className={styles.navLogoIcon}>T</div>
           <span className={styles.navLogoText}>TalentFlow</span>
         </Link>
@@ -710,7 +710,7 @@ const LandingPage = () => {
       {/* --- FOOTER --- */}
       <footer className={styles.footer}>
         <div className={styles.footBrand}>
-          <Link className={styles.footLogo} to="/">
+          <Link className={styles.footLogo} href="/">
             <div className={styles.footLogoIco}>T</div>
             <span className={styles.footLogoTxt}>TalentFlow</span>
           </Link>

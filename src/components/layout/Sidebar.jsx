@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 ;
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -34,6 +35,7 @@ import styles from "./Sidebar.module.css";
 export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(JSON.parse(localStorage.getItem("rms_sidebar_collapsed") || "false"));
   const [unreadMessages, setUnreadMessages] = useState(0);
 
@@ -59,22 +61,22 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
 
   const navLinks = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/jobs", icon: Briefcase, label: "Jobs", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
-    { to: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
-    { to: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
-    { to: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
-    { to: "/recruiter-inbox", icon: Inbox, label: "ATS Validator", roles: ["candidate"] },
-    { to: "/interview-simulator", icon: Video, label: "Mock Interview", roles: ["candidate"] },
-    { to: "/career-path", icon: Map, label: "Career Path", roles: ["candidate"] },
-    { to: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
-    { to: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
-    { to: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
+    { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "recruiter", "candidate"] },
+    { href: "/jobs", icon: Briefcase, label: "Jobs", roles: ["admin", "recruiter", "candidate"] },
+    { href: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
+    { href: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
+    { href: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
+    { href: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
+    { href: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
+    { href: "/recruiter-inbox", icon: Inbox, label: "ATS Validator", roles: ["candidate"] },
+    { href: "/interview-simulator", icon: Video, label: "Mock Interview", roles: ["candidate"] },
+    { href: "/career-path", icon: Map, label: "Career Path", roles: ["candidate"] },
+    { href: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
+    { href: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
+    { href: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
   ];
 
-  const allowedLinks = navLinks.filter(link => link.roles.includes(user.role));
+  const allowedLinks = navLinks.filter(link => link.roles.includes(user?.role));
 
   const handleNavClick = () => {
     if (onClose) onClose();
@@ -101,22 +103,25 @@ export const Sidebar = ({ isOpen, onClose }) => {
       </div>
 
       <nav className={styles.nav}>
-        {allowedLinks.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            onClick={handleNavClick}
-            className={({ isActive }) => cn(styles.navItem, isActive && styles.active)}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-              <link.icon size={20} />
-              <span className={styles.linkText}>{link.label}</span>
-            </div>
-            {link.badge > 0 && (
-              <span className={styles.navBadge}>{link.badge}</span>
-            )}
-          </NavLink>
-        ))}
+        {allowedLinks.map((link) => {
+          const isActive = pathname === link.href;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={handleNavClick}
+              className={cn(styles.navItem, isActive && styles.active)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                <link.icon size={20} />
+                <span className={styles.linkText}>{link.label}</span>
+              </div>
+              {link.badge > 0 && (
+                <span className={styles.navBadge}>{link.badge}</span>
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
       <div className={styles.footer}>

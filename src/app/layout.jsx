@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import { SITE_CONFIG, OrganizationSchema, WebsiteSchema } from '../lib/seo';
 import JsonLd from '../components/JsonLd';
 import Providers from '../components/Providers';
@@ -69,6 +70,7 @@ export default function RootLayout({ children }) {
         <Providers>
           {children}
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
