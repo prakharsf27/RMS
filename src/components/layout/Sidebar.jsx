@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../lib/api";
 import { cn } from "../../lib/utils";
 import {
@@ -30,14 +31,9 @@ import styles from "./Sidebar.module.css";
 
 export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
-  const [theme, setTheme] = useState(localStorage.getItem("rms_theme") || "light");
+  const { theme, toggleTheme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(JSON.parse(localStorage.getItem("rms_sidebar_collapsed") || "false"));
   const [unreadMessages, setUnreadMessages] = useState(0);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("rms_theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem("rms_sidebar_collapsed", JSON.stringify(isCollapsed));
@@ -59,9 +55,6 @@ export const Sidebar = ({ isOpen, onClose }) => {
     return () => clearInterval(interval);
   }, [user]);
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === "light" ? "dark" : "light");
-  };
 
   const navLinks = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "recruiter", "candidate"] },

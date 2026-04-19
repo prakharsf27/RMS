@@ -17,6 +17,7 @@ import ResumeAI from "./pages/ResumeAI";
 import RecruiterInbox from "./pages/RecruiterInbox";
 import InterviewSimulator from "./pages/InterviewSimulator";
 import CareerPath from "./pages/CareerPath";
+import LandingPage from "./pages/LandingPage";
 
 
 function App() {
@@ -29,8 +30,8 @@ function App() {
   return (
     <Routes>
       {/* 1. Public Routes */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
-      <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
 
       {/* 2. Protected Routes (Wrap all internal pages in AppLayout) */}
       <Route element={<AppLayout />}>
