@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import { usePathname } from 'next/navigation';
-;
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { Card } from "../components/ui/Card";
@@ -13,7 +12,7 @@ import { format } from "date-fns";
 
 export default function Messages() {
   const { user: currentUser } = useAuth();
-  const location = useLocation();
+  const searchParams = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -32,15 +31,13 @@ export default function Messages() {
         setConversations(convos);
         
         // If navigated from elsewhere with a specific user to chat with
-        const initialContact = location.state?.recipient;
-        if (initialContact) {
-          const existing = convos.find(c => c.contact._id === (initialContact._id || initialContact.id));
+        const initialRecipientId = searchParams.get('recipientId');
+        if (initialRecipientId) {
+          const existing = convos.find(c => c.contact._id === initialRecipientId);
           if (existing) {
             setActiveChat(existing.contact);
-          } else {
-            // Start a new conversation placeholder if it doesn't exist yet
-            setActiveChat(initialContact);
           }
+          // Note: If contact not in convo list, it could be fetched separately
         } else if (convos.length > 0) {
           setActiveChat(convos[0].contact);
         }
@@ -51,7 +48,7 @@ export default function Messages() {
       }
     };
     init();
-  }, [location.state]);
+  }, [searchParams]);
 
   // Fetch messages when active chat changes
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { AppLayout } from '../../components/layout/AppLayout';
 import View from '../../views/Messages';
 
 export const metadata = {
@@ -5,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <View />;
+  return <AppLayout><View /></AppLayout>;
 }

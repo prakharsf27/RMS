@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { usePathname, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 ;
 
 import api from "../lib/api";
@@ -15,9 +15,9 @@ import { cn } from "../lib/utils";
 
 export default function Profile() {
   const { user: authUser, logout } = useAuth();
-  const location = useLocation();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const viewingUserId = location.state?.userId;
+  const viewingUserId = searchParams.get('userId');
   const [viewedUser, setViewedUser] = useState(null);
   const [isViewingOthers, setIsViewingOthers] = useState(!!viewingUserId);
 

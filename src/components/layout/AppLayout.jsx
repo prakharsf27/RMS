@@ -11,7 +11,7 @@ import { NotificationDropdown } from "../ui/NotificationDropdown";
 import { AIWidget } from "../ui/AIWidget";
 
 
-export const AppLayout = () => {
+export const AppLayout = ({ children }) => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -45,7 +45,7 @@ export const AppLayout = () => {
   };
 
   if (!user) {
-    return /* redirect to "/login" replace  handled manually */ null;
+    return null;
   }
 
   return (
@@ -100,12 +100,11 @@ export const AppLayout = () => {
         </header>
 
         <div className={styles.content}>
-          <Outlet />
+          {children}
         </div>
         <AIWidget />
       </main>
     </div>
-
   );
 };
 
