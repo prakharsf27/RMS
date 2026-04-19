@@ -6,6 +6,7 @@ import { Card } from "../components/ui/Card";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
 import styles from "./Login.module.css";
 import heroImage from '../assets/media__1774505635430.jpg';
+import { cn } from "../lib/utils";
 
 export default function Login() {
   const { login, register } = useAuth();
@@ -72,6 +73,9 @@ export default function Login() {
       </div>
 
       <div className={styles.rightPanel}>
+        <div className={cn(styles.glowSphere, styles.glowTop)} />
+        <div className={cn(styles.glowSphere, styles.glowBottom)} />
+        
         <Card glow className={styles.loginCard}>
           <div className={styles.header}>
             <h2 className="text-gradient">{isRegister ? "Create an Account" : "Welcome Back"}</h2>
@@ -146,20 +150,19 @@ export default function Login() {
                </div>
             )}
 
-            {isRegister && (
-               <div style={{ marginBottom: '1rem' }}>
-                 <label style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Select Role</label>
+             {isRegister && (
+               <div className={styles.roleGroup}>
+                 <label>Select Role</label>
                  <select 
                    value={role} 
                    onChange={(e) => setRole(e.target.value)}
-                   style={{ width: '100%', padding: '0.625rem 0.75rem', borderRadius: '12px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-elevated)', color: 'var(--text-primary)', marginTop: '0.5rem', fontFamily: 'inherit' }}
+                   className={styles.roleSelect}
                  >
                    <option value="candidate">Candidate</option>
                    <option value="recruiter">Recruiter</option>
-                   
                  </select>
                </div>
-            )}
+             )}
 
             <Button type="submit" size="lg" className={styles.submitBtn} disabled={isLoggingIn}>
               {isLoggingIn ? "Authenticating..." : (isRegister ? "Register" : "Sign In")}
