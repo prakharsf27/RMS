@@ -21,7 +21,8 @@ import {
   MessageSquare,
   Sparkles,
   Inbox,
-  Video
+  Video,
+  Menu
 } from "lucide-react";
 
 import styles from "./Sidebar.module.css";
