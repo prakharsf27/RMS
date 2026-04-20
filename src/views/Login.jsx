@@ -5,12 +5,19 @@ import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { Mail, Lock, User as UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import styles from "./Login.module.css";
 import heroImage from '../assets/media__1774505635430.jpg';
 import { cn } from "../lib/utils";
 
 export default function Login({ initialMode = "login" }) {
-  const { login, register } = useAuth();
+  const { login, register, user } = useAuth();
+  const router = useRouter();
+  
+  // Redirect to dashboard if user is already logged in
+  if (user) {
+    router.push("/dashboard");
+  }
   
   const [isRegister, setIsRegister] = useState(initialMode === "register");
   const [email, setEmail] = useState("");
@@ -35,12 +42,19 @@ export default function Login({ initialMode = "login" }) {
     }, 15000);
 
     try {
+      let res;
       if (isRegister) {
-        await register({ fname, lname, email, password, role });
+        res = await register({ fname, lname, email, password, role });
       } else {
-        await login(email, password);
+        res = await login(email, password);
       }
       clearTimeout(authTimeout);
+      
+      if (!res.success) {
+        throw new Error(res.error);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       clearTimeout(authTimeout);
       setError(err.response?.data?.message || err.message);
@@ -53,8 +67,14 @@ export default function Login({ initialMode = "login" }) {
     setEmail(e);
     setPassword(p);
     setIsLoggingIn(true);
+    setError("");
     try {
-        await login(e, p);
+        const res = await login(e, p);
+        if (!res.success) {
+            throw new Error(res.error);
+        } else {
+            router.push("/dashboard");
+        }
     } catch (err) {
         setError(err.response?.data?.message || err.message);
     } finally {
