@@ -8,6 +8,7 @@ import { useTheme } from "../../context/ThemeContext";
 import api from "../../lib/api";
 import { cn } from "../../lib/utils";
 import {
+  Home,
   LayoutDashboard,
   Briefcase,
   Users,
@@ -61,6 +62,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
 
   const navLinks = [
+    { href: "/", icon: Home, label: "Home", roles: ["admin", "recruiter", "candidate"] },
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "recruiter", "candidate"] },
     { href: "/jobs", icon: Briefcase, label: "Jobs", roles: ["admin", "recruiter", "candidate"] },
     { href: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
