@@ -126,6 +126,11 @@
   background-color: var(--bg-color);
 }
 
+.noPadding {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
 /* ─── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .overlay {

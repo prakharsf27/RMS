@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <AppLayout><View /></AppLayout>;
+  return <AppLayout noPadding={true}><View /></AppLayout>;
 }

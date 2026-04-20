@@ -12,7 +12,7 @@ import { NotificationDropdown } from "../ui/NotificationDropdown";
 import { AIWidget } from "../ui/AIWidget";
 
 
-export const AppLayout = ({ children }) => {
+export const AppLayout = ({ children, noPadding = false }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -107,7 +107,7 @@ export const AppLayout = ({ children }) => {
           </div>
         </header>
 
-        <div className={styles.content}>
+        <div className={`${styles.content} ${noPadding ? styles.noPadding : ''}`}>
           {children}
         </div>
         <AIWidget />

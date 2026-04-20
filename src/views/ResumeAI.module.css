@@ -1,7 +1,7 @@
 .raiRoot {
   display: flex;
-  height: calc(100vh - 110px);
-  border-radius: 16px;
+  height: calc(100vh - 70px);
+  border-radius: 0;
   overflow: hidden;
   background: var(--bg-color);
   font-family: 'Outfit', sans-serif;
@@ -162,17 +162,18 @@
 
 .raiBubble {
   max-width: 82%;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 14px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.6;
 }
 
 .raiBubble.bot {
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   border-top-left-radius: 4px;
+  box-shadow: var(--shadow-sm);
 }
 
 .raiBubble.user {
@@ -309,17 +310,17 @@
 
 .raiTextarea {
   width: 100%;
-  padding: 11px 44px 11px 14px;
-  border-radius: 12px;
+  padding: 14px 50px 14px 18px;
+  border-radius: 14px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 15px;
   font-family: inherit;
   resize: none;
   outline: none;
-  min-height: 46px;
-  max-height: 120px;
+  min-height: 52px;
+  max-height: 150px;
   transition: all 0.2s;
   line-height: 1.5;
 }
@@ -489,14 +490,14 @@
 }
 
 /* Resume doc inner styles - keeping these consistent with "paper" look but making them more elegant */
-.r-hdr { padding: 32px 36px 22px; background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; }
-.r-name { font-family: 'Outfit', serif; font-size: 30px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px; line-height: 1.15; }
-.r-tagline { font-size: 14px; color: rgba(199, 210, 254, 0.85); margin-bottom: 14px; }
-.r-contact { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: rgba(199, 210, 254, 0.7); }
-.r-body { padding: 24px 36px 32px; display: flex; flex-direction: column; gap: 20px; }
-.r-sec-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #6366f1; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1.5px solid #e0e7ff; }
-.r-exp-role { font-size: 15px; color: #1e293b; font-weight: 700; }
-.r-bullets li { font-size: 12.5px; color: #475569; line-height: 1.6; padding-left: 14px; position: relative; margin-bottom: 3px; }
+.r-hdr { padding: 40px 48px 28px; background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; }
+.r-name { font-family: 'Outfit', serif; font-size: 36px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; line-height: 1.15; }
+.r-tagline { font-size: 16px; color: rgba(199, 210, 254, 0.85); margin-bottom: 16px; }
+.r-contact { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: rgba(199, 210, 254, 0.7); }
+.r-body { padding: 32px 48px 40px; display: flex; flex-direction: column; gap: 24px; }
+.r-sec-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #6366f1; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1.5px solid #e0e7ff; }
+.r-exp-role { font-size: 17px; color: #1e293b; font-weight: 700; }
+.r-bullets li { font-size: 14px; color: #475569; line-height: 1.6; padding-left: 18px; position: relative; margin-bottom: 4px; }
 .r-bullets li::before { content: '▸'; position: absolute; left: 0; color: #6366f1; font-size: 10px; top: 2px; }
 
 /* JD overlay */
