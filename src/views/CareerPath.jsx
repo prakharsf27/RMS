@@ -15,6 +15,13 @@ export default function CareerPath() {
 
   const generatePath = async () => {
     if (!currentRole.trim()) return;
+    
+    const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      alert("Configuration Error: NEXT_PUBLIC_ANTHROPIC_API_KEY is not set. The AI requires an API key in the environment to function.");
+      return;
+    }
+
     setLoading(true);
     setSelectedNode(null);
 
@@ -26,15 +33,15 @@ Respond ONLY with a JSON object. No markdown, no markdown formatting blocks, no 
     {
       "name": "Management Track",
       "nodes": [
-         { "title": "Current Role", "timeframe": "0 yrs", "skills": [], "desc": "Where you are now" },
-         { "title": "Engineering Manager", "timeframe": "2-3 yrs", "skills": ["Leadership", "Agile", "System Design"], "desc": "First level management" }
+         { "title": "Current Role", "timeframe": "0 yrs", "skills": [], "desc": "Where you are now", "next_steps": ["Ensure strong foundation in current role"] },
+         { "title": "Engineering Manager", "timeframe": "2-3 yrs", "skills": ["Leadership", "Agile", "System Design"], "desc": "First level management", "next_steps": ["Complete leadership training", "Take point on cross-functional projects", "Mentor junior team members"] }
       ]
     },
     {
       "name": "Individual Contributor Track",
       "nodes": [
-         { "title": "Current Role", "timeframe": "0 yrs", "skills": [], "desc": "Where you are now" },
-         { "title": "Staff Engineer", "timeframe": "3-5 yrs", "skills": ["Architecture", "Mentorship", "Deep Tech"], "desc": "High level IC" }
+         { "title": "Current Role", "timeframe": "0 yrs", "skills": [], "desc": "Where you are now", "next_steps": ["Ensure strong foundation"] },
+         { "title": "Staff Engineer", "timeframe": "3-5 yrs", "skills": ["Architecture", "Mentorship", "Deep Tech"], "desc": "High level IC", "next_steps": ["Lead architectural reviews", "Specialize in scalable systems"] }
       ]
     }
   ]
@@ -43,7 +50,12 @@ Respond ONLY with a JSON object. No markdown, no markdown formatting blocks, no 
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerously-allow-browser": "true"
+        },
         body: JSON.stringify({
           model: CLAUDE_MODEL,
           max_tokens: 1500,
@@ -126,6 +138,15 @@ Respond ONLY with a JSON object. No markdown, no markdown formatting blocks, no 
                            <div className={styles.skillsLabels}>
                               {selectedNode.skills.map((s, i) => <span key={i} className={styles.skillTag}>{s}</span>)}
                            </div>
+                        </div>
+                     )}
+
+                     {selectedNode.next_steps && selectedNode.next_steps.length > 0 && (
+                        <div className={styles.section}>
+                           <h4><Compass size={14} /> Next Steps</h4>
+                           <ul style={{ paddingLeft: '20px', fontSize: '13px', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                              {selectedNode.next_steps.map((step, i) => <li key={i} style={{ marginBottom: '4px' }}>{step}</li>)}
+                           </ul>
                         </div>
                      )}
 
