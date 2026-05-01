@@ -206,59 +206,6 @@ export default function ResumeAIChatbot() {
 
   /* ── Call API ── */
   const callAI = useCallback(async (userMsg, extraContext = "") => {
-    const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
-    
-    if (!apiKey) {
-      setStreaming(true);
-      const typingId = Date.now();
-      setMsgs(prev => [...prev, { id: typingId, role: "bot", typing: true, time: now() }]);
-
-      // Robust fallback for demo/testing without an API key
-      setTimeout(() => {
-        setMsgs(prev => prev.filter(m => m.id !== typingId));
-        
-        // Sample structured data for demo
-        const demoResume = {
-          name: "Alex Thompson",
-          tagline: "Senior Software Engineer",
-          email: "alex@example.com",
-          phone: "+1 555-123-4567",
-          location: "San Francisco, CA",
-          linkedin: "linkedin.com/in/alex",
-          summary: "Results-driven Senior Software Engineer with over 8 years of experience in full-stack development, specializing in scalable architectures and AI integration.",
-          experience: [
-            {
-              role: "Senior Full Stack Developer",
-              company: "Tech-Flow Systems",
-              date: "Jan 2020 – Present",
-              bullets: ["Architected a real-time data processing pipeline serving 1M+ active users.", "Optimized React performance reducing TTI by 45%.", "Led a team of 12 engineers using Agile methodologies."]
-            },
-            {
-              role: "Full Stack Engineer",
-              company: "Innovate Labs",
-              date: "June 2016 – Dec 2019",
-              bullets: ["Developed a cloud-native SaaS platform using Node.js and AWS.", "Implemented CI/CD pipelines reducing deployment time by 60%.", "Built responsive UIs following strict accessibility standards."]
-            }
-          ],
-          education: [{ degree: "M.S. in Computer Science", school: "Stanford University", date: "2016" }],
-          skills: {
-            highlighted: ["React", "TypeScript", "Node.js", "System Design"],
-            regular: ["AWS", "PostgreSQL", "Docker", "GraphQL"]
-          },
-          atsScore: 94
-        };
-
-        setResumeData(demoResume);
-        setLastUpdated(now());
-        setAtsScore(94);
-
-        const responseMsg = "✨ I've analyzed your profile and generated an optimized resume layout! You can see it in the preview panel. Since we're in demo mode, I've used a high-performance profile as a template.";
-        addMsg("bot", responseMsg);
-        setStreaming(false);
-      }, 1500);
-      return;
-    }
-
     setStreaming(true);
 
     const fullMsg = extraContext ? userMsg + "\n\n" + extraContext : userMsg;
