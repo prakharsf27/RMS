@@ -60,6 +60,32 @@ const LandingPage = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeHash, setActiveHash] = useState("");
+  const [companies, setCompanies] = useState([]);
+  const [globalStats, setGlobalStats] = useState({
+    users: 14200,
+    applications: 2100000,
+    interviews: 8500,
+    successRate: 94
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const [statsRes, compRes] = await Promise.all([
+                fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/analytics/global`),
+                fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`)
+            ]);
+            const statsData = await statsRes.json();
+            const compData = await compRes.json();
+            
+            if (statsData.users) setGlobalStats(statsData);
+            if (Array.isArray(compData)) setCompanies(compData.map(c => c.name));
+        } catch (err) {
+            console.error("Fetch error:", err);
+        }
+    };
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -171,7 +197,7 @@ const LandingPage = () => {
 
         <div className={styles.heroBadge}>
           <span className={styles.heroBadgeDot}></span>
-          Now in Beta · Join 14,200+ job seekers
+          Now in Beta · Join {globalStats.users.toLocaleString()}+ job seekers
         </div>
 
         <h1 className={styles.heroH1}>
@@ -196,12 +222,12 @@ const LandingPage = () => {
 
         <div className={styles.heroStats}>
           <div className={styles.heroStatItem}>
-            <div className={styles.heroStatVal}>14.2K</div>
+            <div className={styles.heroStatVal}>{(globalStats.users / 1000).toFixed(1)}K</div>
             <div className={styles.heroStatLbl}>Active job seekers</div>
           </div>
           <div className={styles.heroStatDivider}></div>
           <div className={styles.heroStatItem}>
-            <div className={styles.heroStatVal}>94%</div>
+            <div className={styles.heroStatVal}>{globalStats.successRate}%</div>
             <div className={styles.heroStatLbl}>Interview success rate</div>
           </div>
           <div className={styles.heroStatDivider}></div>
@@ -211,7 +237,7 @@ const LandingPage = () => {
           </div>
           <div className={styles.heroStatDivider}></div>
           <div className={styles.heroStatItem}>
-            <div className={styles.heroStatVal}>2.1M</div>
+            <div className={styles.heroStatVal}>{(globalStats.applications / 1000000).toFixed(1)}M</div>
             <div className={styles.heroStatLbl}>Resumes tailored</div>
           </div>
         </div>
@@ -293,10 +319,10 @@ const LandingPage = () => {
           <div className={styles.logosLabel}>TRUSTED BY CANDIDATES TARGETING TOP COMPANIES</div>
           <div className={styles.logosTrackOuter}>
             <div className={styles.logosTrack}>
-              {["Google", "Stripe", "OpenAI", "Microsoft", "Meta", "Netflix", "Apple", "Figma", "Linear", "Vercel", "Notion", "Anthropic"].map((logo, i) => (
+              {(companies.length > 0 ? companies : ["Google", "Stripe", "OpenAI", "Microsoft", "Meta", "Netflix", "Apple", "Figma", "Linear", "Vercel", "Notion", "Anthropic"]).map((logo, i) => (
                 <span key={i} className={styles.logoName}>{logo}</span>
               ))}
-              {["Google", "Stripe", "OpenAI", "Microsoft", "Meta", "Netflix", "Apple", "Figma", "Linear", "Vercel", "Notion", "Anthropic"].map((logo, i) => (
+              {(companies.length > 0 ? companies : ["Google", "Stripe", "OpenAI", "Microsoft", "Meta", "Netflix", "Apple", "Figma", "Linear", "Vercel", "Notion", "Anthropic"]).map((logo, i) => (
                 <span key={`clone-${i}`} className={styles.logoName}>{logo}</span>
               ))}
             </div>
@@ -688,7 +714,7 @@ const LandingPage = () => {
         <Reveal>
           <div className={styles.ctaInner}>
             <h1 className={styles.ctaTitle}>Your next job is closer<br />than you think</h1>
-            <p className={styles.ctaSub}>Join 14,200+ candidates who landed interviews at dream companies. Start free in under 60 seconds.</p>
+            <p className={styles.ctaSub}>Join {globalStats.users.toLocaleString()}+ candidates who landed interviews at dream companies. Start free in under 60 seconds.</p>
             <div className={styles.ctaBtns}>
               <Link href="/login" className={cn(styles.btnHero, styles.primary)}>
                 <Rocket size={16} />

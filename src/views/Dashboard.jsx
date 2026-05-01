@@ -73,14 +73,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 /* ─── DATA ───────────────────────────────────────────────────── */
-const CHART_DATA = [
-  { month: "Nov", Applications: 8, Interviews: 2, Hired: 0 },
-  { month: "Dec", Applications: 12, Interviews: 3, Hired: 1 },
-  { month: "Jan", Applications: 18, Interviews: 5, Hired: 1 },
-  { month: "Feb", Applications: 15, Interviews: 4, Hired: 0 },
-  { month: "Mar", Applications: 22, Interviews: 7, Hired: 1 },
-  { month: "Apr", Applications: 24, Interviews: 8, Hired: 2 },
-];
 
 const COMPANIES = ["Amazon", "Meta", "Microsoft", "Netflix", "Tesla", "NVIDIA", "IBM", "Apple", "Google", "Salesforce", "Adobe", "Spotify"];
 
@@ -104,17 +96,22 @@ export default function Dashboard() {
   const { user } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [dataList, setDataList] = useState([]); // Jobs for candidates, Recent Applications for recruiters
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, listRes] = await Promise.all([
+        const [statsRes, listRes, compRes] = await Promise.all([
           api.get('/analytics'),
-          user.role === 'candidate' ? api.get('/jobs/recommended') : api.get('/applications?limit=5')
+          user.role === 'candidate' ? api.get('/jobs/recommended') : api.get('/applications?limit=5'),
+          api.get('/companies')
         ]);
         setStats(statsRes.data.summary);
+        setChartData(statsRes.data.chartData || []);
+        setCompanies(compRes.data.map(c => c.name));
         setDataList(user.role === 'candidate' ? listRes.data : listRes.data.applications);
       } catch (err) {
         console.error("Dashboard error:", err);
@@ -130,15 +127,15 @@ export default function Dashboard() {
   const isCandidate = user.role === 'candidate';
 
   const dashboardStats = isCandidate ? [
-    { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "+3 this week", up: true },
-    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "1 upcoming", up: true },
-    { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Under review", up: false },
-    { label: "PROFILE VIEWS", value: stats?.profileViews || 147, icon: Eye, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "+12 today", up: true },
+    { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: stats?.applications > 0 ? "Real-time" : "Ready to start", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Next session", up: true },
+    { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Pipeline status", up: false },
+    { label: "PROFILE VIEWS", value: stats?.profileViews || 0, icon: Eye, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "Total activity", up: true },
   ] : [
-    { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "+15 new", up: true },
-    { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "2 closing soon", up: false },
-    { label: "APPLICATIONS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "+8 today", up: true },
-    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "4 today", up: true },
+    { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "Network size", up: true },
+    { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Open requirements", up: false },
+    { label: "APPLICATIONS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Queue volume", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "Schedule load", up: true },
   ];
 
   const profileTasks = isCandidate ? PROFILE_ITEMS : RECRUITER_TASKS;
@@ -153,7 +150,7 @@ export default function Dashboard() {
           <div className={styles.heroGreeting}>Welcome back, {user.fname}! 👋</div>
           <div className={styles.heroSub}>
             {isCandidate 
-              ? "You have 3 new matching jobs and 1 interview scheduled this week."
+              ? `You have ${stats?.jobs || 0} active matching jobs and ${stats?.interviews || 0} interview(s) in your pipeline.`
               : `You have ${dataList?.length || 0} new applications to review today.`}
           </div>
           <div className={styles.heroChips}>
@@ -193,8 +190,11 @@ export default function Dashboard() {
         <div className={styles.cardBody}>
           <div className={styles.marqueeOuter}>
             <div className={styles.marqueeTrack}>
-              {[...COMPANIES, ...COMPANIES].map((c, i) => (
+              {(companies.length > 0 ? companies : COMPANIES).map((c, i) => (
                 <span className={styles.companyTag} key={i}>{c}</span>
+              ))}
+              {(companies.length > 0 ? companies : COMPANIES).map((c, i) => (
+                <span className={styles.companyTag} key={`clone-${i}`}>{c}</span>
               ))}
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function Dashboard() {
               </div>
               <div style={{ height: 200 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={CHART_DATA} margin={{ top: 0, right: 0, bottom: 0, left: -24 }}>
+                  <AreaChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: -24 }}>
                     <defs>
                       <linearGradient id="gApp" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />

@@ -195,9 +195,20 @@ export default function Login({ initialMode = "login" }) {
                </div>
              )}
 
-            <Button type="submit" size="lg" className={styles.submitBtn} disabled={isLoggingIn}>
-              {isLoggingIn ? "Authenticating..." : (isRegister ? "Register" : "Sign In")}
-            </Button>
+            <div className={styles.buttonGroup}>
+              <Button type="submit" size="lg" className={styles.submitBtn} disabled={isLoggingIn}>
+                {isLoggingIn ? "Authenticating..." : (isRegister ? "Register" : "Sign In")}
+              </Button>
+              <Button 
+                type="button" 
+                size="lg" 
+                variant="primary" 
+                className={styles.backHomeBtn}
+                onClick={() => router.push("/")}
+              >
+                Back to Home
+              </Button>
+            </div>
           </form>
 
           <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
@@ -208,17 +219,6 @@ export default function Login({ initialMode = "login" }) {
               {isRegister ? "Already have an account? Sign in here" : "Don't have an account? Create one"}
             </button>
           </div>
-
-          {!isRegister && (
-            <div className={styles.demoAccounts}>
-              <p>Quick Access Demo</p>
-              <div className={styles.demoButtons}>
-                <Button size="sm" variant="secondary" className={styles.demoBtn} onClick={() => handleDemoLogin("admin@rms.com", "password123")}>Admin</Button>
-                <Button size="sm" variant="secondary" className={styles.demoBtn} onClick={() => handleDemoLogin("recruiter@rms.com", "password123")}>Recruiter</Button>
-                <Button size="sm" variant="secondary" className={styles.demoBtn} onClick={() => handleDemoLogin("candidate@rms.com", "password123")}>Candidate</Button>
-              </div>
-            </div>
-          )}
         </Card>
       </div>
     </div>
