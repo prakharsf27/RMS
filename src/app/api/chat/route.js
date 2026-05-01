@@ -8,7 +8,7 @@ export async function POST(req) {
     let aiText = "";
 
     if (provider === 'groq') {
-      const apiKey = process.env.GROQ_API_KEY;
+      const apiKey = process.env.GROQ_API_KEY?.trim(); // Trim whitespace
       if (!apiKey) {
         throw new Error("GROQ_API_KEY is not configured in environment variables");
       }
@@ -33,7 +33,7 @@ export async function POST(req) {
       aiText = data.choices?.[0]?.message?.content || "";
     } 
     else if (provider === 'gemini') {
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.GEMINI_API_KEY?.trim(); // Trim whitespace
       if (!apiKey) {
         throw new Error("GEMINI_API_KEY is not configured in environment variables");
       }
