@@ -48,9 +48,9 @@ Respond ONLY with a JSON object. No markdown, no markdown formatting blocks, no 
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          provider: "gemini",
-          model: "gemini-1.5-flash",
-          max_tokens: 1500,
+          provider: "groq",
+          model: "llama-3.3-70b-versatile",
+          max_tokens: 2000,
           messages: [{ role: "user", content: prompt }]
         })
       });

@@ -55,7 +55,7 @@ Give me a 3-bullet point script/strategy on how to counter-offer this effectivel
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           provider: "gemini",
-          model: "gemini-1.5-flash",
+          model: "gemini-3-flash",
           max_tokens: 500,
           messages: [{ role: "user", content: prompt }]
         })

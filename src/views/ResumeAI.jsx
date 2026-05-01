@@ -224,7 +224,7 @@ export default function ResumeAIChatbot() {
         },
         body: JSON.stringify({
           provider: "gemini",
-          model: "gemini-1.5-flash",
+          model: "gemini-3-flash",
           max_tokens: 4000,
           system: SYSTEM_PROMPTS[mode] + (userResume ? `\n\nUser's existing resume:\n${userResume}` : ""),
           messages: newHistory.map(m => ({
