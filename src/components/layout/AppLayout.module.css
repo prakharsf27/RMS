@@ -8,9 +8,9 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 40;
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 998; /* Just below sidebar 999 */
+  backdrop-filter: blur(4px);
 }
 
 .main {

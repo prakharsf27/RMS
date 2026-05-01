@@ -172,9 +172,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(var(--bg-rgb), 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: var(--bg-color);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   z-index: 99;
   padding: 40px 24px;
   display: flex;
