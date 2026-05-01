@@ -270,19 +270,20 @@ export default function ResumeAIChatbot() {
     setMsgs(prev => [...prev, { id: typingId, role: "bot", typing: true, time: now() }]);
 
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerously-allow-browser": "true"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "claude-3-5-sonnet-20240620",
+          provider: "gemini",
+          model: "gemini-1.5-flash",
           max_tokens: 4000,
           system: SYSTEM_PROMPTS[mode] + (userResume ? `\n\nUser's existing resume:\n${userResume}` : ""),
-          messages: newHistory,
+          messages: newHistory.map(m => ({
+            role: m.role,
+            content: m.content || m.text
+          })),
         }),
       });
 

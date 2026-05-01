@@ -50,11 +50,12 @@ My offer details/leverage: "${offerText}"
 Give me a 3-bullet point script/strategy on how to counter-offer this effectively, maximizing my leverage without sounding greedy. Format cleanly with no markdown headers.`;
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: CLAUDE_MODEL,
+          provider: "gemini",
+          model: "gemini-1.5-flash",
           max_tokens: 500,
           messages: [{ role: "user", content: prompt }]
         })

@@ -83,13 +83,17 @@ Guidelines:
 
   const callClaude = async (msgsArray) => {
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: CLAUDE_MODEL,
+          provider: "groq",
+          model: "llama-3.1-70b-versatile",
           max_tokens: 1500,
-          messages: msgsArray.filter(m => m.role !== "system"),
+          messages: msgsArray.filter(m => m.role !== "system").map(m => ({
+            role: m.role,
+            content: m.content || m.text
+          })),
           system: msgsArray.find(m => m.role === "system")?.content
         })
       });

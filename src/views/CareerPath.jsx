@@ -71,16 +71,14 @@ Respond ONLY with a JSON object. No markdown, no markdown formatting blocks, no 
 }`;
 
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerously-allow-browser": "true"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: CLAUDE_MODEL,
+          provider: "gemini",
+          model: "gemini-1.5-flash",
           max_tokens: 1500,
           messages: [{ role: "user", content: prompt }]
         })
