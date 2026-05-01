@@ -179,6 +179,8 @@ export default function ResumeAIChatbot() {
   const [atsScore, setAtsScore] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
   const msgsRef = useRef(null);
   const inputRef = useRef(null);
   const historyRef = useRef(history);
@@ -326,6 +328,30 @@ export default function ResumeAIChatbot() {
     navigator.clipboard.writeText(t).then(() => alert("Resume copied to clipboard!"));
   };
 
+  const downloadResume = (format) => {
+    if (!resumeData) return;
+    
+    if (format === 'pdf') {
+      window.print();
+    } else {
+      // Simple Word Download
+      const { name, tagline, email, phone, location, summary, experience = [], education = [], skills = {} } = resumeData;
+      let t = `${name}\n${tagline}\n${email} | ${phone} | ${location}\n\nSUMMARY\n${summary}\n\nEXPERIENCE\n`;
+      experience.forEach(e => { t += `${e.role} — ${e.company} (${e.date})\n`; (e.bullets||[]).forEach(b => t += `• ${b}\n`); t += "\n"; });
+      education.forEach(e => t += `${e.degree}, ${e.school} (${e.date})\n`);
+      const allSkills = [...(skills.highlighted||[]), ...(skills.regular||[])];
+      if (allSkills.length) t += `\nSKILLS\n${allSkills.join(" • ")}`;
+
+      const blob = new Blob([t], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${name || 'Resume'}.doc`;
+      link.click();
+    }
+    setShowDownloadMenu(false);
+  };
+
   return (
     <div className={styles.raiRoot}>
       {/* ── Chat Panel ── */}
@@ -449,13 +475,24 @@ export default function ResumeAIChatbot() {
             <button className={styles.raiRbtn} onClick={copyResume} disabled={!resumeData}>
               <Copy size={12} /> Copy
             </button>
+            <div style={{ position: 'relative' }}>
+              <button className={styles.raiRbtn} onClick={() => setShowDownloadMenu(!showDownloadMenu)} disabled={!resumeData}>
+                <Download size={12} /> Download
+              </button>
+              {showDownloadMenu && (
+                <div className={styles.downloadMenu}>
+                  <div className={styles.menuItem} onClick={() => downloadResume('pdf')}>PDF Format</div>
+                  <div className={styles.menuItem} onClick={() => downloadResume('word')}>Word Format</div>
+                </div>
+              )}
+            </div>
             <button className={`${styles.raiRbtn} ${styles.primary}`} onClick={() => setShowJD(true)}>
               <Star size={12} /> Tailor to JD
             </button>
           </div>
         </div>
 
-        <div className={styles.raiPreviewWrap}>
+        <div className={styles.raiPreviewWrap} id="resume-preview-area">
           <ResumeDocument data={resumeData} />
         </div>
 
