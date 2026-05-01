@@ -149,7 +149,6 @@ export default function Jobs() {
   const headers = ["Company", "Role", "Department", "Location", "Status", "Applicants", "Date Posted", ""];
 
   return (
-  return (
     <>
       <div className="animate-fade-in">
         <div className={styles.header}>
