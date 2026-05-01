@@ -6,16 +6,16 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 9999;
-  padding: 1rem; /* Desktop breathing room */
+  padding: 2rem; /* Breather for all sides */
   overflow-y: auto;
   display: flex;
-  align-items: flex-start;
+  align-items: center; /* Robust centering */
   justify-content: center;
   overscroll-behavior: contain;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
-  margin: auto;
   background-color: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: 20px;
@@ -24,9 +24,8 @@
   box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 2rem); /* Dynamic height */
+  max-height: 90vh; /* Stay within viewport safely */
   position: relative;
-  z-index: 1001;
   overflow: hidden;
 }
 

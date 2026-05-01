@@ -149,170 +149,172 @@ export default function Jobs() {
   const headers = ["Company", "Role", "Department", "Location", "Status", "Applicants", "Date Posted", ""];
 
   return (
-    <div className="animate-fade-in">
-      <div className={styles.header}>
-        <div>
-          <h1 className="text-gradient">Job Postings</h1>
-          <p>
-            {user.role === "candidate" 
-              ? "Explore all open opportunities across our global engineering locations." 
-              : "Create, publish, and manage job postings across your organization."}
-          </p>
-
+  return (
+    <>
+      <div className="animate-fade-in">
+        <div className={styles.header}>
+          <div>
+            <h1 className="text-gradient">Job Postings</h1>
+            <p>
+              {user.role === "candidate" 
+                ? "Explore all open opportunities across our global engineering locations." 
+                : "Create, publish, and manage job postings across your organization."}
+            </p>
+          </div>
+          {user.role === "candidate" && (
+            <Button onClick={() => setIsAutoPilotOpen(true)} variant="primary">
+              <Rocket size={18} /> Application Auto-Pilot
+            </Button>
+          )}
+          {user.role !== "candidate" && (
+            <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
+              <Plus size={18} /> Post New Job
+            </Button>
+          )}
         </div>
-        {user.role === "candidate" && (
-          <Button onClick={() => setIsAutoPilotOpen(true)} variant="primary">
-            <Rocket size={18} /> Application Auto-Pilot
-          </Button>
+
+        {user.role !== "recruiter" && (
+          <div className={styles.toolbar}>
+             <div className={styles.searchBox}>
+                <Search size={18} className={styles.searchIcon} />
+                <input 
+                   type="text" 
+                   placeholder="Search by role, department..." 
+                   value={searchTerm}
+                   onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+                />
+             </div>
+             <div className={styles.filters}>
+                <div className={styles.filterGroup}>
+                   <Filter size={14} />
+                   <select 
+                      value={filters.location} 
+                      onChange={(e) => { setFilters({...filters, location: e.target.value}); setPage(1); }}
+                   >
+                      <option value="all">All Locations</option>
+                      <option value="Remote">Remote</option>
+                      <option value="New York">New York</option>
+                      <option value="San Francisco">San Francisco</option>
+                   </select>
+                </div>
+                <div className={styles.filterGroup}>
+                   <select 
+                      value={filters.type} 
+                      onChange={(e) => { setFilters({...filters, type: e.target.value}); setPage(1); }}
+                   >
+                      <option value="all">All Types</option>
+                      <option value="Full-time">Full-time</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Internship">Internship</option>
+                   </select>
+                </div>
+             </div>
+             <div className={styles.resultCount}>
+                Found <strong>{totalResults}</strong> roles
+             </div>
+          </div>
         )}
-        {user.role !== "candidate" && (
-          <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
-            <Plus size={18} /> Post New Job
-          </Button>
+
+
+        {loading ? (
+          <LoadingSpinner label="Querying opportunities..." />
+        ) : (
+          <>
+            <Table 
+              headers={headers}
+              data={jobs}
+              renderRow={(job, i) => (
+                <tr key={job._id || i}>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+                      <div className={styles.companyIcon}>
+                        {job.company?.logo ? (
+                          <img src={job.company.logo} alt={job.company.name} />
+                        ) : (
+                          <span>{job.company?.name?.[0] || 'C'}</span>
+                        )}
+                      </div>
+                      <div>
+                        <span style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>
+                          {job.company?.name || "TalentFlow Partner"}
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || 'Technology'}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.25rem' }}>{job.title}</strong>
+                    <span style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{job.type}</span>
+                  </td>
+                  <td>{job.department}</td>
+                  <td>{job.location}</td>
+                  <td>
+                    <Badge variant={job.status === "active" ? "success" : "neutral"}>
+                      {job.status}
+                    </Badge>
+                  </td>
+                  <td>
+                    <span style={{ fontWeight: 600 }}>{job.applicantsCount}</span> candidates
+                  </td>
+                  <td>{format(new Date(job.createdAt), "MMM d, yyyy")}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    {user.role === "candidate" ? (
+                      (() => {
+                        const hasApplied = appliedJobIds.has(job._id);
+                        return (
+                          <Button 
+                            size="sm" 
+                            onClick={() => !hasApplied && openApply(job)} 
+                            disabled={job.status !== "active" || hasApplied}
+                            variant={hasApplied ? "secondary" : "primary"}
+                          >
+                            {hasApplied ? "Applied" : job.status === "active" ? "Apply Now" : "Closed"}
+                          </Button>
+                        );
+                      })()
+                    ) : (
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <Button variant="secondary" size="sm" onClick={() => openEdit(job)}>Edit</Button>
+                        <Button variant="secondary" size="sm" onClick={() => openView(job)}>View</Button>
+                        <Button 
+                          variant={job.status === 'active' ? 'danger' : 'success'} 
+                          size="sm" 
+                          onClick={() => handleToggleStatus(job._id, job.status)}
+                        >
+                          {job.status === 'active' ? 'Close' : 'Open'}
+                        </Button>
+                      </div>
+                    )}
+
+                  </td>
+                </tr>
+              )}
+            />
+
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                 <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                 >
+                    <ChevronLeft size={16} /> Previous
+                 </Button>
+                 <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
+                 <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                 >
+                    Next <ChevronRight size={16} />
+                 </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
-
-      {user.role !== "recruiter" && (
-        <div className={styles.toolbar}>
-           <div className={styles.searchBox}>
-              <Search size={18} className={styles.searchIcon} />
-              <input 
-                 type="text" 
-                 placeholder="Search by role, department..." 
-                 value={searchTerm}
-                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-              />
-           </div>
-           <div className={styles.filters}>
-              <div className={styles.filterGroup}>
-                 <Filter size={14} />
-                 <select 
-                    value={filters.location} 
-                    onChange={(e) => { setFilters({...filters, location: e.target.value}); setPage(1); }}
-                 >
-                    <option value="all">All Locations</option>
-                    <option value="Remote">Remote</option>
-                    <option value="New York">New York</option>
-                    <option value="San Francisco">San Francisco</option>
-                 </select>
-              </div>
-              <div className={styles.filterGroup}>
-                 <select 
-                    value={filters.type} 
-                    onChange={(e) => { setFilters({...filters, type: e.target.value}); setPage(1); }}
-                 >
-                    <option value="all">All Types</option>
-                    <option value="Full-time">Full-time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Internship">Internship</option>
-                 </select>
-              </div>
-           </div>
-           <div className={styles.resultCount}>
-              Found <strong>{totalResults}</strong> roles
-           </div>
-        </div>
-      )}
-
-
-      {loading ? (
-        <LoadingSpinner label="Querying opportunities..." />
-      ) : (
-        <>
-          <Table 
-            headers={headers}
-            data={jobs}
-            renderRow={(job, i) => (
-              <tr key={job._id || i}>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
-                    <div className={styles.companyIcon}>
-                      {job.company?.logo ? (
-                        <img src={job.company.logo} alt={job.company.name} />
-                      ) : (
-                        <span>{job.company?.name?.[0] || 'C'}</span>
-                      )}
-                    </div>
-                    <div>
-                      <span style={{ fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>
-                        {job.company?.name || "TalentFlow Partner"}
-                      </span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || 'Technology'}</span>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <strong style={{ display: 'block', fontSize: '1.05rem', marginBottom: '0.25rem' }}>{job.title}</strong>
-                  <span style={{ color: 'var(--text-tertiary)', fontSize: '0.875rem' }}>{job.type}</span>
-                </td>
-                <td>{job.department}</td>
-                <td>{job.location}</td>
-                <td>
-                  <Badge variant={job.status === "active" ? "success" : "neutral"}>
-                    {job.status}
-                  </Badge>
-                </td>
-                <td>
-                  <span style={{ fontWeight: 600 }}>{job.applicantsCount}</span> candidates
-                </td>
-                <td>{format(new Date(job.createdAt), "MMM d, yyyy")}</td>
-                <td style={{ textAlign: 'right' }}>
-                  {user.role === "candidate" ? (
-                    (() => {
-                      const hasApplied = appliedJobIds.has(job._id);
-                      return (
-                        <Button 
-                          size="sm" 
-                          onClick={() => !hasApplied && openApply(job)} 
-                          disabled={job.status !== "active" || hasApplied}
-                          variant={hasApplied ? "secondary" : "primary"}
-                        >
-                          {hasApplied ? "Applied" : job.status === "active" ? "Apply Now" : "Closed"}
-                        </Button>
-                      );
-                    })()
-                  ) : (
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <Button variant="secondary" size="sm" onClick={() => openEdit(job)}>Edit</Button>
-                      <Button variant="secondary" size="sm" onClick={() => openView(job)}>View</Button>
-                      <Button 
-                        variant={job.status === 'active' ? 'danger' : 'success'} 
-                        size="sm" 
-                        onClick={() => handleToggleStatus(job._id, job.status)}
-                      >
-                        {job.status === 'active' ? 'Close' : 'Open'}
-                      </Button>
-                    </div>
-                  )}
-
-                </td>
-              </tr>
-            )}
-          />
-
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-               <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-               >
-                  <ChevronLeft size={16} /> Previous
-               </Button>
-               <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
-               <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  disabled={page === totalPages}
-                  onClick={() => setPage(page + 1)}
-               >
-                  Next <ChevronRight size={16} />
-               </Button>
-            </div>
-          )}
-        </>
-      )}
 
       <Modal 
         isOpen={isPostModalOpen} 
@@ -325,7 +327,6 @@ export default function Jobs() {
             isSubmitting={isSubmitting} 
             initialData={isEditing ? selectedJob : null} 
         />
-
       </Modal>
 
       <Modal
@@ -335,7 +336,6 @@ export default function Jobs() {
       >
         {selectedJob && (
           <div className={styles.jobViewContent}>
-            {/* Header Section */}
             <header className={styles.jobViewHeader}>
                 <div className={styles.jobCompanyIconLarge}>
                     {selectedJob.company?.logo ? (
@@ -356,7 +356,6 @@ export default function Jobs() {
                 </div>
             </header>
             
-            {/* Details Grid */}
             <div className={styles.jobDetailsGrid}>
                 <div className={styles.detailCard}>
                     <span className={styles.detailLabel}>Compensation</span>
@@ -372,7 +371,6 @@ export default function Jobs() {
                 </div>
             </div>
 
-            {/* Content Sections */}
             <div className={styles.jobBody}>
                 <section className={styles.jobSection}>
                     <h4>Description</h4>
@@ -393,7 +391,6 @@ export default function Jobs() {
                 )}
             </div>
 
-            {/* Footer Actions */}
             <footer className={styles.jobViewFooter}>
                  <Button variant="secondary" onClick={() => setIsViewModalOpen(false)}>Close Specifications</Button>
                  {user.role === 'candidate' && (
@@ -429,6 +426,6 @@ export default function Jobs() {
             selectedJobs={jobs.filter(j => !appliedJobIds.has(j._id))} 
          />
       )}
-    </div>
+    </>
   );
 }
