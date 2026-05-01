@@ -8,11 +8,16 @@ export async function POST(req) {
     let aiText = "";
 
     if (provider === 'groq') {
+      const apiKey = process.env.GROQ_API_KEY;
+      if (!apiKey) {
+        throw new Error("GROQ_API_KEY is not configured in environment variables");
+      }
+
       const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+          "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: model || "llama-3.1-70b-versatile",
@@ -21,12 +26,20 @@ export async function POST(req) {
         })
       });
       const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
+      if (data.error) {
+        console.error("Groq API Error:", data.error);
+        throw new Error(data.error.message || "Invalid API Key for Groq");
+      }
       aiText = data.choices?.[0]?.message?.content || "";
     } 
     else if (provider === 'gemini') {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not configured in environment variables");
+      }
+
       const geminiModel = model || "gemini-1.5-flash";
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,13 +55,15 @@ export async function POST(req) {
         })
       });
       const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
+      if (data.error) {
+        console.error("Gemini API Error:", data.error);
+        throw new Error(data.error.message || "Invalid API Key for Gemini");
+      }
       aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     } else {
       throw new Error("Unsupported provider: " + provider);
     }
 
-    // Return in Anthropic-compatible format to avoid breaking existing frontend logic
     return NextResponse.json({
       content: [{ text: aiText }]
     });
