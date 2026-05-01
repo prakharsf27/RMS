@@ -18,7 +18,7 @@ export default function InterviewSimulator() {
   const [roleTitle, setRoleTitle] = useState("");
   
   // Session tracking
-  const [usageLimit, setUsageLimit] = useState(3);
+  const [usageLimit, setUsageLimit] = useState(100);
   const [usageCount, setUsageCount] = useState(0);
 
   // Chat/Interview State
