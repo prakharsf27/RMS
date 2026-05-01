@@ -223,8 +223,8 @@ export default function ResumeAIChatbot() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          provider: "gemini",
-          model: "gemini-3-flash",
+          provider: "groq",
+          model: "llama-3.3-70b-versatile",
           max_tokens: 4000,
           system: SYSTEM_PROMPTS[mode] + (userResume ? `\n\nUser's existing resume:\n${userResume}` : ""),
           messages: newHistory.map(m => ({

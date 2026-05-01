@@ -54,8 +54,8 @@ Give me a 3-bullet point script/strategy on how to counter-offer this effectivel
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          provider: "gemini",
-          model: "gemini-3-flash",
+          provider: "groq",
+          model: "llama-3.3-70b-versatile",
           max_tokens: 500,
           messages: [{ role: "user", content: prompt }]
         })

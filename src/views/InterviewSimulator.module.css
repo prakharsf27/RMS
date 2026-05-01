@@ -340,18 +340,10 @@
 }
 
 @media (max-width: 640px) {
-  .scoreGrid {
-    flex-direction: column;
-  }
-  .scoreBox {
-    width: 100%;
-  }
-  .debriefPane {
-    padding: 16px;
-  }
-  .workspace {
-    gap: 12px;
-  }
+.scoreGrid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .scoreBox {
@@ -402,4 +394,72 @@
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
+}
+
+.mediaNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.userStream {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraOff {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.2);
+}
+
+.inputActions {
+  display: flex;
+  gap: 8px;
+}
+
+.voiceBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.voiceBtn.listening {
+  background: var(--danger-color);
+  border-color: var(--danger-color);
+  color: #fff;
+  animation: pulse-danger 1.5s infinite;
+}
+
+@keyframes pulse-danger {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.off {
+  background: var(--danger-color) !important;
 }
