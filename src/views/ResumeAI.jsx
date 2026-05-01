@@ -2,34 +2,17 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Sparkles, Send, Copy, Download, Star, X,
-  FileText, Zap, Target, ArrowRight, CheckCircle
+  FileText, Zap, Target, ArrowRight, CheckCircle, Lock, FileDown, Scissors
 } from "lucide-react";
 
 import styles from "./ResumeAI.module.css";
 
 /* ─── CONSTANTS ─────────────────────────────────────────────── */
-const MODES = [
-  { id: "build", label: "🛠 Build", desc: "Create from scratch" },
-  { id: "tailor", label: "🎯 Tailor", desc: "Match to JD" },
-  { id: "improve", label: "⚡ Improve", desc: "Enhance existing" },
-];
+const SYSTEM_PROMPT = `You are ResumeAI, a world-class executive resume writer. Your goal is to build, tailor, or improve the user's resume.
+Help users through natural conversation. 
 
-const QUICK_ACTIONS = {
-  build: ["Tell me about yourself", "Add work experience", "Add education", "Add skills section", "Generate summary"],
-  tailor: ["Paste my current resume", "Add job description", "Match JD keywords", "Strengthen bullets", "ATS score check"],
-  improve: ["Make more concise", "Quantify my achievements", "Add action verbs", "Fix weak phrases", "ATS optimization"],
-};
-
-const WELCOMES = {
-  build: `👋 **Welcome to ResumeAI!** I'll help you craft a standout resume from scratch.\n\nLet's start simple — **tell me your name and the type of role you're targeting.** I'll build a professional, ATS-optimized resume as we talk.\n\nAlready have a resume? Click **📄 Paste My Resume** to let me improve it.`,
-  tailor: `🎯 **Tailoring Mode activated!**\n\nI'll optimize your resume for a specific job description to maximize your ATS match score.\n\n**Step 1:** Paste your current resume below.\n**Step 2:** Share the job description.\n**Step 3:** Watch me rewrite every bullet and keyword to match.`,
-  improve: `⚡ **Improvement Mode!**\n\nPaste your existing resume and I'll:\n- **Strengthen** weak bullets with impact metrics\n- **Add** ATS keywords you're missing\n- **Rewrite** generic phrases with power verbs\n- **Score** it against best-practice standards\n\nPaste your resume to get started!`,
-};
-
-const SYSTEM_PROMPTS = {
-  build: `You are ResumeAI, an expert resume writer for TalentFlow. Help users build professional, ATS-optimized resumes through natural conversation.
-
-IMPORTANT: When you have enough info to generate/update the resume, ALWAYS include structured JSON like this:
+RULES:
+1. When you have enough info, include structured JSON like this:
 \`\`\`resume-json
 {
   "name": "Full Name",
@@ -38,37 +21,23 @@ IMPORTANT: When you have enough info to generate/update the resume, ALWAYS inclu
   "phone": "+1 555-000-0000",
   "location": "City, State",
   "linkedin": "linkedin.com/in/username",
-  "summary": "2-3 sentence ATS-optimized professional summary",
-  "experience": [
-    {
-      "role": "Job Title",
-      "company": "Company",
-      "date": "Jan 2022 – Present",
-      "bullets": ["Led X initiative resulting in Y% improvement in Z", "Built and scaled..."]
-    }
-  ],
-  "education": [{ "degree": "B.S. Computer Science", "school": "State University", "date": "2019" }],
-  "skills": {
-    "highlighted": ["React", "TypeScript"],
-    "regular": ["Node.js", "SQL", "AWS"]
-  },
-  "atsScore": 82
+  "summary": "...",
+  "experience": [{ "role": "...", "company": "...", "date": "...", "bullets": ["..."] }],
+  "education": [{ "degree": "...", "school": "...", "date": "..." }],
+  "skills": { "highlighted": ["..."], "regular": ["..."] },
+  "atsScore": 85
 }
 \`\`\`
+2. Be professional, concise, and results-oriented.`;
 
-Converse naturally. Ask focused questions. Generate JSON as soon as you have name + role + 1 experience. Update JSON with every new detail.`,
-  tailor: `You are ResumeAI in Tailoring Mode. You analyze job descriptions and optimize resumes for ATS + recruiter appeal.
+const WELCOME = `👋 **Welcome to ResumeAI!** I'll help you craft an ATS-optimized resume.
 
-When given a resume and JD, output tailored version as:
-\`\`\`resume-json
-{ ...same format, atsScore reflecting JD match... }
-\`\`\`
+You can:
+- **Build** a new resume from scratch
+- **Tailor** your current one to a Job Description
+- **Improve** your existing resume with better keywords
 
-Key actions: mirror exact JD keywords in bullets, reorder skills to match JD priority, add inferred skills, quantify achievements, match job title in tagline.`,
-  improve: `You are ResumeAI in Improvement Mode. Analyze pasted resumes and make them significantly better.
-
-Output improved JSON with atsScore. Focus on: strong action verbs (Led, Architected, Drove, Delivered), quantified achievements (%, $, users, time saved), ATS keyword density, modern formatting.`,
-};
+How would you like to start? (Or just paste your resume/JD here!)`;
 
 /* ─── UTILS ─────────────────────────────────────────────────── */
 const fmt = (t) =>
@@ -87,12 +56,10 @@ const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "
 function ResumeDocument({ data }) {
   if (!data) return (
     <div className="rai-doc-empty">
-      <div className="rai-empty-icon">
-        <FileText size={26} color="#6366f1" />
-      </div>
+      <div className="rai-empty-icon"><FileText size={26} color="#6366f1" /></div>
       <div style={{ fontSize: 16, fontWeight: 600, color: "#475569" }}>No resume yet</div>
       <div style={{ fontSize: 13, color: "#334155", textAlign: "center", maxWidth: 280, lineHeight: 1.5 }}>
-        Chat with the AI to build a fresh resume or paste your existing one
+        Chat with ResumeAI to generate your professional profile.
       </div>
     </div>
   );
@@ -100,7 +67,7 @@ function ResumeDocument({ data }) {
   const { name, tagline, email, phone, location, linkedin, summary, experience = [], education = [], skills = {} } = data;
 
   return (
-    <div className="rai-doc">
+    <div className="rai-doc" id="resume-content">
       <div className="r-hdr">
         <div className="r-name">{name}</div>
         {tagline && <div className="r-tagline">{tagline}</div>}
@@ -165,37 +132,23 @@ function ResumeDocument({ data }) {
 
 /* ─── MAIN COMPONENT ────────────────────────────────────────── */
 export default function ResumeAIChatbot() {
-  const [mode, setMode] = useState("build");
-  const [msgs, setMsgs] = useState([]);
+  const [msgs, setMsgs] = useState([{ id: 1, role: "bot", text: WELCOME, time: now() }]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [resumeData, setResumeData] = useState(null);
-  const [userResume, setUserResume] = useState("");
   const [history, setHistory] = useState([]);
-  const [showPaste, setShowPaste] = useState(false);
-  const [pasteText, setPasteText] = useState("");
-  const [showJD, setShowJD] = useState(false);
-  const [jdText, setJdText] = useState("");
   const [atsScore, setAtsScore] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  
+  // Premium / Subscription state
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const msgsRef = useRef(null);
-  const inputRef = useRef(null);
   const historyRef = useRef(history);
   historyRef.current = history;
 
-  // Welcome message on mount / mode change
-  useEffect(() => {
-    setMsgs([{ id: 1, role: "bot", text: WELCOMES[mode], time: now() }]);
-    setHistory([]);
-    setResumeData(null);
-    setUserResume("");
-    setShowPaste(mode !== "build");
-    setAtsScore(null);
-    setLastUpdated(null);
-  }, [mode]);
-
-  // Auto scroll
   useEffect(() => {
     if (msgsRef.current) msgsRef.current.scrollTop = msgsRef.current.scrollHeight;
   }, [msgs]);
@@ -204,39 +157,28 @@ export default function ResumeAIChatbot() {
     setMsgs(prev => [...prev, { id: Date.now() + Math.random(), role, text, time: now(), ...extra }]);
   }, []);
 
-  /* ── Call API ── */
-  const callAI = useCallback(async (userMsg, extraContext = "") => {
+  const callAI = useCallback(async (userMsg) => {
     setStreaming(true);
-
-    const fullMsg = extraContext ? userMsg + "\n\n" + extraContext : userMsg;
-    const newHistory = [...historyRef.current, { role: "user", content: fullMsg }];
+    const newHistory = [...historyRef.current, { role: "user", content: userMsg }];
     setHistory(newHistory);
 
-    // Typing indicator
     const typingId = Date.now();
     setMsgs(prev => [...prev, { id: typingId, role: "bot", typing: true, time: now() }]);
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           provider: "groq",
           model: "llama-3.3-70b-versatile",
           max_tokens: 4000,
-          system: SYSTEM_PROMPTS[mode] + (userResume ? `\n\nUser's existing resume:\n${userResume}` : ""),
-          messages: newHistory.map(m => ({
-            role: m.role,
-            content: m.content || m.text
-          })),
+          system: SYSTEM_PROMPT,
+          messages: newHistory.map(m => ({ role: m.role, content: m.content || m.text })),
         }),
       });
 
       const data = await res.json();
-
-      // Remove typing
       setMsgs(prev => prev.filter(m => m.id !== typingId));
 
       if (data.error) {
@@ -248,10 +190,9 @@ export default function ResumeAIChatbot() {
       const fullText = data.content?.[0]?.text || "";
       setHistory(h => [...h, { role: "assistant", content: fullText }]);
 
-      // Extract JSON
       const jsonMatch = fullText.match(/```resume-json\n([\s\S]*?)\n```/);
       let displayText = fullText.replace(/```resume-json\n[\s\S]*?\n```/, "").trim();
-      if (!displayText) displayText = "✅ Your resume has been updated! Check the preview →";
+      if (!displayText) displayText = "✅ Resume updated! See the preview.";
 
       if (jsonMatch) {
         try {
@@ -262,30 +203,14 @@ export default function ResumeAIChatbot() {
         } catch (e) {}
       }
 
-      // Simulate progressive reveal
-      const words = displayText.split(" ");
-      const msgId = Date.now();
-      setMsgs(prev => [...prev, { id: msgId, role: "bot", text: "", streaming: true, time: now() }]);
-
-      let i = 0;
-      const tick = () => {
-        if (i < words.length) {
-          i = Math.min(i + 4, words.length);
-          setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, text: words.slice(0, i).join(" ") } : m));
-          setTimeout(tick, 25);
-        } else {
-          setMsgs(prev => prev.map(m => m.id === msgId ? { ...m, streaming: false } : m));
-          setStreaming(false);
-        }
-      };
-      tick();
-
+      addMsg("bot", displayText);
+      setStreaming(false);
     } catch (err) {
       setMsgs(prev => prev.filter(m => m.id !== typingId));
-      addMsg("bot", `⚠️ Connection error: ${err.message}\n\nMake sure your Anthropic API key is configured.`);
+      addMsg("bot", `⚠️ Error: ${err.message}`);
       setStreaming(false);
     }
-  }, [mode, userResume, addMsg]);
+  }, [addMsg]);
 
   const send = () => {
     if (!input.trim() || streaming) return;
@@ -295,119 +220,61 @@ export default function ResumeAIChatbot() {
     callAI(txt);
   };
 
-  const submitPaste = () => {
-    if (!pasteText.trim()) return;
-    setUserResume(pasteText.trim());
-    setPasteText("");
-    setShowPaste(false);
-    addMsg("user", `[Pasted resume — ${pasteText.split("\n").length} lines]`);
-    callAI("I pasted my existing resume. Please analyze it and show me an improved version. My resume:\n\n" + pasteText);
-  };
-
-  const tailorWithJD = () => {
-    if (!jdText.trim()) return;
-    setShowJD(false);
-    const msg = resumeData
-      ? "Please tailor my resume for this job description:\n\n" + jdText
-      : "I want to target this role. Build/optimize my resume for:\n\n" + jdText;
-    addMsg("user", "[Job Description pasted]");
-    callAI(msg);
-    setJdText("");
-  };
-
-  const copyResume = () => {
-    if (!resumeData) return;
-    const { name, tagline, email, phone, location, summary, experience = [], education = [], skills = {} } = resumeData;
-    let t = `${name}\n${tagline}\n${email} | ${phone} | ${location}\n\nSUMMARY\n${summary}\n\nEXPERIENCE\n`;
-    experience.forEach(e => { t += `${e.role} — ${e.company} (${e.date})\n`; (e.bullets||[]).forEach(b => t += `• ${b}\n`); t += "\n"; });
-    education.forEach(e => t += `${e.degree}, ${e.school} (${e.date})\n`);
-    const allSkills = [...(skills.highlighted||[]), ...(skills.regular||[])];
-    if (allSkills.length) t += `\nSKILLS\n${allSkills.join(" • ")}`;
-    navigator.clipboard.writeText(t).then(() => alert("Resume copied to clipboard!"));
+  const downloadResume = (format) => {
+    if (!isSubscribed) {
+      setShowUpgradeModal(true);
+      return;
+    }
+    
+    if (format === 'pdf') {
+      window.print();
+    } else {
+      // Simple Word Download via Blob
+      const content = document.getElementById('resume-content').innerText;
+      const blob = new Blob([content], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${resumeData?.name || 'Resume'}.doc`;
+      link.click();
+    }
+    setShowDownloadMenu(false);
   };
 
   return (
     <div className={styles.raiRoot}>
-      {/* ── Chat Panel ── */}
       <div className={styles.raiChat}>
-        {/* Header */}
         <div className={styles.raiHdr}>
           <div className={styles.raiBotRow}>
             <div className={styles.raiAvatar}><Sparkles size={18} color="white" /></div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>ResumeAI by TalentFlow</div>
-              <div style={{ fontSize: 11, color: "var(--text-tertiary)", display: "flex", alignItems: "center", gap: 4 }}>
-                <span className={styles.raiDot} /> Online & ready
-              </div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>ResumeAI Advisor</div>
+              <div style={{ fontSize: 11, color: "var(--text-tertiary)" }}>Your personal executive writer</div>
             </div>
-          </div>
-          <div className={styles.raiTabs}>
-            {MODES.map(m => (
-              <div key={m.id} className={`${styles.raiTab}${mode === m.id ? " " + styles.active : ""}`} onClick={() => !streaming && setMode(m.id)}>
-                {m.label}
-              </div>
-            ))}
           </div>
         </div>
 
-        {/* Messages */}
         <div className={styles.raiMsgs} ref={msgsRef}>
           {msgs.map(msg => (
             <div key={msg.id} className={`${styles.raiMsg}${msg.role === "user" ? " " + styles.user : ""}`}>
               <div className={`${styles.raiMsgAv} ${msg.role === 'bot' ? styles.bot : styles.user}`}>{msg.role === "bot" ? "✨" : "PS"}</div>
               <div>
-                {msg.typing ? (
-                  <div className={`${styles.raiBubble} ${styles.bot}`}>
-                    <div className={styles.raiTyping}><span /><span /><span /></div>
-                  </div>
-                ) : (
-                  <div
-                    className={`${styles.raiBubble} ${msg.role === 'bot' ? styles.bot : styles.user}${msg.streaming ? " " + styles.streaming : ""}`}
-                    dangerouslySetInnerHTML={msg.role === "bot" ? { __html: fmt(msg.text) } : undefined}
-                  >
-                    {msg.role === "user" ? esc(msg.text) : undefined}
-                  </div>
-                )}
-                <div className={styles.raiTime} style={msg.role === "user" ? { textAlign: "right" } : {}}>
-                  {msg.time}
+                <div className={`${styles.raiBubble} ${msg.role === 'bot' ? styles.bot : styles.user}`} dangerouslySetInnerHTML={msg.role === "bot" ? { __html: fmt(msg.text) } : undefined}>
+                  {msg.role === "user" ? esc(msg.text) : undefined}
                 </div>
+                {msg.typing && <div className={styles.raiTyping}><span /><span /><span /></div>}
+                <div className={styles.raiTime}>{msg.time}</div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Quick actions */}
-        <div className={styles.raiQas}>
-          {QUICK_ACTIONS[mode].map(a => (
-            <div key={a} className={styles.raiQa} onClick={() => { if (!streaming) { addMsg("user", a); callAI(a); } }}>{a}</div>
-          ))}
-        </div>
-
-        {/* Paste area */}
-        {showPaste && (
-          <div className={styles.raiPaste}>
-            <div className={styles.raiPasteLbl}>PASTE YOUR EXISTING RESUME</div>
-            <textarea
-              className={styles.raiPasteTa}
-              placeholder="Paste your resume text here (any format — plain text, copied from PDF/Word)..."
-              value={pasteText}
-              onChange={e => setPasteText(e.target.value)}
-            />
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <button className={styles.raiPasteBtn} onClick={submitPaste}>Submit Resume →</button>
-              <button onClick={() => setShowPaste(false)} style={{ padding: "7px 12px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: "var(--text-tertiary)", fontSize: 12, cursor: "pointer" }}>Cancel</button>
-            </div>
-          </div>
-        )}
-
-        {/* Input */}
         <div className={styles.raiInputArea}>
           <div className={styles.raiInputWrap}>
             <textarea
-              ref={inputRef}
               className={styles.raiTextarea}
               rows={1}
-              placeholder="Ask me to build, tailor, or improve your resume..."
+              placeholder="Type to build, paste to improve..."
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
@@ -416,42 +283,39 @@ export default function ResumeAIChatbot() {
               <Send size={14} />
             </button>
           </div>
-          <div className={styles.raiHints}>
-            <span className={styles.raiHint} onClick={() => setShowJD(true)}>📋 Paste Job Description</span>
-            <span className={styles.raiHint} onClick={() => setShowPaste(true)}>📄 Paste My Resume</span>
-            <span className={styles.raiHint} onClick={() => { addMsg("user", "Tailor for this role"); callAI("Tailor my resume for better ATS performance"); }}>🎯 Tailor for role</span>
-            <span className={styles.raiHint} onClick={() => { addMsg("user", "Suggest improvements"); callAI("Review my resume and suggest the most impactful improvements"); }}>💡 Suggest improvements</span>
-          </div>
         </div>
       </div>
 
-      {/* ── Resume Preview Panel ── */}
       <div className={styles.raiResumePanel}>
         <div className={styles.raiResumeHdr}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div>
-              <div className={styles.raiResumeTitle}>Live Resume Preview</div>
-              <div className={styles.raiResumeSub}>
-                {lastUpdated ? `Last updated · ${lastUpdated}` : "Start chatting to generate your resume"}
-              </div>
+          <div>
+            <div className={styles.raiResumeTitle}>Live Preview</div>
+            <div className={styles.raiResumeSub}>{lastUpdated ? `Updated ${lastUpdated}` : "Waiting for content..."}</div>
+          </div>
+          
+          <div className={styles.raiResumeActions}>
+            <div style={{ position: 'relative' }}>
+              <button className={`${styles.raiRbtn} ${styles.primary}`} onClick={() => setShowDownloadMenu(!showDownloadMenu)} disabled={!resumeData}>
+                <Download size={14} /> Download
+              </button>
+              
+              {showDownloadMenu && (
+                <div className={styles.downloadMenu}>
+                  <div className={styles.menuItem} onClick={() => downloadResume('pdf')}>
+                    <FileText size={14} /> PDF Format {!isSubscribed && <Lock size={12} />}
+                  </div>
+                  <div className={styles.menuItem} onClick={() => downloadResume('word')}>
+                    <FileDown size={14} /> Word Format {!isSubscribed && <Lock size={12} />}
+                  </div>
+                </div>
+              )}
             </div>
+            
             {atsScore && (
-              <div className={styles.raiAts} style={{
-                background: atsScore >= 80 ? "rgba(16,185,129,.15)" : atsScore >= 60 ? "rgba(245,158,11,.15)" : "rgba(239,68,68,.15)",
-                border: `1px solid ${atsScore >= 80 ? "rgba(16,185,129,.3)" : atsScore >= 60 ? "rgba(245,158,11,.3)" : "rgba(239,68,68,.3)"}`,
-                color: atsScore >= 80 ? "#34d399" : atsScore >= 60 ? "#fbbf24" : "#f87171",
-              }}>
-                <CheckCircle size={11} /> ATS: {atsScore}%
+              <div className={styles.raiAtsBadge}>
+                ATS Match: {atsScore}%
               </div>
             )}
-          </div>
-          <div className={styles.raiResumeActions}>
-            <button className={styles.raiRbtn} onClick={copyResume} disabled={!resumeData}>
-              <Copy size={12} /> Copy
-            </button>
-            <button className={`${styles.raiRbtn} ${styles.primary}`} onClick={() => setShowJD(true)}>
-              <Star size={12} /> Tailor to JD
-            </button>
           </div>
         </div>
 
@@ -459,34 +323,17 @@ export default function ResumeAIChatbot() {
           <ResumeDocument data={resumeData} />
         </div>
 
-        {/* JD Overlay */}
-        {showJD && (
-          <div className={styles.raiJdOverlay}>
-            <div className={styles.raiJdCard}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>🎯 Tailor to Job Description</div>
-                  <div style={{ fontSize: 12, color: "var(--text-tertiary)" }}>Paste the JD — AI will optimize your resume to match it</div>
-                </div>
-                <button onClick={() => setShowJD(false)} style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 8, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--text-tertiary)", fontSize: 18 }}>
-                  <X size={15} />
-                </button>
-              </div>
-              <textarea
-                className={styles.raiJdTa}
-                placeholder={`Senior Frontend Engineer at Stripe\n\nRequirements:\n• 5+ years React / TypeScript\n• Performance optimization experience\n• Strong CSS & testing skills\n\nResponsibilities:\n• Build scalable web applications\n• Collaborate with design...`}
-                value={jdText}
-                onChange={e => setJdText(e.target.value)}
-              />
-              <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-                <button onClick={() => setShowJD(false)} style={{ flex: 1, padding: 10, borderRadius: 10, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", color: "var(--text-tertiary)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                  Cancel
-                </button>
-                <button onClick={tailorWithJD} style={{ flex: 2, padding: 10, borderRadius: 10, background: "var(--premium-gradient)", border: "none", color: "white", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                  ✨ Tailor My Resume
-                </button>
-              </div>
-            </div>
+        {showUpgradeModal && (
+          <div className={styles.upgradeModal}>
+            <Card className={styles.upgradeCard}>
+              <div className={styles.modalClose} onClick={() => setShowUpgradeModal(false)}><X size={18} /></div>
+              <Target size={40} color="var(--primary-color)" />
+              <h2>TalentFlow Premium</h2>
+              <p>Download professional PDF and Word resumes, get detailed ATS reports, and unlimited AI tailoring.</p>
+              <Button variant="primary" style={{ width: '100%', marginTop: '20px' }} onClick={() => setIsSubscribed(true)}>
+                Upgrade Now
+              </Button>
+            </Card>
           </div>
         )}
       </div>
