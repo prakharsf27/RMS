@@ -11,6 +11,7 @@ import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink, ChevronLeft } from "lucide-react";
 import Link from 'next/link';
 import styles from "./Candidates.module.css";
+import { Modal } from "../components/ui/Modal";
 import { useRouter } from 'next/navigation';
 ;
 
