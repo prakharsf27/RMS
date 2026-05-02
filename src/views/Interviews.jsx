@@ -8,7 +8,7 @@ import { Badge } from "../components/ui/Badge";
 import { Input } from "../components/ui/Input";
 import { Modal } from "../components/ui/Modal";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { Calendar, Clock, Video, MapPin, Plus, CheckCircle, XCircle, MessageSquare } from "lucide-react";
+import { Calendar, Clock, Video, MapPin, Plus, CheckCircle, XCircle, MessageSquare, Users as UsersIcon, ChevronDown } from "lucide-react";
 import { useRouter } from 'next/navigation';
 ;
 import { DatePicker } from "../components/ui/DatePicker";
@@ -221,7 +221,7 @@ export default function Interviews() {
             <div className={styles.formSection}>
               <label className={styles.sectionLabel}>CANDIDATE DETAILS</label>
               <div className={styles.selectWrapper}>
-                <Users size={18} className={styles.selectIcon} />
+                <UsersIcon size={18} className={styles.selectIcon} />
                 <select 
                   className={styles.select}
                   onChange={(e) => {
