@@ -8,7 +8,7 @@ import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
 import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink } from "lucide-react";
+import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink, ChevronLeft } from "lucide-react";
 import Link from 'next/link';
 import styles from "./Candidates.module.css";
 import { useRouter } from 'next/navigation';
@@ -139,7 +139,10 @@ export default function Candidates() {
 
   return (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2.5rem' }}>
+        <Button variant="ghost" size="sm" onClick={() => router.back()} style={{ width: 'fit-content', padding: '0 0.5rem', marginLeft: '-0.5rem' }}>
+          <ChevronLeft size={20} /> Back
+        </Button>
         <div>
           <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>User Management</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Audit recruitment participants and authorize platform access.</p>
