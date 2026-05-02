@@ -218,68 +218,71 @@ export default function Interviews() {
         title="Schedule New Interview"
       >
         <form onSubmit={handleSchedule} className={styles.modalForm}>
-           <div className={styles.formGroup}>
-              <label>Select Candidate Application</label>
-              <select 
-                className={styles.select}
-                onChange={(e) => {
-                    const app = applications.find(a => a._id === e.target.value);
-                    if (app) {
-                        setFormData({
-                            ...formData,
-                            applicationId: app._id,
-                            candidateId: app.candidateId._id,
-                            candidateName: `${app.candidateId.fname} ${app.candidateId.lname}`,
-                            jobTitle: app.jobId.title
-                        });
-                    }
-                }}
-
-                required
-              >
-                <option value="">Choose a candidate application...</option>
-                {applications.filter(a => a.status === 'applied' && a.candidateId).map(app => (
-                    <option key={app._id} value={app._id}>
-                        {app.candidateId.fname} {app.candidateId.lname} - {app.jobId?.title || 'Unknown Role'}
-                    </option>
-                ))}
-              </select>
-           </div>
-
-           <div className={styles.formRow}>
-              <DatePicker 
-                label="Interview Date" 
-                value={formData.date}
-                onChange={(val) => setFormData({...formData, date: val})}
-                required
-              />
-              <TimePicker 
-                label="Meeting Time" 
-                value={formData.time}
-                onChange={(val) => setFormData({...formData, time: val})}
-                required
-              />
-           </div>
-
-           <div className={styles.formGroup}>
-              <label>Interview Type</label>
-              <div className={styles.typeToggle}>
-                 <button 
-                   type="button" 
-                   className={formData.type === 'virtual' ? styles.active : ''}
-                   onClick={() => setFormData({...formData, type: 'virtual', location: ''})}
-                 >
-                   Virtual
-                 </button>
-                 <button 
-                   type="button" 
-                   className={formData.type === 'in-person' ? styles.active : ''}
-                   onClick={() => setFormData({...formData, type: 'in-person', location: ''})}
-                 >
-                   In-Person
-                 </button>
+            <div className={styles.formSection}>
+              <label className={styles.sectionLabel}>CANDIDATE DETAILS</label>
+              <div className={styles.selectWrapper}>
+                <Users size={18} className={styles.selectIcon} />
+                <select 
+                  className={styles.select}
+                  onChange={(e) => {
+                      const app = applications.find(a => a._id === e.target.value);
+                      if (app) {
+                          setFormData({
+                              ...formData,
+                              applicationId: app._id,
+                              candidateId: app.candidateId._id,
+                              candidateName: `${app.candidateId.fname} ${app.candidateId.lname}`,
+                              jobTitle: app.jobId.title
+                          });
+                      }
+                  }}
+                  required
+                >
+                  <option value="">Choose a candidate application...</option>
+                  {applications.filter(a => a.status === 'applied' && a.candidateId).map(app => (
+                      <option key={app._id} value={app._id}>
+                          {app.candidateId.fname} {app.candidateId.lname} — {app.jobId?.title || 'Unknown Role'}
+                      </option>
+                  ))}
+                </select>
+                <ChevronDown size={18} className={styles.selectChevron} />
               </div>
-           </div>
+            </div>
+
+            <div className={styles.formRow}>
+               <DatePicker 
+                 label="Interview Date" 
+                 value={formData.date}
+                 onChange={(val) => setFormData({...formData, date: val})}
+                 required
+               />
+               <TimePicker 
+                 label="Meeting Time" 
+                 value={formData.time}
+                 onChange={(val) => setFormData({...formData, time: val})}
+                 required
+               />
+            </div>
+
+            <div className={styles.formSection}>
+               <label className={styles.sectionLabel}>INTERVIEW CONFIGURATION</label>
+               <div className={styles.typeToggle}>
+                  <button 
+                    type="button" 
+                    className={formData.type === 'virtual' ? styles.active : ''}
+                    onClick={() => setFormData({...formData, type: 'virtual', location: ''})}
+                  >
+                    <Video size={16} /> Virtual Call
+                  </button>
+                  <button 
+                    type="button" 
+                    className={formData.type === 'in-person' ? styles.active : ''}
+                    onClick={() => setFormData({...formData, type: 'in-person', location: ''})}
+                  >
+                    <MapPin size={16} /> In-Person
+                  </button>
+               </div>
+            </div>
 
            <Input 
              label={formData.type === 'virtual' ? "Meeting Link (Zoom/Meet)" : "Office Address"}
@@ -300,8 +303,8 @@ export default function Interviews() {
            </div>
 
            <div className={styles.modalFooter}>
-             <Button type="button" variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-             <Button type="submit">Confirm Schedule</Button>
+             <Button type="button" variant="ghost" onClick={() => setShowModal(false)}>Cancel</Button>
+             <Button type="submit" size="lg" style={{ paddingLeft: '2.5rem', paddingRight: '2.5rem' }}>Confirm Schedule</Button>
            </div>
         </form>
       </Modal>

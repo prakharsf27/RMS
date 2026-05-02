@@ -196,35 +196,69 @@
 .modalForm {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
   padding: 0.5rem 0;
 }
 
-.formGroup {
+.formSection {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-.formGroup label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+.sectionLabel {
+  font-size: 0.688rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selectIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 1rem;
+  color: var(--text-tertiary);
+  pointer-events: none;
 }
 
 .select {
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
+  width: 100%;
+  padding: 0.875rem 2.5rem;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--bg-elevated);
   font-family: inherit;
   color: var(--text-primary);
+  font-size: 0.938rem;
+  appearance: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .typeToggle {
@@ -237,20 +271,30 @@
 
 .typeToggle button {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: none;
   background: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   color: var(--text-secondary);
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.typeToggle button:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-elevated-hover);
 }
 
 .typeToggle button.active {
   background-color: var(--primary);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .textarea {
@@ -267,7 +311,9 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .emptyCard {

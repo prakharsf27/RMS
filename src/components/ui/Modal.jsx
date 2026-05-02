@@ -26,7 +26,9 @@ export const Modal = ({ isOpen, onClose, title, children, className }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.header}>
-          <h2 className={styles.title}>{title}</h2>
+          <div className={styles.headerInfo}>
+            <h2 className={styles.title}>{title}</h2>
+          </div>
           <Button variant="ghost" size="sm" onClick={onClose} className={styles.closeBtn}>
             <X size={20} />
           </Button>
