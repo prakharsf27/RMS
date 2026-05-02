@@ -250,24 +250,22 @@ export default function Applications() {
                             <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(app._id, "rejected")}>
                               <XCircle size={16} /> Reject
                             </Button>
-                            <Button 
-                              size="sm" 
-                              variant="secondary" 
-                              onClick={() => window.location.href = `/messages?recipientId=${candidate._id}`}
-                            >
-                              <Mail size={16} /> Message
-                            </Button>
                           </>
                         )}
-                        {app.status !== "applied" && (
-                           <Button 
-                              size="sm" 
-                              variant="secondary" 
-                              onClick={() => window.location.href = `/messages?recipientId=${candidate._id}`}
-                            >
-                              <Mail size={16} /> Message
-                            </Button>
-                        )}
+                        <Button 
+                          size="sm" 
+                          variant="secondary" 
+                          onClick={() => router.push(`/profile?userId=${candidate._id}`)}
+                        >
+                          <User size={16} /> Profile
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="secondary" 
+                          onClick={() => window.location.href = `/messages?recipientId=${candidate._id}`}
+                        >
+                          <Mail size={16} /> Message
+                        </Button>
                         {user.role === 'admin' && (
                           <Button size="sm" variant="ghost" onClick={() => handleBulkDelete()} style={{ color: 'var(--danger)' }}>
                             <Trash2 size={16} />

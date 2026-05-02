@@ -205,20 +205,27 @@ export default function Profile() {
     }
   };
 
+  const [showResume, setShowResume] = useState(true);
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
   return (
     <div className="animate-fade-in">
       <div className={styles.header}>
-        <h1 className="text-gradient">Professional Identity</h1>
-        <p>Manage your professional persona and recruitment assets.</p>
+        <h1 className="text-gradient">{isViewingOthers ? 'Candidate Intelligence' : 'Professional Identity'}</h1>
+        <p>{isViewingOthers ? `Deep-dive audit of ${user?.fname}'s professional background.` : 'Manage your professional persona and recruitment assets.'}</p>
       </div>
 
-      <div className={styles.container}>
+      <div className={cn(styles.container, (isViewingOthers && user?.resume && showResume) && styles.recruiterView)}>
         <aside className={styles.sidebar}>
           <Card className={styles.avatarCard} premium glow>
             <div className={styles.avatarWrapper}>
-              <img src={avatarPreview} alt="Profile" className={styles.avatar} />
-              <button className={styles.cameraBtn} onClick={() => avatarInputRef.current.click()}><Camera size={16} /></button>
-              <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={handleAvatarChange} />
+              <img src={avatarPreview || user?.avatar} alt="Profile" className={styles.avatar} />
+              {!isViewingOthers && (
+                <>
+                  <button className={styles.cameraBtn} onClick={() => avatarInputRef.current.click()}><Camera size={16} /></button>
+                  <input type="file" ref={avatarInputRef} hidden accept="image/*" onChange={handleAvatarChange} />
+                </>
+              )}
             </div>
             <h3 className={styles.userName}>{user?.fname} {user?.lname}</h3>
             <span className={styles.userRole}>{user?.role?.toUpperCase()}</span>
@@ -263,9 +270,16 @@ export default function Profile() {
             </Button>
           )}
           {isViewingOthers && (
-             <Button variant="secondary" onClick={() => router.push(-1)} style={{ width: '100%', marginTop: '0.5rem' }}>
-                Back to Directory
-             </Button>
+             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Button variant="secondary" onClick={() => router.push(-1)} style={{ width: '100%' }}>
+                    Back to Directory
+                </Button>
+                {user?.resume && (
+                  <Button variant={showResume ? "secondary" : "premium"} onClick={() => setShowResume(!showResume)}>
+                    {showResume ? "Hide Resume" : "Preview Resume"}
+                  </Button>
+                )}
+             </div>
           )}
         </aside>
 
@@ -278,7 +292,7 @@ export default function Profile() {
                  <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>Edit Details</Button>
                )}
                {isViewingOthers && user?.resume && (
-                  <Button size="sm" variant="success" onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${user.resume}`, '_blank')}>
+                  <Button size="sm" variant="success" onClick={() => window.open(`${baseUrl}${user.resume}`, '_blank')}>
                      Download Resume
                   </Button>
                )}
@@ -315,17 +329,6 @@ export default function Profile() {
                     >
                         {user?.isEmailVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.email.sent ? "Verifying..." : "Verify"}
                     </div>
-                    {otpFlow.email.sent && (
-                      <div className={styles.otpContainer}>
-                        <Input 
-                          placeholder="Code" 
-                          className={styles.otpInput} 
-                          value={otpFlow.email.code}
-                          onChange={(e) => setOtpFlow({...otpFlow, email: {...otpFlow.email, code: e.target.value}})}
-                        />
-                        <Button size="sm" onClick={() => handleVerifyOTP('email')}>Submit</Button>
-                      </div>
-                    )}
                 </div>
                 <div className={styles.inputWithBadge}>
                     <Input 
@@ -342,17 +345,6 @@ export default function Profile() {
                     >
                         {user?.isPhoneVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.phone.sent ? "Verifying..." : "Verify"}
                     </div>
-                    {otpFlow.phone.sent && (
-                      <div className={styles.otpContainer}>
-                        <Input 
-                          placeholder="Code" 
-                          className={styles.otpInput} 
-                          value={otpFlow.phone.code}
-                          onChange={(e) => setOtpFlow({...otpFlow, phone: {...otpFlow.phone, code: e.target.value}})}
-                        />
-                        <Button size="sm" onClick={() => handleVerifyOTP('phone')}>Submit</Button>
-                      </div>
-                    )}
                 </div>
                </div>
 
@@ -407,18 +399,6 @@ export default function Profile() {
                       </div>
                     )}
                   </div>
-                  {isEditing && (
-                    <div style={{ marginTop: '0.5rem' }}>
-                      <div className={styles.suggestionHeader}>Recommended for you</div>
-                      <div className={styles.suggestionTags}>
-                        {skillSuggestions.map(s => (
-                          <div key={s} className={styles.suggestionTag} onClick={() => addSkill(s)}>
-                             + {s}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                </div>
 
                <div className={styles.sectionHeader} style={{ marginTop: '1rem' }}>
@@ -427,19 +407,31 @@ export default function Profile() {
                </div>
 
                <div className={styles.grid}>
-                  <div 
-                    className={cn(styles.uploadZone, isScanning && styles.uploadZoneActive)} 
-                    onClick={() => isEditing && !isScanning && resumeInputRef.current.click()}
-                  >
-                     <div className={styles.uploadIcon}>
-                        {isScanning ? <Zap size={24} className="text-primary animate-pulse" /> : (resumeFile || user?.resume ? <CheckCircle size={24} className="text-success" /> : <FilePlus size={24} />)}
-                     </div>
-                     <div>
-                        <strong>{isScanning ? "Scanning Profile..." : resumeFile ? resumeFile.name : user?.resume ? "Resume_Updated.pdf" : "Upload PDF Resume"}</strong>
-                        <p>{isScanning ? "Extracting ATS data points..." : "Format: PDF only (Max 5MB)"}</p>
-                     </div>
-                     <input type="file" ref={resumeInputRef} hidden accept=".pdf" onChange={handleResumeSelect} />
-                  </div>
+                  {!isViewingOthers ? (
+                    <div 
+                        className={cn(styles.uploadZone, isScanning && styles.uploadZoneActive)} 
+                        onClick={() => isEditing && !isScanning && resumeInputRef.current.click()}
+                    >
+                        <div className={styles.uploadIcon}>
+                            {isScanning ? <Zap size={24} className="text-primary animate-pulse" /> : (resumeFile || user?.resume ? <CheckCircle size={24} className="text-success" /> : <FilePlus size={24} />)}
+                        </div>
+                        <div>
+                            <strong>{isScanning ? "Scanning Profile..." : resumeFile ? resumeFile.name : user?.resume ? "Resume_Updated.pdf" : "Upload PDF Resume"}</strong>
+                            <p>{isScanning ? "Extracting ATS data points..." : "Format: PDF only (Max 5MB)"}</p>
+                        </div>
+                        <input type="file" ref={resumeInputRef} hidden accept=".pdf" onChange={handleResumeSelect} />
+                    </div>
+                  ) : (
+                    <div className={styles.uploadZone} style={{ cursor: 'default' }}>
+                        <div className={styles.uploadIcon}>
+                            {user?.resume ? <CheckCircle size={24} className="text-success" /> : <Shield size={24} />}
+                        </div>
+                        <div>
+                            <strong>{user?.resume ? "Resume Available" : "No Resume Attached"}</strong>
+                            <p>{user?.resume ? "Verified identity document" : "Candidate has not uploaded a resume yet"}</p>
+                        </div>
+                    </div>
+                  )}
 
                   <div className={styles.expContent}>
                      <label style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Experience Level</label>
@@ -493,6 +485,16 @@ export default function Profile() {
             </form>
           </Card>
         </main>
+
+        {(isViewingOthers && user?.resume && showResume) && (
+          <aside className={cn(styles.resumePreview, "animate-fade-in")}>
+            <iframe 
+              src={`${baseUrl}${user.resume}#toolbar=0`} 
+              className={styles.resumeIframe}
+              title="Candidate Resume"
+            />
+          </aside>
+        )}
       </div>
     </div>
   );

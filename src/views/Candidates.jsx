@@ -287,7 +287,7 @@ export default function Candidates() {
                                 </Button>
                               </>
                             )}
-                            <Button size="sm" variant="ghost" onClick={() => router.push('/profile', { state: { userId: candidate._id } })}>
+                            <Button size="sm" variant="ghost" onClick={() => router.push(`/profile?userId=${candidate._id}`)}>
                                <ExternalLink size={14} /> Profile
                             </Button>
                         </div>
