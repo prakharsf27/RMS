@@ -19,7 +19,10 @@ export default function Company() {
     email: "",
     location: "",
     description: "",
-    logo: ""
+    logo: "",
+    cinOrGst: "",
+    country: "",
+    isVerified: false
   });
 
   const fetchCompany = async () => {
@@ -74,7 +77,16 @@ export default function Company() {
     <div className={styles.container + " animate-fade-in"}>
       <header className={styles.header}>
         <h1 className={styles.title}>Company Profile</h1>
-        <p className={styles.subtitle}>Manage your organization's public presence on the TalentFlow platform.</p>
+        <p className={styles.subtitle}>Manage your organization's public presence and legal verification.</p>
+        {formData.name && (
+          <div className={styles.statusBadge}>
+            {formData.isVerified ? (
+              <span className={styles.verified}><Save size={14} /> Verified Business</span>
+            ) : (
+              <span className={styles.pending}>Verification Pending</span>
+            )}
+          </div>
+        )}
       </header>
 
       {loading ? (
@@ -96,6 +108,25 @@ export default function Company() {
                 <div className={styles.formGrid}>
                 <Input label="Logo URL" name="logo" value={formData.logo} icon={Globe} onChange={handleChange} />
                 <Input label="Headquarters" name="location" value={formData.location} icon={MapPin} onChange={handleChange} required />
+                </div>
+
+                <div className={styles.formGrid}>
+                <Input 
+                  label="CIN / GST / Tax ID" 
+                  name="cinOrGst" 
+                  value={formData.cinOrGst} 
+                  placeholder="e.g. U74140DL2015PTC288000" 
+                  onChange={handleChange} 
+                  required 
+                />
+                <Input 
+                  label="Country" 
+                  name="country" 
+                  value={formData.country} 
+                  placeholder="e.g. India, United States" 
+                  onChange={handleChange} 
+                  required 
+                />
                 </div>
 
                 <div className={styles.textareaGroup}>

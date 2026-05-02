@@ -51,7 +51,10 @@ exports.getInterviews = async (req, res) => {
     let query = {};
     if (req.user.role === 'candidate') {
       query.candidateId = req.user._id;
+    } else if (req.user.role === 'recruiter') {
+      query.recruiterId = req.user._id;
     }
+    // Admins have no restriction on the query object, so they see all.
 
     const interviews = await Interview.find(query)
       .sort('date')
@@ -69,9 +72,16 @@ exports.getInterviews = async (req, res) => {
 // @access  Private (Recruiter/Admin)
 exports.updateInterview = async (req, res) => {
   try {
-    const interview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ message: 'Interview not found' });
-    res.json(interview);
+
+    // Check ownership
+    if (req.user.role === 'recruiter' && interview.recruiterId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this interview' });
+    }
+
+    const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedInterview);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -82,7 +92,15 @@ exports.updateInterview = async (req, res) => {
 // @access  Private (Recruiter/Admin)
 exports.deleteInterview = async (req, res) => {
   try {
-    await Interview.findByIdAndDelete(req.params.id);
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ message: 'Interview not found' });
+
+    // Check ownership
+    if (req.user.role === 'recruiter' && interview.recruiterId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this interview' });
+    }
+
+    await interview.deleteOne();
     res.json({ message: 'Interview removed' });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -26,6 +26,8 @@ export default function Jobs() {
     type: "all"
   });
   const [appliedJobIds, setAppliedJobIds] = useState(new Set());
+  const [isCompanyVerified, setIsCompanyVerified] = useState(false);
+  const [hasCompanyProfile, setHasCompanyProfile] = useState(false);
   
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -70,8 +72,23 @@ export default function Jobs() {
     }
   };
 
+  const checkCompanyVerification = async () => {
+    if (user.role === 'recruiter') {
+      try {
+        const { data } = await api.get("/companies/my");
+        setHasCompanyProfile(true);
+        setIsCompanyVerified(data.isVerified);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          setHasCompanyProfile(false);
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     fetchJobs();
+    checkCompanyVerification();
   }, [searchTerm, filters.location, filters.type, page]);
 
   const handleCreateJob = async (formData) => {
@@ -166,9 +183,20 @@ export default function Jobs() {
             </Button>
           )}
           {user.role !== "candidate" && (
-            <Button onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}>
-              <Plus size={18} /> Post New Job
-            </Button>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+              <Button 
+                disabled={!isCompanyVerified}
+                onClick={() => { setIsEditing(false); setSelectedJob(null); setIsPostModalOpen(true); }}
+                title={!isCompanyVerified ? "Complete your company profile and wait for verification to post jobs." : ""}
+              >
+                <Plus size={18} /> Post New Job
+              </Button>
+              {!isCompanyVerified && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--danger)', fontWeight: 500 }}>
+                  {!hasCompanyProfile ? "Company profile required" : "Verification pending"}
+                </span>
+              )}
+            </div>
           )}
         </div>
 

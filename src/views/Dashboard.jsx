@@ -86,10 +86,10 @@ const PROFILE_ITEMS = [
 ];
 
 const RECRUITER_TASKS = [
-  { label: "Review 5 Pending Applications", done: false },
-  { label: "Schedule Interviews for Senior Dev", done: false },
-  { label: "Post New Job Opening", done: true },
-  { label: "Verify Candidate References", done: true },
+  { label: "Update company profile", done: false },
+  { label: "Post your first job", done: false },
+  { label: "Review applications", done: false },
+  { label: "Schedule an interview", done: false },
 ];
 
 export default function Dashboard() {
@@ -100,6 +100,7 @@ export default function Dashboard() {
   const [companies, setCompanies] = useState([]);
   const [dataList, setDataList] = useState([]); // Jobs for candidates, Recent Applications for recruiters
   const [isLoading, setIsLoading] = useState(true);
+  const [activities, setActivities] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,6 +112,7 @@ export default function Dashboard() {
         ]);
         setStats(statsRes.data.summary);
         setChartData(statsRes.data.chartData || []);
+        setActivities(statsRes.data.activities || []);
         setCompanies(compRes.data.map(c => c.name));
         setDataList(user.role === 'candidate' ? listRes.data : listRes.data.applications);
       } catch (err) {
@@ -156,15 +158,15 @@ export default function Dashboard() {
           <div className={styles.heroChips}>
             {isCandidate ? (
               <>
-                <div className={styles.heroChip}><Flame size={12} /> 96% match at Stripe</div>
-                <div className={styles.heroChip}><CalendarDays size={12} /> Interview · Apr 20</div>
-                <div className={styles.heroChip}><TrendingUp size={12} /> Profile views up 12%</div>
+                <div className={styles.heroChip}><Zap size={12} /> {stats?.interviews || 0} scheduled interviews</div>
+                <div className={styles.heroChip}><FileText size={12} /> {stats?.applications || 0} active applications</div>
+                <div className={styles.heroChip}><TrendingUp size={12} /> {stats?.profileViews || 0} profile views</div>
               </>
             ) : (
               <>
-                <div className={styles.heroChip}><Target size={12} /> 12 candidates shortlisted</div>
-                <div className={styles.heroChip}><MessageSquare size={12} /> 5 unread messages</div>
-                <div className={styles.heroChip}><CheckCircle size={12} /> 2 offers accepted</div>
+                <div className={styles.heroChip}><Users size={12} /> {stats?.candidates || 0} total candidates</div>
+                <div className={styles.heroChip}><MessageSquare size={12} /> {stats?.unreadMessages || 0} unread messages</div>
+                <div className={styles.heroChip}><CheckCircle size={12} /> {stats?.jobs || 0} active job posts</div>
               </>
             )}
           </div>
@@ -180,6 +182,68 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ─── Dashboard Mockup (Dynamic) ─── */}
+      <div className={`${styles.heroMockup} anim-2`}>
+        <div className={styles.mmBar}>
+          <div className={styles.mmDot} style={{ background: "#ef4444" }}></div>
+          <div className={styles.mmDot} style={{ background: "#f59e0b" }}></div>
+          <div className={styles.mmDot} style={{ background: "#22c55e" }}></div>
+          <div className={styles.mmBarSearch}></div>
+        </div>
+        <div className={styles.mmBody}>
+          <div className={styles.mmSidebar}>
+            <div className={styles.mmLogoRow}>
+              <div className={styles.mmLogoIco}>T</div>
+              <span className={styles.mmLogoTxt}>TalentFlow</span>
+            </div>
+            <div className={cn(styles.mmNavItem, styles.mmNavItemActive)}>
+              <LayoutDashboard size={12} /> Dashboard
+            </div>
+            <div className={styles.mmNavItem}><Briefcase size={12} /> Jobs</div>
+            <div className={styles.mmNavItem}><FileText size={12} /> Applications</div>
+            <div className={styles.mmNavItem}><MessageSquare size={12} /> Messages</div>
+          </div>
+          <div className={styles.mmMain}>
+            <div className={styles.mmHeroCard}>
+              <div>
+                <div className={styles.mmGreeting}>Welcome, {user.fname}</div>
+                <div className={styles.mmGreetingSub}>
+                  {isCandidate ? `${stats?.jobs || 0} active jobs` : `${stats?.candidates || 0} talent pool`}
+                </div>
+              </div>
+              <div className={styles.mmHeroBtn}>{isCandidate ? 'Jobs' : 'Talent'}</div>
+            </div>
+            <div className={styles.mmStatsGrid}>
+              <div className={styles.mmStatCard}>
+                <div className={styles.mmStatVal} style={{ color: "#818cf8" }}>{stats?.applications || 0}</div>
+                <div className={styles.mmStatLbl}>APPS</div>
+              </div>
+              <div className={styles.mmStatCard}>
+                <div className={styles.mmStatVal} style={{ color: "#f59e0b" }}>{stats?.interviews || 0}</div>
+                <div className={styles.mmStatLbl}>INTV</div>
+              </div>
+              <div className={styles.mmStatCard}>
+                <div className={styles.mmStatVal} style={{ color: "#34d399" }}>{isCandidate ? (stats?.offers || 0) : (stats?.jobs || 0)}</div>
+                <div className={styles.mmStatLbl}>{isCandidate ? 'OFFER' : 'JOBS'}</div>
+              </div>
+            </div>
+            <div className={styles.mmJobList}>
+              {dataList?.slice(0, 2).map((item, i) => (
+                <div className={styles.mmJobItem} key={i}>
+                  <div className={styles.mmJobLogo} style={{ background: 'var(--premium-gradient)' }}>
+                    {(isCandidate ? item.company?.name?.[0] : item.candidate?.fname?.[0]) || 'T'}
+                  </div>
+                  <div className={styles.mmJobInfoSmall}>
+                    <div className={styles.mmJobRole}>{isCandidate ? item.title : `${item.candidate?.fname} ${item.candidate?.lname}`}</div>
+                    <div className={styles.mmJobMatch}>{isCandidate ? `${item.matchScore || 0}%` : 'New'}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className={`${styles.card} anim-1`} style={{ marginTop: 24, marginBottom: 24 }}>
         <div className={styles.cardHeader}>
           <div>
@@ -190,10 +254,10 @@ export default function Dashboard() {
         <div className={styles.cardBody}>
           <div className={styles.marqueeOuter}>
             <div className={styles.marqueeTrack}>
-              {(companies.length > 0 ? companies : COMPANIES).map((c, i) => (
+              {companies.map((c, i) => (
                 <span className={styles.companyTag} key={i}>{c}</span>
               ))}
-              {(companies.length > 0 ? companies : COMPANIES).map((c, i) => (
+              {companies.map((c, i) => (
                 <span className={styles.companyTag} key={`clone-${i}`}>{c}</span>
               ))}
             </div>
@@ -228,7 +292,7 @@ export default function Dashboard() {
               <div className={styles.jobList}>
                 {isCandidate ? (
                   dataList?.map((job, i) => {
-                    const match = job.matchScore || (80 + (i * 4) % 15);
+                    const match = job.matchScore || 0;
                     return (
                       <div className={styles.jobCard} key={job._id || i} onClick={() => router.push(`/jobs/${job._id}`)}>
                         <div className={styles.jobLogo} style={{ background: 'var(--premium-gradient)', opacity: 0.9 }}>
@@ -289,23 +353,21 @@ export default function Dashboard() {
             </div>
             <div className={styles.cardBody}>
               <div className={styles.activityFeed}>
-                {(isCandidate ? [
-                  { icon: FileText, text: "Applied to Senior Frontend Engineer at Stripe", time: "2h ago", color: "#6366f1" },
-                  { icon: CalendarDays, text: "Interview scheduled with Linear · Apr 20, 2:00 PM", time: "5h ago", color: "#f59e0b" },
-                  { icon: Eye, text: "Notion viewed your profile", time: "1d ago", color: "#c084fc" },
-                ] : [
-                  { icon: CheckCircle, text: "Sent offer to Alex Rivera for Backend Lead", time: "1h ago", color: "#10b981" },
-                  { icon: CalendarDays, text: "4 interviews scheduled for today", time: "3h ago", color: "#f59e0b" },
-                  { icon: Users, text: "New application received for Product Manager", time: "4h ago", color: "#6366f1" },
-                ]).map((act, i) => (
-                  <div className={styles.activityItem} key={i}>
-                    <div className={styles.activityDot} style={{ background: act.color }} />
-                    <div className={styles.activityContent}>
-                      <p className={styles.activityAction}>{act.text}</p>
-                      <span className={styles.activityTime}>{act.time}</span>
+                {activities.length > 0 ? (
+                  activities.map((act, i) => (
+                    <div className={styles.activityItem} key={act._id || i}>
+                      <div className={styles.activityDot} style={{ background: 'var(--primary)' }} />
+                      <div className={styles.activityContent}>
+                        <p className={styles.activityAction}>{act.action}: {act.details || 'System event'}</p>
+                        <span className={styles.activityTime}>{new Date(act.timestamp).toLocaleString()}</span>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className={styles.emptyActivity}>
+                    <p>No recent activity recorded.</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>

@@ -22,9 +22,11 @@ exports.getConversations = async (req, res) => {
     });
     participants.delete(userId.toString());
 
-    const conversationList = await Promise.all(
+    const conversationList = (await Promise.all(
       Array.from(participants).map(async (pId) => {
         const contact = await User.findById(pId).select('fname lname avatar role');
+        if (!contact) return null;
+
         const lastMessage = await Message.findOne({
           $or: [
             { senderId: userId, receiverId: pId },
@@ -42,9 +44,13 @@ exports.getConversations = async (req, res) => {
           })
         };
       })
-    );
+    )).filter(Boolean);
 
-    res.json(conversationList.sort((a, b) => b.lastMessage.createdAt - a.lastMessage.createdAt));
+    res.json(conversationList.sort((a, b) => {
+      const timeA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
+      const timeB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+      return timeB - timeA;
+    }));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

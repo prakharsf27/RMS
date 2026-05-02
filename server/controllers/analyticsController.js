@@ -2,6 +2,8 @@ const Job = require('../models/Job');
 const Application = require('../models/Application');
 const User = require('../models/User');
 const Interview = require('../models/Interview');
+const AuditLog = require('../models/AuditLog');
+const Message = require('../models/Message');
 
 // @desc    Get dashboard analytics (Stats + Charts)
 // @route   GET /api/analytics
@@ -32,6 +34,14 @@ exports.getStats = async (req, res) => {
     const candidatesCount = await User.countDocuments(candQuery);
     
     const interviewsCount = await Interview.countDocuments(query);
+
+    // Activity Feed
+    const activities = await AuditLog.find({ userId: req.user._id })
+      .sort('-createdAt')
+      .limit(5);
+
+    // Unread Messages
+    const unreadMessages = await Message.countDocuments({ receiverId: req.user._id, read: false });
 
     // Hired vs Rejected vs Applied (for Pie Chart)
     const statsByStatus = await Application.aggregate([
@@ -103,17 +113,13 @@ exports.getStats = async (req, res) => {
           offers: offeredCount,
           interviews: interviewsCount,
           profileViews: userDoc?.profileViews || 0,
-          jobs: await Job.countDocuments({ status: 'active' })
+          jobs: await Job.countDocuments({ status: 'active' }),
+          unreadMessages
         },
-        chartData
+        chartData,
+        activities
       });
     }
-
-    // Global Stats for Landing Page / Admin
-    const totalUsers = await User.countDocuments({ role: 'candidate' });
-    const totalAppsGlobal = await Application.countDocuments();
-    // Assuming resumes are generated/stored, for now we use total applications as a proxy or just users
-    const totalResumes = totalUsers * 2; // Mocking a ratio if not explicitly tracked
 
     res.json({
       summary: {
@@ -121,15 +127,12 @@ exports.getStats = async (req, res) => {
         applications: appsCount,
         candidates: candidatesCount,
         interviews: interviewsCount,
-        global: {
-            users: totalUsers,
-            applications: totalAppsGlobal,
-            resumes: totalResumes
-        }
+        unreadMessages
       },
       byStatus: statsByStatus,
       byDepartment: statsByDept,
-      chartData
+      chartData,
+      activities
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -146,10 +149,10 @@ exports.getGlobalStats = async (req, res) => {
         const totalInterviews = await Interview.countDocuments();
         
         res.json({
-            users: totalUsers + 12000, 
-            applications: totalApps + 45000,
-            interviews: totalInterviews + 8500,
-            successRate: 94
+            users: totalUsers, 
+            applications: totalApps,
+            interviews: totalInterviews,
+            successRate: totalApps > 0 ? Math.round((totalInterviews / totalApps) * 100) : 0
         });
     } catch (error) {
         res.status(500).json({ message: error.message });

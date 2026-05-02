@@ -1,4 +1,5 @@
 const Job = require('../models/Job');
+const Company = require('../models/Company');
 
 // @desc    Get all jobs with search, filters, and pagination
 // @route   GET /api/jobs
@@ -109,6 +110,15 @@ exports.createJob = async (req, res) => {
   const { title, department, location, type, salary, description, requirements } = req.body;
 
   try {
+    // Check if company is verified
+    const company = await Company.findOne({ recruiterId: req.user._id });
+    if (!company) {
+      return res.status(403).json({ message: 'Please complete your company profile before posting jobs.' });
+    }
+    if (!company.isVerified) {
+      return res.status(403).json({ message: 'Your company profile is pending verification. You can post jobs once verified.' });
+    }
+
     const job = await Job.create({
       title,
       department,
@@ -203,14 +213,12 @@ exports.getRecommendedJobs = async (req, res) => {
         }
       });
       
-      // Artificial boost based on department/title match
-      let score = 70 + (matchCount * 5); // baseline 70%
-      if (score > 98) score = 98; // cap at 98%
-      
-      // If no skills match, assign a varied score between 65-80
-      if (matchCount === 0) {
-        const randomBonus = (job._id.toString().charCodeAt(0) % 15);
-        score = 65 + randomBonus;
+      // Real Match Score calculation
+      let score = 0;
+      if (jobReqs.length > 0) {
+        score = Math.round((matchCount / jobReqs.length) * 100);
+      } else {
+        score = 50; // Neutral score if no requirements specified
       }
 
       return {

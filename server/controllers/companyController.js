@@ -29,7 +29,7 @@ exports.getMyCompany = async (req, res) => {
 // @route   POST /api/companies
 // @access  Private (Recruiter)
 exports.upsertCompany = async (req, res) => {
-  const { name, description, industry, location, website, logo } = req.body;
+  const { name, description, industry, location, website, logo, cinOrGst, country } = req.body;
 
   try {
     let company = await Company.findOne({ recruiterId: req.user._id });
@@ -42,6 +42,9 @@ exports.upsertCompany = async (req, res) => {
       company.location = location || company.location;
       company.website = website || company.website;
       company.logo = logo || company.logo;
+      company.cinOrGst = cinOrGst || company.cinOrGst;
+      company.country = country || company.country;
+      // Note: we don't automatically set isVerified to true; it would typically be a manual or background process.
     } else {
       // Create
       company = new Company({
@@ -51,6 +54,8 @@ exports.upsertCompany = async (req, res) => {
         location,
         website,
         logo,
+        cinOrGst,
+        country,
         recruiterId: req.user._id
       });
     }

@@ -7,6 +7,9 @@ const CompanySchema = new mongoose.Schema({
   location: { type: String },
   website: { type: String },
   logo: { type: String },
+  cinOrGst: { type: String, required: true },
+  country: { type: String, required: true },
+  isVerified: { type: Boolean, default: false },
   recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 

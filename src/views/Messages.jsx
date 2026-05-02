@@ -36,8 +36,15 @@ export default function Messages() {
           const existing = convos.find(c => c.contact._id === initialRecipientId);
           if (existing) {
             setActiveChat(existing.contact);
+          } else {
+            // Fetch contact info if not in conversations
+            try {
+              const { data: contact } = await api.get(`/auth/users/${initialRecipientId}`);
+              setActiveChat(contact);
+            } catch (err) {
+              console.error("Fetch contact error:", err);
+            }
           }
-          // Note: If contact not in convo list, it could be fetched separately
         } else if (convos.length > 0) {
           setActiveChat(convos[0].contact);
         }
@@ -122,21 +129,31 @@ export default function Messages() {
           </div>
           
           <div className={styles.conversationList}>
-            {conversations.length === 0 ? (
-              <div className={styles.sidebarEmpty}>
-                <MessageSquare size={40} className={styles.emptyIcon} />
-                <p>No conversations yet</p>
-                <span>Reach out to candidates or recruiters from the pipeline to start chatting.</span>
-              </div>
-            ) : (
-              conversations.map(convo => (
+            {(() => {
+              // Merge activeChat into conversations list if it's not already there
+              let displayConvos = [...conversations];
+              if (activeChat && !conversations.find(c => c.contact._id === activeChat._id)) {
+                displayConvos = [{ contact: activeChat, lastMessage: null, unreadCount: 0 }, ...displayConvos];
+              }
+
+              if (displayConvos.length === 0) {
+                return (
+                  <div className={styles.sidebarEmpty}>
+                    <MessageSquare size={40} className={styles.emptyIcon} />
+                    <p>No conversations yet</p>
+                    <span>Reach out to candidates or recruiters from the pipeline to start chatting.</span>
+                  </div>
+                );
+              }
+
+              return displayConvos.map(convo => (
                 <div 
                   key={convo.contact._id} 
                   className={`${styles.convoItem} ${activeChat?._id === convo.contact._id ? styles.active : ""}`}
                   onClick={() => setActiveChat(convo.contact)}
                 >
                   <div className={styles.avatarWrapper}>
-                    <img src={convo.contact.avatar} alt="" className={styles.avatar} />
+                    <img src={convo.contact.avatar || `https://ui-avatars.com/api/?name=${convo.contact.fname}+${convo.contact.lname}`} alt="" className={styles.avatar} />
                     <div className={styles.statusDot}></div>
                   </div>
                   <div className={styles.convoBody}>
@@ -147,13 +164,13 @@ export default function Messages() {
                       </span>
                     </div>
                     <div className={styles.convoPreview}>
-                      <p>{convo.lastMessage?.content}</p>
+                      <p>{convo.lastMessage?.content || "New conversation"}</p>
                       {convo.unreadCount > 0 && <span className={styles.unreadCount}>{convo.unreadCount}</span>}
                     </div>
                   </div>
                 </div>
-              ))
-            )}
+              ));
+            })()}
           </div>
         </aside>
 

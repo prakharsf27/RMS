@@ -190,8 +190,6 @@ export default function Candidates() {
                 renderRow={(candidate, i) => {
                   const isSelected = user.role === 'admin' ? selectedIds.includes(candidate._id) : candidate.isEngaged;
                   const isBlocked = candidate.status === 'suspended';
-                  // Mock match score for directory if not present
-                  const mockScore = candidate.matchScore || (80 + (i % 15));
                   
                   return (
                     <tr key={candidate._id || i} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
@@ -217,22 +215,24 @@ export default function Candidates() {
                           </a>
                         </div>
                       </td>
-                      <td><div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Remote</div></td>
+                      <td><div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{candidate.location || 'N/A'}</div></td>
                       <td>{isBlocked ? <Badge variant="danger">Suspended</Badge> : <Badge variant="success">Active</Badge>}</td>
                       <td>
-                        <div style={{ 
-                            width: '36px', 
-                            height: '36px', 
-                            borderRadius: '50%', 
-                            border: `2px solid ${mockScore > 85 ? 'var(--success)' : 'var(--warning)'}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '0.7rem',
-                            fontWeight: 800
-                        }}>
-                            {mockScore}%
-                        </div>
+                        {candidate.matchScore ? (
+                          <div style={{ 
+                              width: '36px', 
+                              height: '36px', 
+                              borderRadius: '50%', 
+                              border: `2px solid ${candidate.matchScore > 85 ? 'var(--success)' : 'var(--warning)'}`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.7rem',
+                              fontWeight: 800
+                          }}>
+                              {candidate.matchScore}%
+                          </div>
+                        ) : '-'}
                       </td>
                       <td>
                         <Button size="sm" variant="ghost" onClick={() => router.push('/messages', { state: { recipient: candidate } })}>
