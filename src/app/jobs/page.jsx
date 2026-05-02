@@ -3,7 +3,7 @@ import View from '../../views/Jobs';
 
 export const metadata = {
   title: 'Browse Jobs',
-  description: 'Explore thousands of job opportunities curated to your skills and experience. Find your next role with TalentFlow's AI-powered job matching engine.',
+  description: "Explore thousands of job opportunities curated to your skills and experience. Find your next role with TalentFlow's AI-powered job matching engine.",
   alternates: { canonical: '/jobs' },
   keywords: ['job search', 'recruitment', 'job openings', 'find jobs', 'career opportunities'],
   robots: { index: true, follow: true },

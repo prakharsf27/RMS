@@ -3,7 +3,7 @@ import View from '../../views/Messages';
 
 export const metadata = {
   title: 'Messages',
-  description: 'Communicate with candidates and recruiters through TalentFlow's secure messaging platform.',
+  description: "Communicate with candidates and recruiters through TalentFlow's secure messaging platform.",
   robots: { index: false, follow: false },
 };
 
