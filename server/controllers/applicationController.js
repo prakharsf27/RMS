@@ -1,6 +1,8 @@
 const Application = require('../models/Application');
 const Job = require('../models/Job');
 const Notification = require('../models/Notification');
+const Message = require('../models/Message');
+const Company = require('../models/Company');
 const { cloudinary } = require('../config/cloudinary');
 const sendEmail = require('../config/emailService');
 const mongoose = require('mongoose');
@@ -62,7 +64,6 @@ exports.applyForJob = async (req, res) => {
     });
 
     // Send Confirmation Email
-
     sendEmail({
       email: req.user.email,
       type: 'APPLICATION_CONFIRM',
@@ -70,6 +71,26 @@ exports.applyForJob = async (req, res) => {
         jobTitle: job.title,
         companyName: job.company?.name || 'TalentFlow Partner'
       }
+    });
+
+    // Automated Recruiter Message
+    const company = await Company.findOne({ recruiterId: job.recruiterId });
+    const autoMessage = `Hello ${req.user.fname},
+
+Thank you for applying to "${job.title}". 
+We will be reviewing your application and get back to you soon.
+
+This is an automated message.
+
+About ${company?.name || 'the company'}:
+${company?.description || 'Leading innovation in the industry.'}
+
+Visit us: ${company?.website || 'N/A'}`;
+
+    await Message.create({
+      senderId: job.recruiterId,
+      receiverId: req.user._id,
+      content: autoMessage
     });
 
     res.status(201).json(application);
