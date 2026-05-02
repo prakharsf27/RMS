@@ -269,24 +269,28 @@ export default function Dashboard() {
                     );
                   })
                 ) : (
-                  dataList?.map((app, i) => (
-                    <div className={styles.jobCard} key={app._id || i} onClick={() => router.push(`/applications/${app._id}`)}>
-                      <div className={styles.jobLogo} style={{ background: 'var(--premium-gradient)', opacity: 0.8 }}>
-                        {app.candidate?.fname?.[0] || 'C'}
-                      </div>
-                      <div className={styles.jobInfo}>
-                        <div className={styles.jobRole}>{app.candidate?.fname} {app.candidate?.lname}</div>
-                        <div className={styles.jobMeta}>
-                          <span className={styles.jobMetaItem}><Briefcase size={11} />{app.job?.title}</span>
-                          <span className={styles.typeTag} style={{ background: 'rgba(56,189,248,0.15)', color: '#38bdf8' }}>{app.status}</span>
+                  dataList?.map((app, i) => {
+                    const candidate = app.candidateId || {};
+                    const job = app.jobId || {};
+                    return (
+                      <div className={styles.jobCard} key={app._id || i} onClick={() => router.push(`/applications/${app._id}`)}>
+                        <div className={styles.jobLogo} style={{ background: 'var(--premium-gradient)', opacity: 0.8 }}>
+                          {candidate.fname?.[0] || 'C'}
+                        </div>
+                        <div className={styles.jobInfo}>
+                          <div className={styles.jobRole}>{candidate.fname} {candidate.lname}</div>
+                          <div className={styles.jobMeta}>
+                            <span className={styles.jobMetaItem}><Briefcase size={11} />{job.title}</span>
+                            <span className={styles.typeTag} style={{ background: 'rgba(56,189,248,0.15)', color: '#38bdf8' }}>{app.status}</span>
+                          </div>
+                        </div>
+                        <div className={styles.jobRight}>
+                          <div className={styles.jobMetaItem}><Clock size={11} />{new Date(app.createdAt).toLocaleDateString()}</div>
+                          <button className={styles.applyBtn} style={{ background: 'var(--bg-elevated-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}>Details</button>
                         </div>
                       </div>
-                      <div className={styles.jobRight}>
-                        <div className={styles.jobMetaItem}><Clock size={11} />{new Date(app.createdAt).toLocaleDateString()}</div>
-                        <button className={styles.applyBtn} style={{ background: 'var(--bg-elevated-hover)', color: 'var(--text-primary)', border: '1px solid var(--border-color)' }}>Details</button>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
