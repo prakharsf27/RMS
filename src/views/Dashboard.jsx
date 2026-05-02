@@ -114,7 +114,9 @@ export default function Dashboard() {
         setChartData(statsRes.data.chartData || []);
         setActivities(statsRes.data.activities || []);
         setCompanies(compRes.data.map(c => c.name));
-        setDataList(user.role === 'candidate' ? listRes.data : listRes.data.applications);
+        
+        // FIX: applications endpoint returns array directly, not {applications: []}
+        setDataList(user.role === 'candidate' ? listRes.data : (listRes.data.applications || listRes.data));
       } catch (err) {
         console.error("Dashboard error:", err);
       } finally {
@@ -127,12 +129,18 @@ export default function Dashboard() {
   if (isLoading) return <LoadingSpinner label="Personalizing your workspace..." />;
 
   const isCandidate = user.role === 'candidate';
+  const isAdmin = user.role === 'admin';
 
   const dashboardStats = isCandidate ? [
     { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: stats?.applications > 0 ? "Real-time" : "Ready to start", up: true },
     { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Next session", up: true },
     { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Pipeline status", up: false },
     { label: "PROFILE VIEWS", value: stats?.profileViews || 0, icon: Eye, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "Total activity", up: true },
+  ] : isAdmin ? [
+    { label: "TOTAL USERS", value: stats?.candidates || 0, icon: Users, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "Platform size", up: true },
+    { label: "ALL JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Market volume", up: true },
+    { label: "TOTAL APPS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "System traffic", up: true },
+    { label: "PENDING VERIF", value: stats?.pendingVerifications || 0, icon: ShieldAlert, color: "#ef4444", bg: "rgba(239,68,68,0.15)", trend: "Needs review", up: false },
   ] : [
     { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "Network size", up: true },
     { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Open requirements", up: false },

@@ -39,5 +39,6 @@ router.put('/users/:id/engaged', protect, authorize('admin', 'recruiter'), toggl
 
 router.get('/pending-recruiters', protect, authorize('admin'), getPendingRecruiters);
 router.put('/approve-recruiter/:id', protect, authorize('admin'), approveRecruiter);
+router.put('/users/:id', protect, authorize('admin'), require('../controllers/authController').updateUserAdmin);
 
 module.exports = router;

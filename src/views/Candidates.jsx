@@ -10,6 +10,7 @@ import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink } from "lucide-react";
 import Link from 'next/link';
+import styles from "./Candidates.module.css";
 import { useRouter } from 'next/navigation';
 ;
 
@@ -20,6 +21,8 @@ export default function Candidates() {
   const [pendingRecruiters, setPendingRecruiters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
 
   const fetchData = async () => {
     setLoading(true);
@@ -83,6 +86,28 @@ export default function Candidates() {
     }
   };
 
+  const handleEditClick = (u) => {
+    setEditingUser(u);
+    setEditFormData({
+      fname: u.fname,
+      lname: u.lname,
+      email: u.email,
+      role: u.role,
+      status: u.status
+    });
+  };
+
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(`/auth/users/${editingUser._id}`, editFormData);
+      setEditingUser(null);
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || err.message);
+    }
+  };
+
   const toggleSelect = async (id) => {
     try {
       await api.put(`/auth/users/${id}/engaged`);
@@ -104,6 +129,7 @@ export default function Candidates() {
     "Profile", 
     "Mail ID", 
     "Location", 
+    "Role",
     "Status", 
     "Match",
     "Connect",
@@ -216,6 +242,7 @@ export default function Candidates() {
                         </div>
                       </td>
                       <td><div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{candidate.location || 'N/A'}</div></td>
+                      <td><Badge variant="info">{candidate.role}</Badge></td>
                       <td>{isBlocked ? <Badge variant="danger">Suspended</Badge> : <Badge variant="success">Active</Badge>}</td>
                       <td>
                         {candidate.matchScore ? (
@@ -241,14 +268,19 @@ export default function Candidates() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                           {user.role === "admin" && (
-                              <Button size="sm" variant={isBlocked ? "success" : "secondary"} onClick={() => handleStatusToggle(candidate._id)}>
-                                 {isBlocked ? <ShieldCheck size={14} /> : <ShieldOff size={14} />}
-                              </Button>
-                           )}
-                           <Button size="sm" variant="ghost" onClick={() => router.push('/profile', { state: { userId: candidate._id } })}>
-                              <ExternalLink size={14} /> Profile
-                           </Button>
+                            {user.role === "admin" && (
+                              <>
+                                <Button size="sm" variant="ghost" onClick={() => handleEditClick(candidate)} title="Edit User">
+                                  <Users size={14} className="text-primary" />
+                                </Button>
+                                <Button size="sm" variant={isBlocked ? "success" : "secondary"} onClick={() => handleStatusToggle(candidate._id)} title={isBlocked ? "Activate" : "Suspend"}>
+                                  {isBlocked ? <ShieldCheck size={14} /> : <ShieldOff size={14} />}
+                                </Button>
+                              </>
+                            )}
+                            <Button size="sm" variant="ghost" onClick={() => router.push('/profile', { state: { userId: candidate._id } })}>
+                               <ExternalLink size={14} /> Profile
+                            </Button>
                         </div>
                       </td>
                     </tr>
@@ -264,6 +296,78 @@ export default function Candidates() {
           </Card>
         </>
       )}
+
+      {/* ─── Edit User Modal ─── */}
+      <Modal 
+        isOpen={!!editingUser} 
+        onClose={() => setEditingUser(null)} 
+        title="Edit User Profile"
+      >
+        <form onSubmit={handleUpdateUser} style={{ display: 'flex', flexdirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className={styles.formGroup}>
+              <label style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 6, display: 'block' }}>FIRST NAME</label>
+              <input 
+                className={styles.input} 
+                value={editFormData.fname || ''} 
+                onChange={e => setEditFormData({...editFormData, fname: e.target.value})}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 6, display: 'block' }}>LAST NAME</label>
+              <input 
+                className={styles.input} 
+                value={editFormData.lname || ''} 
+                onChange={e => setEditFormData({...editFormData, lname: e.target.value})}
+                required
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 6, display: 'block' }}>EMAIL ADDRESS</label>
+            <input 
+              type="email"
+              className={styles.input} 
+              value={editFormData.email || ''} 
+              onChange={e => setEditFormData({...editFormData, email: e.target.value})}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className={styles.formGroup}>
+              <label style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 6, display: 'block' }}>PLATFORM ROLE</label>
+              <select 
+                className={styles.input} 
+                value={editFormData.role || ''} 
+                onChange={e => setEditFormData({...editFormData, role: e.target.value})}
+              >
+                <option value="candidate">Candidate</option>
+                <option value="recruiter">Recruiter</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <label style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', marginBottom: 6, display: 'block' }}>ACCOUNT STATUS</label>
+              <select 
+                className={styles.input} 
+                value={editFormData.status || ''} 
+                onChange={e => setEditFormData({...editFormData, status: e.target.value})}
+              >
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
+            <Button type="button" variant="secondary" onClick={() => setEditingUser(null)}>Cancel</Button>
+            <Button type="submit">Save Changes</Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

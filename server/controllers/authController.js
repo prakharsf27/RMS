@@ -94,16 +94,22 @@ exports.login = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllUsers = async (req, res) => {
   try {
-    let query = { role: 'candidate' };
+    let query = {};
     
-    // Privacy: Recruiters only see candidates who applied to their jobs
-    if (req.user.role === 'recruiter') {
-      const Application = require('../models/Application');
-      const Job = require('../models/Job');
-      
-      const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
-      const applicants = await Application.find({ jobId: { $in: recruiterJobs.map(j => j._id) } }).distinct('candidateId');
-      query._id = { $in: applicants };
+    if (req.user.role === 'admin') {
+      // Admin sees everyone by default, can filter by role via query param if needed
+      if (req.query.role) query.role = req.query.role;
+    } else {
+      query.role = 'candidate';
+      // Privacy: Recruiters only see candidates who applied to their jobs
+      if (req.user.role === 'recruiter') {
+        const Application = require('../models/Application');
+        const Job = require('../models/Job');
+        
+        const recruiterJobs = await Job.find({ recruiterId: req.user._id }).select('_id');
+        const applicants = await Application.find({ jobId: { $in: recruiterJobs.map(j => j._id) } }).distinct('candidateId');
+        query._id = { $in: applicants };
+      }
     }
 
     const users = await User.find(query).select('-password');
@@ -279,6 +285,34 @@ exports.bulkUserDelete = async (req, res) => {
     const { ids } = req.body;
     await User.deleteMany({ _id: { $in: ids } });
     res.json({ message: `Successfully deleted ${ids.length} users` });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// @desc    Update user profile (Admin override)
+// @route   PUT /api/auth/users/:id
+// @access  Private (Admin)
+exports.updateUserAdmin = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.fname = req.body.fname || user.fname;
+    user.lname = req.body.lname || user.lname;
+    user.email = req.body.email || user.email;
+    user.role = req.body.role || user.role;
+    user.status = req.body.status || user.status;
+    user.bio = req.body.bio || user.bio;
+    user.experienceLevel = req.body.experienceLevel || user.experienceLevel;
+    user.yearsOfExperience = req.body.yearsOfExperience || user.yearsOfExperience;
+    user.hiringStatus = req.body.hiringStatus || user.hiringStatus;
+
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+
+    const updatedUser = await user.save();
+    res.json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

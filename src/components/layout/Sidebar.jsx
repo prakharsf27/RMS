@@ -75,6 +75,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { href: "/career-path", icon: Map, label: "Career Path", roles: ["candidate"] },
     { href: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
     { href: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
+    { href: "/verification", icon: ShieldAlert, label: "Verification", roles: ["admin"] },
     { href: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
   ];
 

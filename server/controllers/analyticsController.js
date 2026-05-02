@@ -121,13 +121,16 @@ exports.getStats = async (req, res) => {
       });
     }
 
+    const pendingVerifications = req.user.role === 'admin' ? await (require('../models/Company')).countDocuments({ isVerified: false }) : 0;
+    
     res.json({
       summary: {
         jobs: jobsCount,
         applications: appsCount,
         candidates: candidatesCount,
         interviews: interviewsCount,
-        unreadMessages
+        unreadMessages,
+        pendingVerifications
       },
       byStatus: statsByStatus,
       byDepartment: statsByDept,

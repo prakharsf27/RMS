@@ -66,3 +66,18 @@ exports.upsertCompany = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// @desc    Verify/Unverify company (Admin override)
+// @route   PUT /api/companies/:id/verify
+// @access  Private (Admin)
+exports.verifyCompany = async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.id);
+    if (!company) return res.status(404).json({ message: 'Company not found' });
+
+    company.isVerified = req.body.isVerified ?? true;
+    await company.save();
+    res.json(company);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
