@@ -1,5 +1,6 @@
 const Job = require('../models/Job');
 const Company = require('../models/Company');
+const User = require('../models/User');
 
 // @desc    Get all jobs with search, filters, and pagination
 // @route   GET /api/jobs
@@ -197,7 +198,6 @@ exports.getRecommendedJobs = async (req, res) => {
       
     // Join with Company matching recruiterId
     const jobsWithCompany = await Promise.all(jobs.map(async (job) => {
-      const Company = require('../models/Company');
       const company = await Company.findOne({ recruiterId: job.recruiterId._id });
       return { ...job.toObject(), company };
     }));
