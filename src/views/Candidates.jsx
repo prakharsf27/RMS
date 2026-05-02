@@ -266,7 +266,7 @@ export default function Candidates() {
                         ) : '-'}
                       </td>
                       <td>
-                        <Button size="sm" variant="ghost" onClick={() => router.push('/messages', { state: { recipient: candidate } })}>
+                        <Button size="sm" variant="ghost" onClick={() => router.push(`/messages?recipientId=${candidate._id}`)}>
                           <MessageSquare size={18} className="text-gradient" />
                         </Button>
                       </td>
