@@ -9,9 +9,9 @@ export const metadata = {
     default:  `${SITE_CONFIG.name} — ${SITE_CONFIG.tagline}`,
     template: `%s | ${SITE_CONFIG.name}`,
   },
-  description: 'TalentFlow uses AI to build ATS-optimized resumes, simulate real job interviews, track applications, and deliver salary intelligence.',
-  keywords:    ['AI resume builder', 'mock interview practice', 'ATS resume checker', 'job application tracker'],
-  metadataBase: new URL(SITE_CONFIG.url),
+  description: 'TalentFlow is an AI-powered Recruitment Management System (RMS) that connects candidates and recruiters. Build ATS-optimized resumes, simulate interviews, track applications, and streamline hiring pipelines.',
+  keywords:    ['recruitment management system', 'AI resume builder', 'mock interview practice', 'ATS resume checker', 'job application tracker', 'hiring platform', 'talent acquisition'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rms-blush-iota.vercel.app'),
   alternates: {
     canonical: '/',
   },
