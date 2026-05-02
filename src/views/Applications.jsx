@@ -10,10 +10,12 @@ import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail, User } from "lucide-react";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import CandidateCRM from "./CandidateCRM";
 
 export default function Applications() {
   const { user } = useAuth();
+  const router = useRouter();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
