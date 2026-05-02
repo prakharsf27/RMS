@@ -8,7 +8,7 @@ import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
 import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail } from "lucide-react";
+import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail, User } from "lucide-react";
 import { format } from "date-fns";
 import CandidateCRM from "./CandidateCRM";
 
