@@ -145,8 +145,12 @@ export default function Candidates() {
           <ChevronLeft size={20} /> Back
         </Button>
         <div>
-          <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>User Management</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Audit recruitment participants and authorize platform access.</p>
+          <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>
+            {user.role === "admin" ? "User Management" : "Candidate Management"}
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
+            {user.role === "admin" ? "Audit recruitment participants and authorize platform access." : "Manage candidate progression and talent engagement."}
+          </p>
         </div>
       </div>
 
@@ -211,7 +215,9 @@ export default function Candidates() {
              </div>
           )}
 
-          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Candidate Directory</h2>
+          <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+            {user.role === "admin" ? "User Directory" : "Candidate Directory"}
+          </h2>
           <Card>
             {candidates.length > 0 ? (
               <Table 

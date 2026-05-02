@@ -108,6 +108,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       <nav className={styles.nav}>
         {allowedLinks.map((link) => {
           const isActive = pathname === link.href;
+          const displayLabel = (link.href === "/candidates" && user?.role === "admin") ? "Users" : link.label;
           return (
             <Link
               key={link.href}
@@ -117,7 +118,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
                 <link.icon size={20} />
-                <span className={styles.linkText}>{link.label}</span>
+                <span className={styles.linkText}>{displayLabel}</span>
               </div>
               {link.badge > 0 && (
                 <span className={styles.navBadge}>{link.badge}</span>
