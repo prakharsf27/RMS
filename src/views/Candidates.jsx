@@ -8,12 +8,11 @@ import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
 import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users, MessageSquare, ExternalLink, ChevronLeft } from "lucide-react";
+import { ShieldOff, ShieldCheck, Trash2, CheckCircle2, Square, CheckSquare, Users as UsersIcon, MessageSquare, ExternalLink, ChevronLeft } from "lucide-react";
 import Link from 'next/link';
 import styles from "./Candidates.module.css";
 import { Modal } from "../components/ui/Modal";
 import { useRouter } from 'next/navigation';
-;
 
 export default function Candidates() {
   const { user } = useAuth();
@@ -281,7 +280,7 @@ export default function Candidates() {
                             {user.role === "admin" && (
                               <>
                                 <Button size="sm" variant="ghost" onClick={() => handleEditClick(candidate)} title="Edit User">
-                                  <Users size={14} className="text-primary" />
+                                  <UsersIcon size={14} className="text-primary" />
                                 </Button>
                                 <Button size="sm" variant={isBlocked ? "success" : "secondary"} onClick={() => handleStatusToggle(candidate._id)} title={isBlocked ? "Activate" : "Suspend"}>
                                   {isBlocked ? <ShieldCheck size={14} /> : <ShieldOff size={14} />}
@@ -299,7 +298,7 @@ export default function Candidates() {
               />
             ) : (
               <div style={{ textAlign: "center", padding: "4rem", color: "var(--text-tertiary)" }}>
-                <Users size={48} style={{ margin: "0 auto 1rem", opacity: 0.5 }} />
+                <UsersIcon size={48} style={{ margin: "0 auto 1rem", opacity: 0.5 }} />
                 <p>No candidates found in the database.</p>
               </div>
             )}
