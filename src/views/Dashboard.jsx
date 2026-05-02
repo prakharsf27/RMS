@@ -7,7 +7,7 @@ import api from "../lib/api";
 import { 
   LayoutDashboard, Briefcase, FileText, MessageSquare, 
   CalendarDays, User, Users, Bell, Search, ChevronLeft, ChevronRight, 
-  TrendingUp, Eye, Zap, Award, LogOut, Settings, Sparkles, 
+  TrendingUp, Eye, Zap, Award, LogOut, Settings, Sparkles, ShieldAlert,
   ArrowRight, Clock, CheckCircle, MapPin, Building2, Menu,
   Bot, Star, Bookmark, BarChart3, CheckSquare, ChevronDown,
   ArrowUpRight, Flame, Target, X, Send
