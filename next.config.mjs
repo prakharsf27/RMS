@@ -24,8 +24,16 @@ const nextConfig = {
       },
     ];
   },
+  compress: true,
+  reactStrictMode: true,
   images: {
     formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      { protocol: 'https', hostname: '**' } // Allows Vercel Image Optimization for all external URLs (cloudinary, ui-avatars, etc.)
+    ],
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', 'framer-motion', 'date-fns'],
   },
 };
 

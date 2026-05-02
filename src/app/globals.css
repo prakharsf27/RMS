@@ -1,6 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 @source "../index.html";
 @source "**/*.{js,jsx,ts,tsx}";
@@ -90,7 +88,7 @@
 }
 
 body {
-  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-outfit), var(--font-inter), system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.6;
@@ -102,8 +100,8 @@ body {
 /* ────────────────────────────────────────────────────────── */
 /* Tailwind v4 CSS Theme Extension */
 @theme {
-  --font-display: "Space Grotesk", "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
   
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));

@@ -2,7 +2,12 @@ import { Analytics } from "@vercel/analytics/next"
 import { SITE_CONFIG, OrganizationSchema, WebsiteSchema } from '../lib/seo';
 import JsonLd from '../components/JsonLd';
 import Providers from '../components/Providers';
+import { Outfit, Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
+
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit', display: 'swap', weight: ['300', '400', '500', '600', '700', '800'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap', weight: ['400', '500', '600'] });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap', weight: ['300', '400', '500', '600', '700'] });
 
 export const metadata = {
   title: {
@@ -62,7 +67,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${outfit.variable} ${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
         <JsonLd schema={[OrganizationSchema, WebsiteSchema]} />
       </head>
