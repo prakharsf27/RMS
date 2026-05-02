@@ -190,67 +190,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ─── Dashboard Mockup (Dynamic) ─── */}
-      <div className={`${styles.heroMockup} anim-2`}>
-        <div className={styles.mmBar}>
-          <div className={styles.mmDot} style={{ background: "#ef4444" }}></div>
-          <div className={styles.mmDot} style={{ background: "#f59e0b" }}></div>
-          <div className={styles.mmDot} style={{ background: "#22c55e" }}></div>
-          <div className={styles.mmBarSearch}></div>
-        </div>
-        <div className={styles.mmBody}>
-          <div className={styles.mmSidebar}>
-            <div className={styles.mmLogoRow}>
-              <div className={styles.mmLogoIco}>T</div>
-              <span className={styles.mmLogoTxt}>TalentFlow</span>
-            </div>
-            <div className={cn(styles.mmNavItem, styles.mmNavItemActive)}>
-              <LayoutDashboard size={12} /> Dashboard
-            </div>
-            <div className={styles.mmNavItem}><Briefcase size={12} /> Jobs</div>
-            <div className={styles.mmNavItem}><FileText size={12} /> Applications</div>
-            <div className={styles.mmNavItem}><MessageSquare size={12} /> Messages</div>
-          </div>
-          <div className={styles.mmMain}>
-            <div className={styles.mmHeroCard}>
-              <div>
-                <div className={styles.mmGreeting}>Welcome, {user.fname}</div>
-                <div className={styles.mmGreetingSub}>
-                  {isCandidate ? `${stats?.jobs || 0} active jobs` : `${stats?.candidates || 0} talent pool`}
-                </div>
-              </div>
-              <div className={styles.mmHeroBtn}>{isCandidate ? 'Jobs' : 'Talent'}</div>
-            </div>
-            <div className={styles.mmStatsGrid}>
-              <div className={styles.mmStatCard}>
-                <div className={styles.mmStatVal} style={{ color: "#818cf8" }}>{stats?.applications || 0}</div>
-                <div className={styles.mmStatLbl}>APPS</div>
-              </div>
-              <div className={styles.mmStatCard}>
-                <div className={styles.mmStatVal} style={{ color: "#f59e0b" }}>{stats?.interviews || 0}</div>
-                <div className={styles.mmStatLbl}>INTV</div>
-              </div>
-              <div className={styles.mmStatCard}>
-                <div className={styles.mmStatVal} style={{ color: "#34d399" }}>{isCandidate ? (stats?.offers || 0) : (stats?.jobs || 0)}</div>
-                <div className={styles.mmStatLbl}>{isCandidate ? 'OFFER' : 'JOBS'}</div>
-              </div>
-            </div>
-            <div className={styles.mmJobList}>
-              {dataList?.slice(0, 2).map((item, i) => (
-                <div className={styles.mmJobItem} key={i}>
-                  <div className={styles.mmJobLogo} style={{ background: 'var(--premium-gradient)' }}>
-                    {(isCandidate ? item.company?.name?.[0] : item.candidate?.fname?.[0]) || 'T'}
-                  </div>
-                  <div className={styles.mmJobInfoSmall}>
-                    <div className={styles.mmJobRole}>{isCandidate ? item.title : `${item.candidate?.fname} ${item.candidate?.lname}`}</div>
-                    <div className={styles.mmJobMatch}>{isCandidate ? `${item.matchScore || 0}%` : 'New'}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div className={`${styles.card} anim-1`} style={{ marginTop: 24, marginBottom: 24 }}>
         <div className={styles.cardHeader}>
