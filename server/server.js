@@ -32,6 +32,12 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Dat
 
 // Ensure DB is connected before handling any requests
 app.use(dbMiddleware);
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Security-Policy', "frame-ancestors 'self' *;");
+  next();
+});
 
 // Static Folders
 const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;

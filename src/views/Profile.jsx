@@ -206,7 +206,11 @@ export default function Profile() {
   };
 
   const [showResume, setShowResume] = useState(true);
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL 
+    ? (process.env.NEXT_PUBLIC_API_URL.startsWith('http') 
+        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '') 
+        : '') 
+    : 'http://localhost:5000';
 
   return (
     <div className="animate-fade-in">
