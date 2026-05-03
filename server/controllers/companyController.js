@@ -81,3 +81,24 @@ exports.verifyCompany = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// @desc    Update company profile (Admin)
+// @route   PUT /api/companies/:id
+// @access  Private (Admin)
+exports.updateCompanyAdmin = async (req, res) => {
+  try {
+    const company = await Company.findById(req.params.id);
+    if (!company) return res.status(404).json({ message: 'Company not found' });
+
+    const fields = ['name', 'description', 'industry', 'location', 'website', 'logo', 'cinOrGst', 'country', 'isVerified'];
+    fields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        company[field] = req.body[field];
+      }
+    });
+
+    const updated = await company.save();
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

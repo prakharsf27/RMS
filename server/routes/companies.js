@@ -7,5 +7,6 @@ router.get('/', getCompanies);
 router.get('/my', protect, authorize('recruiter'), getMyCompany);
 router.post('/', protect, authorize('recruiter'), upsertCompany);
 router.put('/:id/verify', protect, authorize('admin'), verifyCompany);
+router.put('/:id', protect, authorize('admin'), require('../controllers/companyController').updateCompanyAdmin);
 
 module.exports = router;
