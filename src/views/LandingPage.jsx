@@ -23,8 +23,14 @@ import {
   Check, 
   X,
   Plus,
-  Menu
+  Menu,
+  HelpCircle,
+  ChevronDown,
+  Sparkles,
+  Award
 } from "lucide-react";
+import { SoftwareAppSchema, OrganizationSchema, FAQSchema } from "../lib/seo";
+import JsonLd from "../components/JsonLd";
 import { AnimatePresence } from "framer-motion";
 import { cn } from "../lib/utils";
 import styles from "./LandingPage.module.css";
@@ -110,8 +116,28 @@ const LandingPage = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const faqs = [
+    {
+      q: "What is Talent Flow?",
+      a: "Talent Flow is an AI-powered Recruitment Management System designed to bridge the gap between ambitious candidates and forward-thinking recruiters."
+    },
+    {
+      q: "How does the AI Resume Builder work?",
+      a: "Our ATS-optimized builder analyzes job descriptions and suggests real-time improvements to ensure your resume passes through automated screening systems with a high match score."
+    },
+    {
+      q: "Can I practice for specific job roles?",
+      a: "Yes! The Interview Simulator generates personalized questions based on the specific job title and company you are targeting, providing real-time feedback on your answers."
+    },
+    {
+      q: "Is Talent Flow free for candidates?",
+      a: "We offer a generous free tier that includes basic resume building and application tracking. Premium features like advanced AI simulations are available in our Pro plan."
+    }
+  ];
+
   return (
     <div className={styles.container}>
+      <JsonLd schema={[SoftwareAppSchema, OrganizationSchema, FAQSchema(faqs)]} />
       {/* --- NAV --- */}
       <nav className={cn(styles.nav, scrolled && styles.navScrolled)}>
         <Link className={styles.navLogo} href="/" onClick={closeMenu}>
@@ -201,12 +227,11 @@ const LandingPage = () => {
         </div>
 
         <h1 className={styles.heroH1}>
-          Land your dream job.<br />
-          <span className={styles.gradText}>Impossibly faster.</span>
+          Land your dream job with <span className={styles.gradText}>Talent Flow.</span>
         </h1>
 
         <p className={styles.heroSub}>
-          TalentFlow uses AI to build your resume, simulate interviews, track applications, and tailor everything to every job — so you get hired, not just considered.
+          The AI-powered Recruitment Management System (RMS) that builds your resume, simulates interviews, tracks applications, and handles everything until you're hired.
         </p>
 
         <div className={styles.heroCtas}>
@@ -731,6 +756,33 @@ const LandingPage = () => {
             </div>
           </div>
         </Reveal>
+      </section>
+
+      {/* --- FAQ Section --- */}
+      <section id="faq" className={styles.faqSection}>
+        <div className={styles.sectionHeader}>
+          <Reveal>
+            <div className={styles.badge}>COMMON QUESTIONS</div>
+            <h2 className={styles.sectionTitle}>Everything you need to know about <span className="text-gradient">Talent Flow</span></h2>
+            <p className={styles.sectionSubtitle}>Answers to frequently asked questions about our AI recruitment platform.</p>
+          </Reveal>
+        </div>
+
+        <div className={styles.faqGrid}>
+          {faqs.map((faq, idx) => (
+            <Reveal key={idx} delay={idx * 0.1}>
+              <details className={styles.faqItem}>
+                <summary className={styles.faqQuestion}>
+                  <span>{faq.q}</span>
+                  <ChevronDown size={18} className={styles.faqIcon} />
+                </summary>
+                <div className={styles.faqAnswer}>
+                  <p>{faq.a}</p>
+                </div>
+              </details>
+            </Reveal>
+          ))}
+        </div>
       </section>
 
       {/* --- FOOTER --- */}
