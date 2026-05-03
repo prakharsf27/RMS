@@ -222,7 +222,7 @@ const LandingPage = () => {
         <div className={styles.heroGlow2}></div>
 
         <div className={styles.heroBadge}>
-          <span className={styles.heroBadgeDot}></span>
+          <span className={styles.heroBadgeDot} style={{ background: "#E17055", boxShadow: "0 0 8px rgba(225, 112, 85, 0.4)" }}></span>
           Now in Beta · Join {globalStats.users.toLocaleString()}+ job seekers
         </div>
 
@@ -236,7 +236,7 @@ const LandingPage = () => {
 
         <div className={styles.heroCtas}>
           <Link href="/register" className={cn(styles.btnHero, styles.primary)}>
-            <Rocket size={16} />
+            <Rocket size={16} color="#E17055" />
             Start for free — no card needed
           </Link>
           <a href="#features" className={cn(styles.btnHero, styles.secondary)}>
@@ -373,8 +373,8 @@ const LandingPage = () => {
           <div className={cn(styles.bentoCard, styles.span8)}>
             <Reveal>
               <div className={styles.bentoHeader}>
-                <div className={styles.bentoIcon} style={{ background: "rgba(99,102,241,0.15)" }}>
-                  <Video size={22} color="#818cf8" strokeWidth={1.8} />
+                <div className={styles.bentoIcon} style={{ background: "rgba(30, 58, 138, 0.1)" }}>
+                  <Video size={22} color="#1E3A8A" strokeWidth={1.8} />
                 </div>
                 <div className={styles.bentoMeta}>
                   <div className={styles.bentoTitle}>AI Interview Simulator</div>
@@ -398,8 +398,8 @@ const LandingPage = () => {
                   </div>
                   <div className={styles.intBarRow}>
                     <div className={styles.intBarLbl}>Depth</div>
-                    <div className={styles.intBarOuter}><div className={styles.intBarFill} style={{ width: "93%", background: "linear-gradient(90deg,#10b981,#14b8a6)" }}></div></div>
-                    <span className={styles.intBarVal} style={{ color: "#10b981" }}>93%</span>
+                    <div className={styles.intBarOuter}><div className={styles.intBarFill} style={{ width: "93%", background: "linear-gradient(90deg, #1E3A8A, #E17055)" }}></div></div>
+                    <span className={styles.intBarVal} style={{ color: "#E17055" }}>93%</span>
                   </div>
                   <div className={styles.intScoreRow}>
                     <div className={styles.intScoreBox}>
@@ -416,8 +416,8 @@ const LandingPage = () => {
           {/* Resume Builder */}
           <div className={cn(styles.bentoCard, styles.span4)}>
             <Reveal delay={0.1}>
-              <div className={styles.bentoIcon} style={{ background: "rgba(16,185,129,0.15)" }}>
-                <FileText size={22} color="#34d399" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(225, 112, 85, 0.1)" }}>
+                <FileText size={22} color="#E17055" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>AI Resume Builder</div>
               <div className={styles.bentoDesc}>Build, tailor, and score your resume with AI. Paste any job description and watch every bullet rewrite itself to match.</div>
@@ -444,8 +444,8 @@ const LandingPage = () => {
           {/* Ghosting Tracker */}
           <div className={cn(styles.bentoCard, styles.span5)}>
             <Reveal>
-              <div className={styles.bentoIcon} style={{ background: "rgba(245,158,11,0.15)" }}>
-                <Briefcase size={22} color="#f59e0b" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(30, 58, 138, 0.1)" }}>
+                <Briefcase size={22} color="#1E3A8A" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>Job Ghosting Tracker</div>
               <div className={styles.bentoDesc}>Your personal job CRM. Track every application, set follow-up reminders, and get AI-drafted follow-up emails — so you never lose momentum.</div>
@@ -471,8 +471,8 @@ const LandingPage = () => {
           {/* Salary Intelligence */}
           <div className={cn(styles.bentoCard, styles.span4)}>
             <Reveal delay={0.1}>
-              <div className={styles.bentoIcon} style={{ background: "rgba(20,184,166,0.15)" }}>
-                <DollarSign size={22} color="#14b8a6" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(225, 112, 85, 0.1)" }}>
+                <DollarSign size={22} color="#E17055" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>Salary Intelligence</div>
               <div className={styles.bentoDesc}>See real salary bands before you apply. Then let AI coach you on how to negotiate your offer with actual leverage points.</div>
@@ -494,8 +494,8 @@ const LandingPage = () => {
           {/* Career Path */}
           <div className={cn(styles.bentoCard, styles.span3)}>
             <Reveal delay={0.2}>
-              <div className={styles.bentoIcon} style={{ background: "rgba(192,132,252,0.15)" }}>
-                <Map size={22} color="#c084fc" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(30, 58, 138, 0.1)" }}>
+                <Map size={22} color="#1E3A8A" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>Career Path Visualizer</div>
               <div className={styles.bentoDesc}>AI maps 3–5 career trajectories from where you are today. See the skills, timeline, and transitions.</div>
@@ -524,8 +524,8 @@ const LandingPage = () => {
                 <Video size={12} strokeWidth={2.5} />
                 Interview Simulator
               </div>
-              <h2 className={styles.sectionTitle} style={{ color: "#f8fafc" }}>Practice until<br />you can't fail</h2>
-              <p className={styles.sectionSub} style={{ color: "rgba(199,210,254,0.75)" }}>Our AI interviewer knows the exact role, the company's hiring signals, and what answers actually impress hiring managers.</p>
+              <h2 className={styles.sectionTitle} style={{ color: "#ffffff" }}>Practice until<br />you can't fail</h2>
+              <p className={styles.sectionSub} style={{ color: "rgba(255,252,245,0.75)" }}>Our AI interviewer knows the exact role, the company's hiring signals, and what answers actually impress hiring managers.</p>
               <div className={styles.spotlightFeatList}>
                 {[
                   "Role-specific questions from real JDs",
@@ -627,7 +627,7 @@ const LandingPage = () => {
               co: "Stripe", 
               quote: "The interview simulator is genuinely scary good. It asked me the exact question Stripe asked in my actual interview — word for word.",
               initials: "AR",
-              grad: "linear-gradient(135deg,#6366f1,#8b5cf6)"
+              grad: "linear-gradient(135deg,#1E3A8A,#E17055)"
             },
             { 
               name: "Sana Khan", 
@@ -635,7 +635,7 @@ const LandingPage = () => {
               co: "Figma", 
               quote: "I went from 0 callbacks in 3 weeks to 4 interviews in one week. The resume tailor found keywords I'd never have thought to include.",
               initials: "SK",
-              grad: "linear-gradient(135deg,#10b981,#14b8a6)"
+              grad: "rgba(225, 112, 85, 0.15)"
             },
             { 
               name: "Marcus Powell", 
@@ -643,13 +643,13 @@ const LandingPage = () => {
               co: "Vercel", 
               quote: "The ghosting tracker changed everything for me. I actually negotiated a $22K higher offer using the salary tool.",
               initials: "MP",
-              grad: "linear-gradient(135deg,#f59e0b,#ef4444)"
+              grad: "rgba(30, 58, 138, 0.15)"
             }
           ].map((item, i) => (
             <div key={i} className={styles.testiCard}>
               <Reveal delay={i * 0.1}>
                 <div className={styles.testiStars}>
-                  {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="#f59e0b" color="#f59e0b" />)}
+                  {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="#E17055" color="#E17055" />)}
                 </div>
                 <p className={styles.testiQuote}>"{item.quote}"</p>
                 <div className={styles.testiPerson}>
@@ -742,7 +742,7 @@ const LandingPage = () => {
             <p className={styles.ctaSub}>Join {globalStats.users.toLocaleString()}+ candidates who landed interviews at dream companies. Start free in under 60 seconds.</p>
             <div className={styles.ctaBtns}>
               <Link href="/login" className={cn(styles.btnHero, styles.primary)}>
-                <Rocket size={16} />
+                <Rocket size={16} color="#E17055" />
                 Get started — it's free
               </Link>
               <button className={cn(styles.btnHero, styles.secondary)} style={{ borderColor: "rgba(255,255,255,0.25)", color: "#c7d2fe" }}>

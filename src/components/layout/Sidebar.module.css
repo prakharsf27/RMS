@@ -49,9 +49,7 @@
   font-family: 'Outfit', sans-serif;
   font-size: 1.25rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #818cf8, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--secondary);
   letter-spacing: -0.02em;
   flex: 1;
   transition: opacity 0.2s, width 0.2s;
@@ -148,10 +146,10 @@
 }
 
 .navItem.active {
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(30, 58, 138, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(30, 58, 138, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .navItem.active::before {
@@ -162,7 +160,7 @@
     transform: translateY(-50%);
     width: 3px;
     height: 20px;
-    background: #6366f1;
+    background: var(--secondary);
     border-radius: 0 3px 3px 0;
 }
 

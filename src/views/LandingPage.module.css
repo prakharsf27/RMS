@@ -64,9 +64,7 @@
 .navLogoText {
   font-size: 18px;
   font-weight: 700;
-  background: var(--premium-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--secondary);
 }
 
 .navLinks {
@@ -84,7 +82,7 @@
 }
 
 .navLinks a:hover {
-  color: var(--text);
+  color: var(--secondary);
 }
 
 .navCtas {
@@ -117,8 +115,8 @@
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
-  color: white;
-  background: var(--premium-gradient);
+  color: #FFFCF5;
+  background: var(--primary);
   border: none;
   cursor: pointer;
   transition: all 0.2s;
@@ -131,7 +129,8 @@
 
 .btnPrimary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.4);
+  background: var(--primary-hover);
+  box-shadow: 0 8px 28px rgba(30, 58, 138, 0.25);
 }
 
 .hideMobile {
@@ -276,11 +275,11 @@
   padding: 6px 16px;
   border-radius: 100px;
   margin-bottom: 32px;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(225, 112, 85, 0.1);
+  border: 1px solid rgba(225, 112, 85, 0.2);
   font-size: 12px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--secondary);
   position: relative;
   z-index: 1;
 }
@@ -344,15 +343,16 @@
 }
 
 .btnHero.primary {
-  background: var(--premium-gradient);
-  color: white;
+  background: var(--primary);
+  color: #FFFCF5;
   border: none;
-  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 10px 30px rgba(30, 58, 138, 0.2);
 }
 
 .btnHero.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.45);
+  background: var(--primary-hover);
+  box-shadow: 0 15px 40px rgba(30, 58, 138, 0.35);
 }
 
 .btnHero.secondary {

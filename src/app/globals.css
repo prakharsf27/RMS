@@ -5,22 +5,22 @@
 
 /* Dynamic Light Theme - Indigo/Slate Palette */
 :root {
-  --bg-color: #f8fafc;
+  --bg-color: #FFFCF5;
   --bg-elevated: #ffffff;
-  --bg-elevated-hover: #f1f5f9;
+  --bg-elevated-hover: #fffaf0;
   
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-tertiary: #64748b;
+  --text-primary: #1F2937;
+  --text-secondary: #374151;
+  --text-tertiary: #6B7280;
   
-  --border-color: #e2e8f0;
+  --border-color: #f3f4f6;
   
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
-  --primary-light: #e0e7ff;
+  --primary: #1E3A8A;
+  --primary-hover: #172554;
+  --primary-light: #eff6ff;
   
-  --secondary: #8b5cf6;
-  --secondary-hover: #7c3aed;
+  --secondary: #E17055;
+  --secondary-hover: #d65d45;
   
   --success: #10b981;
   --warning: #f59e0b;
@@ -76,9 +76,9 @@
   --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.15);
 
   /* Premium Design Tokens */
-  --premium-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
-  --premium-bg: #080d1a;
-  --card-gradient: linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015));
+  --premium-gradient: linear-gradient(135deg, #1E3A8A, #E17055);
+  --premium-bg: #0f172a;
+  --card-gradient: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(225, 112, 85, 0.05));
 }
 
 *, *::before, *::after {
