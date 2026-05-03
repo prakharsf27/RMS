@@ -18,11 +18,28 @@ const UserSchema = new mongoose.Schema({
   profileViews: { type: Number, default: 0 },
   
   // Advanced Identity Fields
+  // Advanced Identity Fields
   dob: { type: Date },
   phone: { type: String },
+  gender: { type: String },
+  nationality: { type: String },
+  pan: { type: String },
+  address: { type: String },
+  state: { type: String },
   isEmailVerified: { type: Boolean, default: false },
   isPhoneVerified: { type: Boolean, default: false },
   
+  // Professional Identity
+  professionalHeadline: { type: String },
+  careerObjective: { type: String },
+  links: {
+    linkedin: String,
+    github: String,
+    portfolio: String,
+    behance: String,
+    other: String
+  },
+
   // Talent Assets
   resume: { type: String }, // Path to PDF
   experienceLevel: { 
@@ -31,6 +48,74 @@ const UserSchema = new mongoose.Schema({
     default: 'fresher' 
   },
   yearsOfExperience: { type: Number, default: 0 },
+
+  workExperience: [{
+    title: String,
+    empType: String,
+    company: String,
+    location: String,
+    startDate: Date,
+    endDate: Date,
+    isCurrent: Boolean,
+    description: String,
+    skills: [String]
+  }],
+
+  education: [{
+    degree: String,
+    field: String,
+    institution: String,
+    board: String,
+    startYear: String,
+    endYear: String,
+    grade: String,
+    coursework: String,
+    achievements: String
+  }],
+
+  certifications: [{
+    title: String,
+    certType: String,
+    organization: String,
+    issueDate: Date,
+    expiryDate: Date,
+    credentialId: String
+  }],
+
+  projects: [{
+    title: String,
+    projectType: String,
+    description: String,
+    duration: String,
+    link: String,
+    skills: [String]
+  }],
+
+  languages: [{
+    name: String,
+    proficiency: String
+  }],
+
+  jobPreferences: {
+    titles: [String],
+    workModes: [String],
+    locations: [String],
+    relocation: String,
+    salaryMin: Number,
+    salaryMax: Number,
+    salaryType: { type: String, default: 'Annual' },
+    noticePeriod: String,
+    employmentStatus: String
+  },
+
+  references: [{
+    name: String,
+    designation: String,
+    organization: String,
+    relationship: String,
+    email: String,
+    phone: String
+  }],
   
   // Recruitment Status
   hiringStatus: { 

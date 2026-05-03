@@ -138,10 +138,23 @@
   font-weight: 700;
 }
 
-.statusHired { color: var(--success) !important; }
-.statusPending { color: var(--warning) !important; }
-.statusRejected { color: var(--danger) !important; }
-.statusInterviewing { color: var(--info) !important; }
+.statLine strong {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.status {
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.hired { background-color: var(--success-light); color: var(--success); }
+.pending { background-color: var(--warning-light); color: var(--warning); }
+.rejected { background-color: var(--danger-light); color: var(--danger); }
+.interviewing { background-color: var(--info-light); color: var(--info); }
 
 .main {
     display: flex;
@@ -525,18 +538,270 @@
   font-size: 0.75rem;
 }
 
+/* Section Card Styles */
+.sectionCard {
+  padding: 0 !important;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.sectionCardHead {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.sectionCardHead:hover {
+  background-color: var(--bg-elevated-hover);
+}
+
+.sectionCardHeadLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.sectionCardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.sectionCardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+
+.sectionCardSub {
+  font-size: 0.813rem;
+  color: var(--text-tertiary);
+  margin-top: 0.125rem;
+}
+
+.sectionChevron {
+  color: var(--text-tertiary);
+  transition: transform 0.3s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+.sectionCardBody {
+  padding: 0 1.5rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Field Styles */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.requiredStar {
+  color: var(--danger);
+  margin-left: 0.25rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated-hover);
+  color: var(--text-primary);
+  font-size: 0.938rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  background-color: var(--bg-elevated);
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.fieldHint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Tag Input Styles */
+.tagWrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.625rem;
+  background-color: var(--bg-elevated-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  min-height: 48px;
+  cursor: text;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.tagX {
+  background: none;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.125rem;
+  border-radius: 50%;
+}
+
+.tagX:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.tagInput {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+/* Entry Card (Repeatable items) */
+.entryCard {
+  background-color: var(--bg-elevated-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* Edit Prompt */
+.editPrompt {
+  margin-top: 2rem;
+  padding: 2rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  background: linear-gradient(135deg, var(--primary-light), transparent);
+}
+
+.editPromptContent {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.editPromptContent h4 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.editPromptContent p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Badges */
+.badgeReq, .badgeOpt {
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.75rem;
+}
+
+.badgeReq { background-color: var(--danger-light); color: var(--danger); }
+.badgeOpt { background-color: var(--text-tertiary-light); color: var(--text-tertiary); }
+
 @media (max-width: 900px) {
   .container { grid-template-columns: 1fr; }
   .grid { grid-template-columns: 1fr; }
+  .recruiterView { grid-template-columns: 1fr; }
+  .resumePreview { position: static; height: 600px; }
 }
 
 @media (max-width: 600px) {
   .header { text-align: center; margin-bottom: 1.5rem; }
   .header h1 { font-size: 2rem; }
-  .formHeader { flex-direction: column; align-items: flex-start; gap: 1rem; }
-  .expLevelContainer { grid-template-columns: 1fr; }
-  .form { gap: 1.25rem; }
-  .uploadZone { padding: 1.5rem; }
-  .footerActions { flex-direction: column-reverse; }
-  .footerActions button { width: 100%; }
+  .editPrompt { flex-direction: column; text-align: center; }
+  .editPromptContent { flex-direction: column; }
+  .sectionCardHead { padding: 1rem; }
+  .sectionCardBody { padding: 1rem; }
 }

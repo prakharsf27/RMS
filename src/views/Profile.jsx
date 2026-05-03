@@ -2,101 +2,191 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSearchParams, useRouter } from 'next/navigation';
-;
-
 import api from "../lib/api";
 import { Card } from "../components/ui/Card";
-import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { User, Mail, Shield, Camera, Save, LogOut, CheckCircle, AlertCircle, FilePlus, Phone, Calendar, Briefcase, X, Plus, Zap, Search } from "lucide-react";
+import { 
+  User, Mail, Shield, Camera, Save, LogOut, CheckCircle, 
+  AlertCircle, FilePlus, Phone, Calendar, Briefcase, X, 
+  Plus, Zap, Search, Globe, Map, Award, BookOpen, 
+  Code, Languages, Settings, HelpCircle, ExternalLink,
+  ChevronDown, Trash2, GraduationCap, Laptop, Sparkles, Building2, Info
+} from "lucide-react";
 import styles from "./Profile.module.css";
 import { cn } from "../lib/utils";
+
+// ── Sub-components for Multi-Section UI ──────────────────────────────────────
+
+function SectionCard({ icon: Icon, iconBg, title, badge, badgeType = "req", subtitle, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Card className={styles.sectionCard} premium>
+      <div className={styles.sectionCardHead} onClick={() => setOpen(!open)}>
+        <div className={styles.sectionCardHeadLeft}>
+          <div className={styles.sectionCardIcon} style={{ background: iconBg }}>
+            <Icon size={18} />
+          </div>
+          <div>
+            <div className={styles.sectionCardTitle}>
+              {title}{" "}
+              {badge && (
+                <span className={badgeType === "req" ? styles.badgeReq : styles.badgeOpt}>
+                  {badge}
+                </span>
+              )}
+            </div>
+            <div className={styles.sectionCardSub}>{subtitle}</div>
+          </div>
+        </div>
+        <ChevronDown 
+          size={18} 
+          className={cn(styles.sectionChevron, open && styles.rotated)} 
+        />
+      </div>
+      {open && <div className={styles.sectionCardBody}>{children}</div>}
+    </Card>
+  );
+}
+
+function Field({ label, required, hint, children }) {
+  return (
+    <div className={styles.field}>
+      <label className={styles.fieldLabel}>
+        {label}
+        {required && <span className={styles.requiredStar}>*</span>}
+      </label>
+      {children}
+      {hint && <span className={styles.fieldHint}>{hint}</span>}
+    </div>
+  );
+}
+
+function TagInput({ placeholder, tags = [], onChange }) {
+  const [val, setVal] = useState("");
+  const add = (e) => {
+    if (e.key === "Enter" && val.trim()) {
+      e.preventDefault();
+      if (!tags.includes(val.trim())) {
+        onChange([...tags, val.trim()]);
+      }
+      setVal("");
+    }
+  };
+  const remove = (i) => onChange(tags.filter((_, idx) => idx !== i));
+  return (
+    <div className={styles.tagWrap}>
+      {tags.map((t, i) => (
+        <span key={i} className={styles.tag}>
+          {t}
+          <button type="button" className={styles.tagX} onClick={() => remove(i)}><X size={10} /></button>
+        </span>
+      ))}
+      <input
+        className={styles.tagInput}
+        value={val}
+        placeholder={tags.length === 0 ? placeholder : ""}
+        onChange={(e) => setVal(e.target.value)}
+        onKeyDown={add}
+      />
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 
 export default function Profile() {
   const { user: authUser, logout } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
   const viewingUserId = searchParams.get('userId');
+  
   const [viewedUser, setViewedUser] = useState(null);
   const [isViewingOthers, setIsViewingOthers] = useState(!!viewingUserId);
-
-  useEffect(() => {
-    if (viewingUserId) {
-        const fetchViewedUser = async () => {
-            setIsLoading(true);
-            try {
-                const { data } = await api.get(`/auth/users/${viewingUserId}`);
-                setViewedUser(data);
-                setIsViewingOthers(true);
-            } catch (err) {
-                console.error("Fetch viewed user error:", err);
-                setIsViewingOthers(false);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchViewedUser();
-    } else {
-        setViewedUser(authUser);
-        setIsViewingOthers(false);
-    }
-  }, [viewingUserId, authUser]);
-
-  const user = viewedUser || authUser;
+  const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showResume, setShowResume] = useState(true);
 
   const avatarInputRef = useRef(null);
-
   const resumeInputRef = useRef(null);
-  
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        fname: user.fname || "",
-        lname: user.lname || "",
-        email: user.email || "",
-        bio: user.bio || "",
-        dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : "",
-        phone: user.phone || "",
-        experienceLevel: user.experienceLevel || "fresher",
-        yearsOfExperience: user.yearsOfExperience || 0,
-        password: ""
-      });
-      setAvatarPreview(user.avatar);
-      setSkills(user.skills || []);
-      setAtsScore(user.atsScore || 0);
-    }
-  }, [user]);
 
+  // Form State
   const [formData, setFormData] = useState({
-    fname: "",
-    lname: "",
-    email: "",
-    bio: "",
-    dob: "",
-    phone: "",
-    experienceLevel: "fresher",
-    yearsOfExperience: 0,
-    password: ""
+    fname: "", lname: "", email: "", phone: "", bio: "",
+    dob: "", gender: "", nationality: "", pan: "", address: "", state: "",
+    professionalHeadline: "", careerObjective: "",
+    links: { linkedin: "", github: "", portfolio: "", behance: "", other: "" },
+    experienceLevel: "fresher", yearsOfExperience: 0,
+    workExperience: [], education: [], certifications: [], projects: [],
+    languages: [], skills: [],
+    jobPreferences: { 
+      titles: [], workModes: [], locations: [], relocation: "Yes", 
+      salaryMin: "", salaryMax: "", salaryType: "Annual", 
+      noticePeriod: "Immediately", employmentStatus: "Fresher" 
+    },
+    references: []
   });
 
   const [avatarPreview, setAvatarPreview] = useState(null);
-
-  const [resumeFile, setResumeFile] = useState(null);
   const [newAvatarFile, setNewAvatarFile] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // New states for OTP, Skills, and ATS
-  const [otpFlow, setOtpFlow] = useState({
-    email: { sent: false, code: "", loading: false },
-    phone: { sent: false, code: "", loading: false }
-  });
-  const [skills, setSkills] = useState(user?.skills || ["React", "JavaScript", "CSS3", "Git"]);
-  const [atsScore, setAtsScore] = useState(user?.atsScore || 0);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [atsScore, setAtsScore] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
-  
-  const skillSuggestions = ["TypeScript", "Node.js", "Python", "Docker", "AWS", "SQL", "MongoDB", "Redux", "GraphQL"];
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+      try {
+        const id = viewingUserId || authUser?._id;
+        if (!id) return;
+        const { data } = await api.get(`/auth/users/${id}`);
+        setViewedUser(data);
+        setIsViewingOthers(!!viewingUserId);
+      } catch (err) {
+        console.error("Fetch user error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, [viewingUserId, authUser]);
+
+  useEffect(() => {
+    if (viewedUser) {
+      setFormData({
+        fname: viewedUser.fname || "",
+        lname: viewedUser.lname || "",
+        email: viewedUser.email || "",
+        phone: viewedUser.phone || "",
+        bio: viewedUser.bio || "",
+        dob: viewedUser.dob ? new Date(viewedUser.dob).toISOString().split('T')[0] : "",
+        gender: viewedUser.gender || "",
+        nationality: viewedUser.nationality || "",
+        pan: viewedUser.pan || "",
+        address: viewedUser.address || "",
+        state: viewedUser.state || "",
+        professionalHeadline: viewedUser.professionalHeadline || "",
+        careerObjective: viewedUser.careerObjective || "",
+        links: viewedUser.links || { linkedin: "", github: "", portfolio: "", behance: "", other: "" },
+        experienceLevel: viewedUser.experienceLevel || "fresher",
+        yearsOfExperience: viewedUser.yearsOfExperience || 0,
+        workExperience: viewedUser.workExperience || [],
+        education: viewedUser.education || [],
+        certifications: viewedUser.certifications || [],
+        projects: viewedUser.projects || [],
+        languages: viewedUser.languages || [],
+        skills: viewedUser.skills || [],
+        jobPreferences: viewedUser.jobPreferences || { 
+            titles: [], workModes: [], locations: [], relocation: "Yes", 
+            salaryMin: "", salaryMax: "", salaryType: "Annual", 
+            noticePeriod: "Immediately", employmentStatus: "Fresher" 
+        },
+        references: viewedUser.references || []
+      });
+      setAvatarPreview(viewedUser.avatar);
+      setAtsScore(viewedUser.atsScore || 0);
+    }
+  }, [viewedUser]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -120,52 +210,11 @@ export default function Profile() {
 
   const simulateScan = () => {
     setIsScanning(true);
-    // Mimic deep scanning process
     setTimeout(() => {
       const randomScore = Math.floor(Math.random() * (98 - 75 + 1)) + 75;
       setAtsScore(randomScore);
       setIsScanning(false);
-      alert(`Resume analysis complete! ATS Score: ${randomScore}/100. Based on our analysis, we recommend highlighting your project achievements more clearly.`);
     }, 2500);
-  };
-
-  const handleSendOTP = async (type) => {
-    setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], loading: true } }));
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], sent: true, loading: false } }));
-      alert(`A 6-digit verification code has been sent to your ${type === 'email' ? 'email address' : 'mobile number'}. (Simulated code: 123456)`);
-    } catch (err) {
-      alert("Failed to send OTP.");
-      setOtpFlow(prev => ({ ...prev, [type]: { ...prev[type], loading: false } }));
-    }
-  };
-
-  const handleVerifyOTP = async (type) => {
-    if (otpFlow[type].code !== "123456") return alert("Invalid verification code. Please try again.");
-    
-    setIsLoading(true);
-    try {
-      // Simulate verification update
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} verified successfully!`);
-      window.location.reload(); // Refresh to show verified state
-    } catch (err) {
-      alert("Verification failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const addSkill = (skill) => {
-    if (!skills.includes(skill)) {
-      setSkills([...skills, skill]);
-    }
-  };
-
-  const removeSkill = (skill) => {
-    setSkills(skills.filter(s => s !== skill));
   };
 
   const handleSubmit = async (e) => {
@@ -174,12 +223,15 @@ export default function Profile() {
     
     const data = new FormData();
     Object.keys(formData).forEach(key => {
-        data.append(key, formData[key]);
+        if (typeof formData[key] === 'object') {
+            data.append(key, JSON.stringify(formData[key]));
+        } else {
+            data.append(key, formData[key]);
+        }
     });
     
     if (newAvatarFile) data.append('avatar', newAvatarFile);
     if (resumeFile) data.append('resume', resumeFile);
-    data.append('skills', JSON.stringify(skills));
     data.append('atsScore', atsScore);
 
     try {
@@ -187,7 +239,7 @@ export default function Profile() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setIsEditing(false);
-      alert("Professional identity updated successfully!");
+      alert("Professional identity synchronized successfully.");
       window.location.reload();
     } catch (err) {
       alert(err.response?.data?.message || err.message);
@@ -196,21 +248,25 @@ export default function Profile() {
     }
   };
 
-  const getStatusClass = (status) => {
-    switch(status) {
-        case 'hired': return styles.statusHired;
-        case 'rejected': return styles.statusRejected;
-        case 'interviewing': return styles.statusInterviewing;
-        default: return styles.statusPending;
-    }
+  // List Management Helpers
+  const addItem = (field, defaultObj) => {
+    setFormData(prev => ({ ...prev, [field]: [...prev[field], defaultObj] }));
+  };
+  const removeItem = (field, index) => {
+    setFormData(prev => ({ ...prev, [field]: prev[field].filter((_, i) => i !== index) }));
+  };
+  const updateItem = (field, index, key, value) => {
+    setFormData(prev => {
+        const newList = [...prev[field]];
+        newList[index] = { ...newList[index], [key]: value };
+        return { ...prev, [field]: newList };
+    });
   };
 
-  const [showResume, setShowResume] = useState(true);
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL 
-    ? (process.env.NEXT_PUBLIC_API_URL.startsWith('http') 
-        ? process.env.NEXT_PUBLIC_API_URL.replace(/\/api$/, '') 
-        : '') 
-    : 'http://localhost:5000';
+  const user = viewedUser || authUser;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api$/, '') || 'http://localhost:5000';
+
+  if (isLoading && !user) return <LoadingSpinner label="Authenticating identity..." />;
 
   return (
     <div className="animate-fade-in">
@@ -231,7 +287,7 @@ export default function Profile() {
                 </>
               )}
             </div>
-            <h3 className={styles.userName}>{user?.fname} {user?.lname}</h3>
+            <h3 className={styles.userName}>{formData.fname} {formData.lname}</h3>
             <span className={styles.userRole}>{user?.role?.toUpperCase()}</span>
             <div className={styles.badgeRow}>
                <Shield size={14} /> {user?.isEmailVerified && user?.isPhoneVerified ? 'Verified Talent' : 'Identity Pending'}
@@ -244,14 +300,10 @@ export default function Profile() {
                 <strong>{new Date(user?.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</strong>
              </div>
              <div className={styles.statLine}>
-                <span>Recruitment Status</span>
-                <strong className={getStatusClass(user?.hiringStatus)}>
+                <span>Hiring Status</span>
+                <strong className={cn(styles.status, styles[user?.hiringStatus])}>
                     {(user?.hiringStatus || 'pending').toUpperCase()}
                 </strong>
-             </div>
-             <div className={styles.statLine}>
-                <span>Identity Score</span>
-                <strong style={{ color: 'var(--primary)' }}>92/100</strong>
              </div>
              {atsScore > 0 && (
                 <div className={styles.statLine}>
@@ -261,21 +313,19 @@ export default function Profile() {
              )}
           </Card>
 
-          {isScanning && (
-            <div className={cn(styles.atsScore, "animate-fade-in")}>
-               <LoadingSpinner label="Decoding Resume Structure..." />
-               <p style={{ fontSize: '0.75rem', marginTop: '0.5rem', color: 'var(--primary)' }}>Calculating semantic match...</p>
-            </div>
-          )}
-
           {!isViewingOthers && (
-            <Button variant="secondary" icon={LogOut} onClick={logout} style={{ width: '100%', marginTop: '0.5rem', color: 'var(--danger)' }}>
-              Sign Out
-            </Button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <Button variant="premium" onClick={handleSubmit} disabled={!isEditing || isLoading}>
+                {isLoading ? "Saving..." : "Save Changes"}
+              </Button>
+              <Button variant="secondary" icon={LogOut} onClick={logout} style={{ color: 'var(--danger)' }}>
+                Sign Out
+              </Button>
+            </div>
           )}
           {isViewingOthers && (
              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <Button variant="secondary" onClick={() => router.push(-1)} style={{ width: '100%' }}>
+                <Button variant="secondary" onClick={() => router.back()} style={{ width: '100%' }}>
                     Back to Directory
                 </Button>
                 {user?.resume && (
@@ -287,135 +337,91 @@ export default function Profile() {
           )}
         </aside>
 
-
         <main className={styles.main}>
-          <Card premium>
-            <div className={styles.formHeader}>
-               <h2>{isViewingOthers ? `${user?.fname}'s Identity` : 'General Information'}</h2>
-               {!isEditing && !isViewingOthers && (
-                 <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>Edit Details</Button>
-               )}
-               {isViewingOthers && user?.resume && (
-                  <Button size="sm" variant="success" onClick={() => window.open(user.resume.startsWith('http') ? user.resume : `${baseUrl}${user.resume}`, '_blank')}>
-                     Download Resume
-                  </Button>
-               )}
-            </div>
+          <form onSubmit={handleSubmit}>
+            {/* 1. Basic Information */}
+            <SectionCard icon={User} iconBg="var(--primary-light)" title="Basic Information" badge="Required" subtitle="Your name, photo, and identity details" defaultOpen>
+              <div className={styles.grid}>
+                <Field label="First Name" required>
+                  <input className={styles.input} value={formData.fname} disabled={!isEditing} onChange={e => setFormData({...formData, fname: e.target.value})} />
+                </Field>
+                <Field label="Last Name" required>
+                  <input className={styles.input} value={formData.lname} disabled={!isEditing} onChange={e => setFormData({...formData, lname: e.target.value})} />
+                </Field>
+              </div>
+              <div className={styles.grid}>
+                <Field label="Date of Birth" required>
+                  <input type="date" className={styles.input} value={formData.dob} disabled={!isEditing} onChange={e => setFormData({...formData, dob: e.target.value})} />
+                </Field>
+                <Field label="Gender">
+                  <select className={styles.input} value={formData.gender} disabled={!isEditing} onChange={e => setFormData({...formData, gender: e.target.value})}>
+                    <option value="">Select</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Non-binary</option>
+                    <option>Prefer not to say</option>
+                  </select>
+                </Field>
+              </div>
+              <div className={styles.grid}>
+                <Field label="Nationality">
+                  <input className={styles.input} value={formData.nationality} disabled={!isEditing} onChange={e => setFormData({...formData, nationality: e.target.value})} />
+                </Field>
+                <Field label="PAN / National ID">
+                  <input className={styles.input} placeholder="For identity verification" value={formData.pan} disabled={!isEditing} onChange={e => setFormData({...formData, pan: e.target.value})} />
+                </Field>
+              </div>
+            </SectionCard>
 
+            {/* 2. Contact Details */}
+            <SectionCard icon={Mail} iconBg="var(--info-light)" title="Contact Details" badge="Required" subtitle="Recruiter communication channels">
+              <div className={styles.grid}>
+                <Field label="Email Address" required>
+                  <input className={styles.input} value={formData.email} disabled />
+                </Field>
+                <Field label="Phone Number" required>
+                  <input className={styles.input} value={formData.phone} disabled={!isEditing} onChange={e => setFormData({...formData, phone: e.target.value})} />
+                </Field>
+              </div>
+              <div className={styles.grid}>
+                <Field label="City / Town" required>
+                  <input className={styles.input} value={formData.address} disabled={!isEditing} onChange={e => setFormData({...formData, address: e.target.value})} />
+                </Field>
+                <Field label="State">
+                  <input className={styles.input} value={formData.state} disabled={!isEditing} onChange={e => setFormData({...formData, state: e.target.value})} />
+                </Field>
+              </div>
+            </SectionCard>
 
-            <form onSubmit={handleSubmit} className={styles.form}>
-               <div className={styles.grid}>
-                  <Input 
-                    label="First Name" 
-                    value={formData.fname} 
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, fname: e.target.value})}
-                  />
-                  <Input 
-                    label="Last Name" 
-                    value={formData.lname} 
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, lname: e.target.value})}
-                  />
-               </div>
-               
-               <div className={styles.grid}>
-                <div className={styles.inputWithBadge}>
-                    <Input 
-                        label="Email Address" 
-                        icon={Mail} 
-                        value={formData.email} 
-                        disabled={true}
-                    />
-                    <div 
-                      className={cn(styles.verifyBadge, user?.isEmailVerified ? styles.verified : styles.unverified)}
-                      onClick={() => !user?.isEmailVerified && !otpFlow.email.sent && handleSendOTP('email')}
-                    >
-                        {user?.isEmailVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.email.sent ? "Verifying..." : "Verify"}
-                    </div>
-                </div>
-                <div className={styles.inputWithBadge}>
-                    <Input 
-                        label="Phone Number" 
-                        icon={Phone} 
-                        value={formData.phone} 
-                        disabled={!isEditing}
-                        placeholder="+91 00000 00000"
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
-                    <div 
-                      className={cn(styles.verifyBadge, user?.isPhoneVerified ? styles.verified : styles.unverified)}
-                      onClick={() => !user?.isPhoneVerified && !otpFlow.phone.sent && handleSendOTP('phone')}
-                    >
-                        {user?.isPhoneVerified ? <><CheckCircle size={10} /> Verified</> : otpFlow.phone.sent ? "Verifying..." : "Verify"}
-                    </div>
-                </div>
-               </div>
+            {/* 3. Headline & Summary */}
+            <SectionCard icon={Sparkles} iconBg="var(--premium-light)" title="Headline & Summary" badge="Required" subtitle="How you present yourself to recruiters">
+              <Field label="Professional Headline" required hint="Appears under your name. Keep it punchy.">
+                <input className={styles.input} placeholder="e.g. Full Stack Developer | React & Node.js Specialist" value={formData.professionalHeadline} disabled={!isEditing} onChange={e => setFormData({...formData, professionalHeadline: e.target.value})} />
+              </Field>
+              <Field label="About / Professional Summary" required>
+                <textarea className={styles.textarea} style={{ minHeight: 120 }} value={formData.bio} disabled={!isEditing} onChange={e => setFormData({...formData, bio: e.target.value})} placeholder="Describe your expertise, career highlights and what drives you..." />
+              </Field>
+              <Field label="Career Objective">
+                <textarea className={styles.textarea} value={formData.careerObjective} disabled={!isEditing} onChange={e => setFormData({...formData, careerObjective: e.target.value})} placeholder="Briefly state your immediate goals..." />
+              </Field>
+            </SectionCard>
 
-               <div className={styles.grid}>
-                  <div className={styles.bioGroup}>
-                      <label>Date of Birth</label>
-                      <div className={styles.dobWrapper}>
-                        <input 
-                            type="date"
-                            className={cn(styles.textarea, styles.dobInput)}
-                            value={formData.dob} 
-                            disabled={!isEditing}
-                            onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                        />
-                        <Calendar size={18} className={styles.dobIcon} />
-                      </div>
-                  </div>
-                  <Input 
-                    label="Portfolio / Web URL" 
-                    icon={Shield} 
-                    placeholder="https://yourportfolio.com"
-                    disabled={!isEditing}
-                  />
-               </div>
+            {/* 4. Online Profiles */}
+            <SectionCard icon={Globe} iconBg="var(--warning-light)" title="Online Profiles" badge="Optional" badgeType="opt" subtitle="LinkedIn, GitHub, Portfolio">
+              <div className={styles.grid}>
+                <Field label="LinkedIn"><input className={styles.input} value={formData.links.linkedin} disabled={!isEditing} onChange={e => setFormData({...formData, links: {...formData.links, linkedin: e.target.value}})} /></Field>
+                <Field label="GitHub"><input className={styles.input} value={formData.links.github} disabled={!isEditing} onChange={e => setFormData({...formData, links: {...formData.links, github: e.target.value}})} /></Field>
+              </div>
+              <div className={styles.grid}>
+                <Field label="Portfolio"><input className={styles.input} value={formData.links.portfolio} disabled={!isEditing} onChange={e => setFormData({...formData, links: {...formData.links, portfolio: e.target.value}})} /></Field>
+                <Field label="Behance"><input className={styles.input} value={formData.links.behance} disabled={!isEditing} onChange={e => setFormData({...formData, links: {...formData.links, behance: e.target.value}})} /></Field>
+              </div>
+            </SectionCard>
 
-               <div className={styles.bioGroup}>
-                  <label>Professional Summary</label>
-                  <textarea 
-                    value={formData.bio}
-                    disabled={!isEditing}
-                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                    placeholder="Briefly describe your career goals and expertise..."
-                    className={styles.textarea}
-                  />
-               </div>
-
-               <div className={styles.skillsSection}>
-                  <div className={styles.sectionHeader}>
-                    <h3>Skills & Expertise</h3>
-                    <p>Highlight your technical toolkit and domain expertise.</p>
-                  </div>
-                  <div className={styles.skillTags}>
-                    {skills.map(skill => (
-                      <div key={skill} className={styles.skillTag}>
-                        {skill}
-                        {isEditing && <X size={14} style={{ cursor: 'pointer' }} onClick={() => removeSkill(skill)} />}
-                      </div>
-                    ))}
-                    {isEditing && (
-                      <div className={styles.skillTag} style={{ borderStyle: 'dashed', cursor: 'pointer' }}>
-                        <Plus size={14} /> Add Skill
-                      </div>
-                    )}
-                  </div>
-               </div>
-
-               <div className={styles.sectionHeader} style={{ marginTop: '1rem' }}>
-                  <h3>Talent Assets & Experience</h3>
-                  <p>Provide your resume and detail your professional background.</p>
-               </div>
-
-               <div className={styles.grid}>
-                  {!isViewingOthers ? (
-                    <div 
-                        className={cn(styles.uploadZone, isScanning && styles.uploadZoneActive)} 
-                        onClick={() => isEditing && !isScanning && resumeInputRef.current.click()}
-                    >
+            {/* 5. Resume Upload */}
+            <SectionCard icon={FilePlus} iconBg="var(--danger-light)" title="Resume / CV" badge="Required" subtitle="Upload your latest PDF for ATS parsing">
+                {!isViewingOthers ? (
+                    <div className={cn(styles.uploadZone, isScanning && styles.uploadZoneActive)} onClick={() => isEditing && !isScanning && resumeInputRef.current.click()}>
                         <div className={styles.uploadIcon}>
                             {isScanning ? <Zap size={24} className="text-primary animate-pulse" /> : (resumeFile || user?.resume ? <CheckCircle size={24} className="text-success" /> : <FilePlus size={24} />)}
                         </div>
@@ -425,69 +431,209 @@ export default function Profile() {
                         </div>
                         <input type="file" ref={resumeInputRef} hidden accept=".pdf" onChange={handleResumeSelect} />
                     </div>
-                  ) : (
+                ) : (
                     <div className={styles.uploadZone} style={{ cursor: 'default' }}>
-                        <div className={styles.uploadIcon}>
-                            {user?.resume ? <CheckCircle size={24} className="text-success" /> : <Shield size={24} />}
-                        </div>
+                        <CheckCircle size={24} className="text-success" />
                         <div>
                             <strong>{user?.resume ? "Resume Available" : "No Resume Attached"}</strong>
-                            <p>{user?.resume ? "Verified identity document" : "Candidate has not uploaded a resume yet"}</p>
+                            <p>Verified candidate document</p>
                         </div>
                     </div>
-                  )}
+                )}
+            </SectionCard>
 
-                  <div className={styles.expContent}>
-                     <label style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Experience Level</label>
-                     <div className={styles.expLevelContainer}>
-                        <div 
-                           className={cn(styles.expCard, formData.experienceLevel === 'fresher' && styles.expCardActive)}
-                           onClick={() => isEditing && setFormData({...formData, experienceLevel: 'fresher', yearsOfExperience: 0})}
-                        >
-                           <div className={styles.radioCircle} />
-                           <div className={styles.expContent}>
-                               <strong>Fresher</strong>
-                               <span>Student/Junior</span>
-                           </div>
+            {/* 6. Work Experience */}
+            <SectionCard icon={Briefcase} iconBg="var(--primary-light)" title="Work Experience" badge="Optional" badgeType="opt" subtitle="Internships, full-time, or freelance work">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {formData.workExperience.map((exp, idx) => (
+                  <div key={idx} className={styles.entryCard}>
+                    {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('workExperience', idx)}><Trash2 size={14} /></button>}
+                    <div className={styles.grid}>
+                      <Field label="Job Title" required><input className={styles.input} value={exp.title} disabled={!isEditing} onChange={e => updateItem('workExperience', idx, 'title', e.target.value)} /></Field>
+                      <Field label="Company" required><input className={styles.input} value={exp.company} disabled={!isEditing} onChange={e => updateItem('workExperience', idx, 'company', e.target.value)} /></Field>
+                    </div>
+                    <div className={styles.grid}>
+                      <Field label="Start Date"><input type="date" className={styles.input} value={exp.startDate?.split('T')[0]} disabled={!isEditing} onChange={e => updateItem('workExperience', idx, 'startDate', e.target.value)} /></Field>
+                      <Field label="End Date"><input type="date" className={styles.input} value={exp.endDate?.split('T')[0]} disabled={!isEditing || exp.isCurrent} onChange={e => updateItem('workExperience', idx, 'endDate', e.target.value)} /></Field>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                       <input type="checkbox" checked={exp.isCurrent} disabled={!isEditing} onChange={e => updateItem('workExperience', idx, 'isCurrent', e.target.checked)} />
+                       <span style={{ fontSize: 13 }}>Currently working here</span>
+                    </div>
+                    <Field label="Description"><textarea className={styles.textarea} value={exp.description} disabled={!isEditing} onChange={e => updateItem('workExperience', idx, 'description', e.target.value)} /></Field>
+                  </div>
+                ))}
+                {isEditing && (
+                  <Button variant="secondary" type="button" onClick={() => addItem('workExperience', { title: "", company: "", startDate: "", endDate: "", isCurrent: false, description: "" })}>
+                    + Add Experience
+                  </Button>
+                )}
+              </div>
+            </SectionCard>
+
+            {/* 7. Education */}
+            <SectionCard icon={GraduationCap} iconBg="var(--info-light)" title="Education" badge="Required" subtitle="Degrees and academic qualifications">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {formData.education.map((edu, idx) => (
+                        <div key={idx} className={styles.entryCard}>
+                            {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('education', idx)}><Trash2 size={14} /></button>}
+                            <div className={styles.grid}>
+                                <Field label="Degree" required><input className={styles.input} value={edu.degree} disabled={!isEditing} onChange={e => updateItem('education', idx, 'degree', e.target.value)} /></Field>
+                                <Field label="Institution" required><input className={styles.input} value={edu.institution} disabled={!isEditing} onChange={e => updateItem('education', idx, 'institution', e.target.value)} /></Field>
+                            </div>
+                            <div className={styles.grid}>
+                                <Field label="Start Year"><input className={styles.input} value={edu.startYear} disabled={!isEditing} onChange={e => updateItem('education', idx, 'startYear', e.target.value)} /></Field>
+                                <Field label="End Year"><input className={styles.input} value={edu.endYear} disabled={!isEditing} onChange={e => updateItem('education', idx, 'endYear', e.target.value)} /></Field>
+                            </div>
                         </div>
-                        <div 
-                           className={cn(styles.expCard, formData.experienceLevel === 'experienced' && styles.expCardActive)}
-                           onClick={() => isEditing && setFormData({...formData, experienceLevel: 'experienced'})}
-                        >
-                           <div className={styles.radioCircle} />
-                           <div className={styles.expContent}>
-                               <strong>Experienced</strong>
-                               <span>Professional</span>
-                           </div>
+                    ))}
+                    {isEditing && (
+                        <Button variant="secondary" type="button" onClick={() => addItem('education', { degree: "", institution: "", startYear: "", endYear: "" })}>
+                            + Add Education
+                        </Button>
+                    )}
+                </div>
+            </SectionCard>
+
+            {/* 8. Skills */}
+            <SectionCard icon={Code} iconBg="var(--warning-light)" title="Skills" badge="Required" subtitle="Technical and soft skills">
+                <Field label="Skills" required hint="Press Enter to add each skill">
+                    <TagInput tags={formData.skills} onChange={tags => setFormData({...formData, skills: tags})} placeholder="e.g. React, Node.js, Project Management" />
+                </Field>
+            </SectionCard>
+
+            {/* 9. Certifications */}
+            <SectionCard icon={Award} iconBg="var(--success-light)" title="Certifications & Awards" badge="Optional" badgeType="opt" subtitle="Courses, licences, and professional achievements">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {formData.certifications.map((cert, idx) => (
+                        <div key={idx} className={styles.entryCard}>
+                            {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('certifications', idx)}><Trash2 size={14} /></button>}
+                            <div className={styles.grid}>
+                                <Field label="Title" required><input className={styles.input} value={cert.title} disabled={!isEditing} onChange={e => updateItem('certifications', idx, 'title', e.target.value)} /></Field>
+                                <Field label="Organization"><input className={styles.input} value={cert.organization} disabled={!isEditing} onChange={e => updateItem('certifications', idx, 'organization', e.target.value)} /></Field>
+                            </div>
+                            <div className={styles.grid}>
+                                <Field label="Issue Date"><input type="date" className={styles.input} value={cert.issueDate?.split('T')[0]} disabled={!isEditing} onChange={e => updateItem('certifications', idx, 'issueDate', e.target.value)} /></Field>
+                                <Field label="Credential ID"><input className={styles.input} value={cert.credentialId} disabled={!isEditing} onChange={e => updateItem('certifications', idx, 'credentialId', e.target.value)} /></Field>
+                            </div>
                         </div>
-                     </div>
-                  </div>
-               </div>
+                    ))}
+                    {isEditing && (
+                        <Button variant="secondary" type="button" onClick={() => addItem('certifications', { title: "", organization: "", issueDate: "", credentialId: "" })}>
+                            + Add Certification
+                        </Button>
+                    )}
+                </div>
+            </SectionCard>
 
-               {formData.experienceLevel === 'experienced' && (
-                  <div className="animate-fade-in">
-                    <Input 
-                        label="Years of Experience" 
-                        type="number"
-                        icon={Briefcase}
-                        value={formData.yearsOfExperience} 
-                        disabled={!isEditing}
-                        min="0"
-                        onChange={(e) => setFormData({...formData, yearsOfExperience: e.target.value})}
-                    />
-                  </div>
-               )}
+            {/* 10. Projects */}
+            <SectionCard icon={Laptop} iconBg="var(--premium-light)" title="Projects" badge="Optional" badgeType="opt" subtitle="Academic, personal, or professional work">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {formData.projects.map((proj, idx) => (
+                        <div key={idx} className={styles.entryCard}>
+                            {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('projects', idx)}><Trash2 size={14} /></button>}
+                            <div className={styles.grid}>
+                                <Field label="Project Title" required><input className={styles.input} value={proj.title} disabled={!isEditing} onChange={e => updateItem('projects', idx, 'title', e.target.value)} /></Field>
+                                <Field label="Project Link"><input className={styles.input} value={proj.link} disabled={!isEditing} onChange={e => updateItem('projects', idx, 'link', e.target.value)} /></Field>
+                            </div>
+                            <Field label="Description"><textarea className={styles.textarea} value={proj.description} disabled={!isEditing} onChange={e => updateItem('projects', idx, 'description', e.target.value)} /></Field>
+                        </div>
+                    ))}
+                    {isEditing && (
+                        <Button variant="secondary" type="button" onClick={() => addItem('projects', { title: "", link: "", description: "" })}>
+                            + Add Project
+                        </Button>
+                    )}
+                </div>
+            </SectionCard>
 
-               {isEditing && (
-                  <div className={styles.footerActions}>
-                     <Button type="button" variant="ghost" onClick={() => setIsEditing(false)}>Cancel</Button>
-                     <Button type="submit" disabled={isLoading || isScanning}>
-                        {isLoading ? "Synchronizing..." : <><Save size={18} /> Update Professional Identity</>}
-                     </Button>
-                  </div>
-               )}
-            </form>
-          </Card>
+            {/* 11. Languages */}
+            <SectionCard icon={Languages} iconBg="var(--primary-light)" title="Languages" badge="Optional" badgeType="opt" subtitle="Languages you can communicate in">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {formData.languages.map((lang, idx) => (
+                        <div key={idx} className={styles.entryCard} style={{ flexDirection: 'row', alignItems: 'flex-end', gap: '1rem' }}>
+                            {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('languages', idx)}><Trash2 size={14} /></button>}
+                            <Field label="Language" style={{ flex: 1 }}><input className={styles.input} value={lang.name} disabled={!isEditing} onChange={e => updateItem('languages', idx, 'name', e.target.value)} /></Field>
+                            <Field label="Proficiency" style={{ flex: 1 }}>
+                                <select className={styles.input} value={lang.proficiency} disabled={!isEditing} onChange={e => updateItem('languages', idx, 'proficiency', e.target.value)}>
+                                    <option>Native</option>
+                                    <option>Fluent</option>
+                                    <option>Professional</option>
+                                    <option>Conversational</option>
+                                    <option>Basic</option>
+                                </select>
+                            </Field>
+                        </div>
+                    ))}
+                    {isEditing && (
+                        <Button variant="secondary" type="button" onClick={() => addItem('languages', { name: "", proficiency: "Fluent" })}>
+                            + Add Language
+                        </Button>
+                    )}
+                </div>
+            </SectionCard>
+
+            {/* 12. Job Preferences */}
+            <SectionCard icon={Settings} iconBg="var(--info-light)" title="Job Preferences" badge="Required" subtitle="Help us match you with the right roles">
+                <Field label="Desired Job Titles">
+                    <TagInput tags={formData.jobPreferences.titles} onChange={tags => setFormData({...formData, jobPreferences: {...formData.jobPreferences, titles: tags}})} placeholder="e.g. Software Engineer" />
+                </Field>
+                <div className={styles.grid}>
+                    <Field label="Relocation">
+                        <select className={styles.input} value={formData.jobPreferences.relocation} disabled={!isEditing} onChange={e => setFormData({...formData, jobPreferences: {...formData.jobPreferences, relocation: e.target.value}})}>
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Depends</option>
+                        </select>
+                    </Field>
+                    <Field label="Notice Period">
+                        <select className={styles.input} value={formData.jobPreferences.noticePeriod} disabled={!isEditing} onChange={e => setFormData({...formData, jobPreferences: {...formData.jobPreferences, noticePeriod: e.target.value}})}>
+                            <option>Immediately</option>
+                            <option>15 days</option>
+                            <option>30 days</option>
+                            <option>Other</option>
+                        </select>
+                    </Field>
+                </div>
+            </SectionCard>
+
+            {/* 13. References */}
+            <SectionCard icon={User} iconBg="var(--bg-elevated-hover)" title="References" badge="Optional" badgeType="opt" subtitle="Professional or academic references">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {formData.references.map((ref, idx) => (
+                        <div key={idx} className={styles.entryCard}>
+                            {isEditing && <button type="button" className={styles.removeBtn} onClick={() => removeItem('references', idx)}><Trash2 size={14} /></button>}
+                            <div className={styles.grid}>
+                                <Field label="Full Name"><input className={styles.input} value={ref.name} disabled={!isEditing} onChange={e => updateItem('references', idx, 'name', e.target.value)} /></Field>
+                                <Field label="Designation"><input className={styles.input} value={ref.designation} disabled={!isEditing} onChange={e => updateItem('references', idx, 'designation', e.target.value)} /></Field>
+                            </div>
+                            <div className={styles.grid}>
+                                <Field label="Organization"><input className={styles.input} value={ref.organization} disabled={!isEditing} onChange={e => updateItem('references', idx, 'organization', e.target.value)} /></Field>
+                                <Field label="Contact Info"><input className={styles.input} value={ref.email} disabled={!isEditing} placeholder="Email or Phone" onChange={e => updateItem('references', idx, 'email', e.target.value)} /></Field>
+                            </div>
+                        </div>
+                    ))}
+                    {isEditing && (
+                        <Button variant="secondary" type="button" onClick={() => addItem('references', { name: "", designation: "", organization: "", email: "" })}>
+                            + Add Reference
+                        </Button>
+                    )}
+                </div>
+            </SectionCard>
+
+            {!isViewingOthers && !isEditing && (
+                <Card className={styles.editPrompt} glow>
+                    <div className={styles.editPromptContent}>
+                        <Info size={24} className="text-primary" />
+                        <div>
+                            <h4>Is your profile up to date?</h4>
+                            <p>Keeping your professional identity current increases your chances of being noticed by top recruiters.</p>
+                        </div>
+                    </div>
+                    <Button variant="premium" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                </Card>
+            )}
+          </form>
         </main>
 
         {(isViewingOthers && user?.resume && showResume) && (

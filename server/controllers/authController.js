@@ -225,6 +225,47 @@ exports.updateProfile = async (req, res) => {
     user.experienceLevel = req.body.experienceLevel || user.experienceLevel;
     user.yearsOfExperience = req.body.yearsOfExperience || user.yearsOfExperience;
 
+    // Professional Identity
+    user.professionalHeadline = req.body.professionalHeadline || user.professionalHeadline;
+    user.careerObjective = req.body.careerObjective || user.careerObjective;
+    
+    if (req.body.links) {
+        user.links = typeof req.body.links === 'string' ? JSON.parse(req.body.links) : req.body.links;
+    }
+    
+    // Arrays and complex objects
+    if (req.body.workExperience) {
+        user.workExperience = typeof req.body.workExperience === 'string' ? JSON.parse(req.body.workExperience) : req.body.workExperience;
+    }
+    if (req.body.education) {
+        user.education = typeof req.body.education === 'string' ? JSON.parse(req.body.education) : req.body.education;
+    }
+    if (req.body.certifications) {
+        user.certifications = typeof req.body.certifications === 'string' ? JSON.parse(req.body.certifications) : req.body.certifications;
+    }
+    if (req.body.projects) {
+        user.projects = typeof req.body.projects === 'string' ? JSON.parse(req.body.projects) : req.body.projects;
+    }
+    if (req.body.languages) {
+        user.languages = typeof req.body.languages === 'string' ? JSON.parse(req.body.languages) : req.body.languages;
+    }
+    if (req.body.jobPreferences) {
+        user.jobPreferences = typeof req.body.jobPreferences === 'string' ? JSON.parse(req.body.jobPreferences) : req.body.jobPreferences;
+    }
+    if (req.body.references) {
+        user.references = typeof req.body.references === 'string' ? JSON.parse(req.body.references) : req.body.references;
+    }
+    if (req.body.skills) {
+        user.skills = typeof req.body.skills === 'string' ? JSON.parse(req.body.skills) : req.body.skills;
+    }
+
+    // Identity Fields
+    user.gender = req.body.gender || user.gender;
+    user.nationality = req.body.nationality || user.nationality;
+    user.pan = req.body.pan || user.pan;
+    user.address = req.body.address || user.address;
+    user.state = req.body.state || user.state;
+
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -246,21 +287,7 @@ exports.updateProfile = async (req, res) => {
     const updatedUser = await user.save();
 
     res.json({
-      _id: updatedUser._id,
-      fname: updatedUser.fname,
-      lname: updatedUser.lname,
-      email: updatedUser.email,
-      bio: updatedUser.bio,
-      dob: updatedUser.dob,
-      phone: updatedUser.phone,
-      experienceLevel: updatedUser.experienceLevel,
-      yearsOfExperience: updatedUser.yearsOfExperience,
-      isEmailVerified: updatedUser.isEmailVerified,
-      isPhoneVerified: updatedUser.isPhoneVerified,
-      hiringStatus: updatedUser.hiringStatus,
-      resume: updatedUser.resume,
-      role: updatedUser.role,
-      avatar: updatedUser.avatar,
+      ...updatedUser.toObject(),
       token: generateToken(updatedUser._id),
     });
   } else {
