@@ -112,7 +112,11 @@ export default function Verification() {
                       <span><Globe size={14} /> {company.country || 'Global'}</span>
                       <span>Tax ID: {company.cinOrGst || 'N/A'}</span>
                     </div>
-                    <p className={styles.recruiter}>Recruiter: {company.recruiterId?.fname} {company.recruiterId?.lname}</p>
+                    <p className={styles.recruiter}>
+                      Recruiter: {typeof company.recruiterId === 'object' ? 
+                        `${company.recruiterId?.fname || ''} ${company.recruiterId?.lname || ''}` : 
+                        'Unassigned'}
+                    </p>
                   </div>
                 </div>
                 <div className={styles.actions}>
@@ -240,11 +244,23 @@ export default function Verification() {
                 <h4 className={styles.sectionLabel}><User size={14} /> Recruiter Relationship</h4>
                 <div className={styles.recruiterCard}>
                   <div className={styles.recruiterAvatar}>
-                    <img src={selectedCompany.recruiterId?.avatar || '/default-avatar.png'} alt="" />
+                    <img 
+                      src={(typeof selectedCompany.recruiterId === 'object' && selectedCompany.recruiterId?.avatar) || '/default-avatar.png'} 
+                      alt="" 
+                    />
                   </div>
                   <div className={styles.recruiterInfo}>
-                    <div className={styles.recruiterName}>{selectedCompany.recruiterId?.fname} {selectedCompany.recruiterId?.lname}</div>
-                    <div className={styles.recruiterEmail}><Mail size={12} /> {selectedCompany.recruiterId?.email}</div>
+                    <div className={styles.recruiterName}>
+                      {typeof selectedCompany.recruiterId === 'object' ? 
+                        `${selectedCompany.recruiterId?.fname || ''} ${selectedCompany.recruiterId?.lname || ''}` : 
+                        'Unknown Recruiter'}
+                    </div>
+                    <div className={styles.recruiterEmail}>
+                      <Mail size={12} /> 
+                      {typeof selectedCompany.recruiterId === 'object' ? 
+                        (selectedCompany.recruiterId?.email || 'N/A') : 
+                        'N/A'}
+                    </div>
                     <div className={styles.recruiterBadge}><Badge variant="info">Primary Recruiter Account</Badge></div>
                   </div>
                 </div>
