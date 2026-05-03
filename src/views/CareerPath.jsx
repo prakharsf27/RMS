@@ -216,8 +216,8 @@ Respond ONLY with a JSON object. Strictly parseable JSON exactly like this:
 
                      <div className={styles.section}>
                         <h4><Briefcase size={14} /> Stepping Stone Jobs</h4>
-                        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                           Filter roles in the <a href="/jobs" style={{ color: 'var(--primary-color)' }}>jobs portal</a> matching these skills to accelerate your path to this node.
+                        <p style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
+                           Filter roles in the <a href="/jobs" style={{ color: 'var(--primary)' }}>jobs portal</a> matching these skills to accelerate your path to this node.
                         </p>
                      </div>
                   </Card>

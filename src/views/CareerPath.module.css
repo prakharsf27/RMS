@@ -14,7 +14,7 @@
 }
 
 .searchIcon {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
 }
 
 .searchBar input {
@@ -106,7 +106,7 @@
 }
 
 .connector {
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   opacity: 0.5;
 }
 
@@ -170,7 +170,7 @@
 .emptyDrawer {
   padding: 40px;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   background-color: var(--bg-subtle);
   border: 1px dashed var(--border-color);
   border-radius: 12px;
@@ -202,7 +202,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 8px;
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 .followUpHeader h3 {
@@ -242,7 +242,7 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background-color: var(--primary-color);
+  background-color: var(--primary);
   color: white;
   border: none;
   display: flex;
@@ -272,7 +272,7 @@
 .answerHeader {
   font-size: 12px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 12px;
