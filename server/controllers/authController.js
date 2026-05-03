@@ -232,10 +232,14 @@ exports.updateProfile = async (req, res) => {
     // Handle File Uploads
     if (req.files) {
       if (req.files.avatar) {
-        user.avatar = `/uploads/avatars/${req.files.avatar[0].filename}`;
+        user.avatar = req.files.avatar[0].path.startsWith('http') 
+          ? req.files.avatar[0].path 
+          : `/uploads/avatars/${req.files.avatar[0].filename}`;
       }
       if (req.files.resume) {
-        user.resume = `/uploads/resumes/${req.files.resume[0].filename}`;
+        user.resume = req.files.resume[0].path.startsWith('http') 
+          ? req.files.resume[0].path 
+          : `/uploads/resumes/${req.files.resume[0].filename}`;
       }
     }
 

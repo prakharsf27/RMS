@@ -296,7 +296,7 @@ export default function Profile() {
                  <Button variant="secondary" size="sm" onClick={() => setIsEditing(true)}>Edit Details</Button>
                )}
                {isViewingOthers && user?.resume && (
-                  <Button size="sm" variant="success" onClick={() => window.open(`${baseUrl}${user.resume}`, '_blank')}>
+                  <Button size="sm" variant="success" onClick={() => window.open(user.resume.startsWith('http') ? user.resume : `${baseUrl}${user.resume}`, '_blank')}>
                      Download Resume
                   </Button>
                )}
@@ -493,7 +493,7 @@ export default function Profile() {
         {(isViewingOthers && user?.resume && showResume) && (
           <aside className={cn(styles.resumePreview, "animate-fade-in")}>
             <iframe 
-              src={`${baseUrl}${user.resume}#toolbar=0`} 
+              src={`${user.resume.startsWith('http') ? user.resume : baseUrl + user.resume}#toolbar=0`} 
               className={styles.resumeIframe}
               title="Candidate Resume"
             />
