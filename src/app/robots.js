@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://rms-blush-iota.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://talentflowai-blush-iota.vercel.app';
 
 export default function robots() {
   return {

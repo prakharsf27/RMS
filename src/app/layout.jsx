@@ -16,7 +16,7 @@ export const metadata = {
   },
   description: 'TalentFlow is an AI-powered Recruitment Management System (RMS) that connects candidates and recruiters. Build ATS-optimized resumes, simulate interviews, track applications, and streamline hiring pipelines.',
   keywords:    ['recruitment management system', 'AI resume builder', 'mock interview practice', 'ATS resume checker', 'job application tracker', 'hiring platform', 'talent acquisition'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://rms-blush-iota.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://talentflowai-blush-iota.vercel.app'),
   alternates: {
     canonical: '/',
   },

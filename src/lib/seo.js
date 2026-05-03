@@ -5,10 +5,12 @@
  */
 
 /* ── Site-wide constants ─────────────────────────────────────────────────── */
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://talentflowai-blush-iota.vercel.app';
+
 export const SITE_CONFIG = {
   name:           'TalentFlow',
   tagline:        'AI Resume Builder & Interview Simulator',
-  url:            'https://talentflow.app',
+  url:            SITE_URL,
   twitter:        '@TalentFlowApp',
   locale:         'en_US',
   defaultOGImage: '/og/default.png',
