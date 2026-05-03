@@ -45,7 +45,7 @@
 .searchBox input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
 }
 
 .filters {
@@ -268,7 +268,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--primary);
-  border-bottom: 2px solid var(--primary-light);
+  border-bottom: 2px solid var(--border-color);
   display: inline-block;
   padding-bottom: 0.25rem;
 }

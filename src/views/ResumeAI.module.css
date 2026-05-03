@@ -76,7 +76,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
   flex-shrink: 0;
 }
 
@@ -180,7 +180,7 @@
   background: var(--primary);
   color: white;
   border-top-right-radius: 4px;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
 }
 
 .raiBubble strong {
@@ -189,7 +189,7 @@
 }
 
 .dark .raiBubble strong {
-  color: #a5b4fc;
+  color: var(--primary);
 }
 
 .raiBubble ul {
@@ -490,15 +490,15 @@
 }
 
 /* Resume doc inner styles - keeping these consistent with "paper" look but making them more elegant */
-.r-hdr { padding: 40px 48px 28px; background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; }
+.r-hdr { padding: 40px 48px 28px; background: linear-gradient(135deg, #0f172a, #1E3A8A); color: white; }
 .r-name { font-family: 'Outfit', serif; font-size: 36px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; line-height: 1.15; }
 .r-tagline { font-size: 16px; color: rgba(199, 210, 254, 0.85); margin-bottom: 16px; }
 .r-contact { display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: rgba(199, 210, 254, 0.7); }
 .r-body { padding: 32px 48px 40px; display: flex; flex-direction: column; gap: 24px; }
-.r-sec-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #6366f1; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1.5px solid #e0e7ff; }
+.r-sec-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--primary); text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1.5px solid var(--border-color); }
 .r-exp-role { font-size: 17px; color: #1e293b; font-weight: 700; }
 .r-bullets li { font-size: 14px; color: #475569; line-height: 1.6; padding-left: 18px; position: relative; margin-bottom: 4px; }
-.r-bullets li::before { content: '▸'; position: absolute; left: 0; color: #6366f1; font-size: 10px; top: 2px; }
+.r-bullets li::before { content: '▸'; position: absolute; left: 0; color: var(--primary); font-size: 10px; top: 2px; }
 
 /* JD overlay */
 .raiJdOverlay {

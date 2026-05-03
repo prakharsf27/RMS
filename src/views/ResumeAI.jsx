@@ -73,7 +73,7 @@ Output improved JSON with atsScore. Focus on: strong action verbs (Led, Architec
 /* ─── UTILS ─────────────────────────────────────────────────── */
 const fmt = (t) =>
   t.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-   .replace(/`(.*?)`/g, '<code style="background:rgba(99,102,241,.2);padding:1px 5px;border-radius:4px;font-size:11px;color:#a5b4fc;font-family:monospace">$1</code>')
+    .replace(/`(.*?)`/g, '<code style="background:rgba(30,58,138,.1);padding:1px 5px;border-radius:4px;font-size:11px;color:#1E3A8A;font-family:monospace">$1</code>')
    .replace(/^[-•]\s(.+)/gm, "<li>$1</li>")
    .replace(/<li>/g, "</ul><ul><li>")
    .replace("</ul>", "")
@@ -88,7 +88,7 @@ function ResumeDocument({ data }) {
   if (!data) return (
     <div className="rai-doc-empty">
       <div className="rai-empty-icon">
-        <FileText size={26} color="#6366f1" />
+        <FileText size={26} color="#1E3A8A" />
       </div>
       <div style={{ fontSize: 16, fontWeight: 600, color: "#475569" }}>No resume yet</div>
       <div style={{ fontSize: 13, color: "#334155", textAlign: "center", maxWidth: 280, lineHeight: 1.5 }}>

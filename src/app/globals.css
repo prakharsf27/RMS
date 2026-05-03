@@ -37,7 +37,7 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.2);
+  --shadow-glow: 0 0 25px rgba(30, 58, 138, 0.2);
   --shadow-glow-success: 0 0 25px rgba(16, 185, 129, 0.2);
 }
 
@@ -52,12 +52,12 @@
   
   --border-color: #1e293b;
   
-  --primary: #818cf8;
-  --primary-hover: #6366f1;
-  --primary-light: #1e1b4b;
+  --primary: #60a5fa; 
+  --primary-hover: #3b82f6;
+  --primary-light: #1e3a8a20;
   
-  --secondary: #a78bfa;
-  --secondary-hover: #8b5cf6;
+  --secondary: #fb923c;
+  --secondary-hover: #f97316;
   
   --success: #34d399;
   --warning: #fbbf24;
@@ -73,12 +73,12 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
-  --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.15);
+  --shadow-glow: 0 0 20px rgba(96, 165, 250, 0.15);
 
   /* Premium Design Tokens */
   --premium-gradient: linear-gradient(135deg, #1E3A8A, #E17055);
   --premium-bg: #0f172a;
-  --card-gradient: linear-gradient(135deg, rgba(30, 58, 138, 0.05), rgba(225, 112, 85, 0.05));
+  --card-gradient: linear-gradient(135deg, rgba(30, 58, 138, 0.08), rgba(225, 112, 85, 0.08));
 }
 
 *, *::before, *::after {
