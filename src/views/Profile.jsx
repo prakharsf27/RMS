@@ -133,6 +133,12 @@ export default function Profile() {
   const [atsScore, setAtsScore] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
 
+  // OTP State
+  const [showEmailOtp, setShowEmailOtp] = useState(false);
+  const [showPhoneOtp, setShowPhoneOtp] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
@@ -248,6 +254,71 @@ export default function Profile() {
     }
   };
 
+  // OTP Functions
+  const handleSendEmailOtp = async () => {
+    setOtpLoading(true);
+    try {
+      await api.post("/auth/send-email-otp");
+      setShowEmailOtp(true);
+      setShowPhoneOtp(false);
+      setOtpValue("");
+      alert("Verification code sent to your email!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyEmailOtp = async () => {
+    if (!otpValue) return;
+    setOtpLoading(true);
+    try {
+      await api.post("/auth/verify-email-otp", { otp: otpValue });
+      setShowEmailOtp(false);
+      alert("Email verified successfully!");
+      window.location.reload();
+    } catch (err) {
+      alert(err.response?.data?.message || "Invalid code");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleSendPhoneOtp = async () => {
+    if (!formData.phone) {
+        alert("Please add a phone number first.");
+        return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.post("/auth/send-phone-otp");
+      setShowPhoneOtp(true);
+      setShowEmailOtp(false);
+      setOtpValue("");
+      alert("Verification code sent to your phone! (Check console in dev mode)");
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const handleVerifyPhoneOtp = async () => {
+    if (!otpValue) return;
+    setOtpLoading(true);
+    try {
+      await api.post("/auth/verify-phone-otp", { otp: otpValue });
+      setShowPhoneOtp(false);
+      alert("Phone number verified successfully!");
+      window.location.reload();
+    } catch (err) {
+      alert(err.response?.data?.message || "Invalid code");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
   // List Management Helpers
   const addItem = (field, defaultObj) => {
     setFormData(prev => ({ ...prev, [field]: [...prev[field], defaultObj] }));
@@ -290,8 +361,76 @@ export default function Profile() {
             <h3 className={styles.userName}>{formData.fname} {formData.lname}</h3>
             <span className={styles.userRole}>{user?.role?.toUpperCase()}</span>
             <div className={styles.badgeRow}>
-               <Shield size={14} /> {user?.isEmailVerified && user?.isPhoneVerified ? 'Verified Talent' : 'Identity Pending'}
+               <Shield size={14} /> 
+               {user?.isEmailVerified && user?.isPhoneVerified ? (
+                 <span className={styles.verifiedText}>Verified Talent</span>
+               ) : (
+                 <span className={styles.pendingText}>Identity Pending</span>
+               )}
             </div>
+
+            {/* OTP Verification Controls */}
+            {!isViewingOthers && (
+              <div className={styles.verificationControls}>
+                {!user?.isEmailVerified && (
+                  <div className={styles.verifyItem}>
+                    <div className={styles.verifyLabel}>
+                      <Mail size={12} /> Email
+                    </div>
+                    {showEmailOtp ? (
+                      <div className={styles.otpInputGroup}>
+                        <input 
+                          className={styles.otpInput} 
+                          placeholder="Code" 
+                          value={otpValue} 
+                          onChange={e => setOtpValue(e.target.value)} 
+                          maxLength={6}
+                        />
+                        <button onClick={handleVerifyEmailOtp} disabled={otpLoading} className={styles.otpBtn}>
+                          {otpLoading ? "..." : <CheckCircle size={14} />}
+                        </button>
+                        <button onClick={() => setShowEmailOtp(false)} className={styles.otpCancel}>
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button className={styles.verifyBtn} onClick={handleSendEmailOtp} disabled={otpLoading}>
+                        Verify
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {!user?.isPhoneVerified && (
+                  <div className={styles.verifyItem}>
+                    <div className={styles.verifyLabel}>
+                      <Phone size={12} /> Phone
+                    </div>
+                    {showPhoneOtp ? (
+                      <div className={styles.otpInputGroup}>
+                        <input 
+                          className={styles.otpInput} 
+                          placeholder="Code" 
+                          value={otpValue} 
+                          onChange={e => setOtpValue(e.target.value)} 
+                          maxLength={6}
+                        />
+                        <button onClick={handleVerifyPhoneOtp} disabled={otpLoading} className={styles.otpBtn}>
+                          {otpLoading ? "..." : <CheckCircle size={14} />}
+                        </button>
+                        <button onClick={() => setShowPhoneOtp(false)} className={styles.otpCancel}>
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button className={styles.verifyBtn} onClick={handleSendPhoneOtp} disabled={otpLoading}>
+                        Verify
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
           
           <Card className={styles.statsCard} premium>

@@ -15,6 +15,13 @@ const {
   toggleEngaged
 } = require('../controllers/authController');
 
+const {
+  sendEmailOTP,
+  verifyEmailOTP,
+  sendPhoneOTP,
+  verifyPhoneOTP
+} = require('../controllers/otpController');
+
 
 const { protect, authorize } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -27,6 +34,12 @@ router.route('/profile')
     { name: 'avatar', maxCount: 1 },
     { name: 'resume', maxCount: 1 }
   ]), updateProfile);
+
+// OTP Verification Routes
+router.post('/send-email-otp', protect, sendEmailOTP);
+router.post('/verify-email-otp', protect, verifyEmailOTP);
+router.post('/send-phone-otp', protect, sendPhoneOTP);
+router.post('/verify-phone-otp', protect, verifyPhoneOTP);
 
 // Admin Routes
 router.get('/users', protect, authorize('admin', 'recruiter'), getAllUsers);

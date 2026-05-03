@@ -28,6 +28,10 @@ const UserSchema = new mongoose.Schema({
   state: { type: String },
   isEmailVerified: { type: Boolean, default: false },
   isPhoneVerified: { type: Boolean, default: false },
+  emailOTP: String,
+  emailOTPExpires: Date,
+  phoneOTP: String,
+  phoneOTPExpires: Date,
   
   // Professional Identity
   professionalHeadline: { type: String },
