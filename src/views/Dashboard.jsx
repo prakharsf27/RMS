@@ -61,8 +61,8 @@ function StatCardItem({ label, value, icon: Icon, color, bg, trend, up, delay })
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "rgba(10,15,30,0.97)", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 12, padding: "10px 14px" }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#818cf8", marginBottom: 6 }}>{label}</div>
+    <div style={{ background: "#1F2937", border: "1px solid #1E3A8A", borderRadius: 12, padding: "10px 14px" }}>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#E17055", marginBottom: 6 }}>{label}</div>
       {payload.map((p) => (
         <div key={p.name} style={{ fontSize: 12, color: p.color, display: "flex", justifyContent: "space-between", gap: 16 }}>
           <span>{p.name}</span><span style={{ fontWeight: 600 }}>{p.value}</span>
@@ -132,20 +132,20 @@ export default function Dashboard() {
   const isAdmin = user.role === 'admin';
 
   const dashboardStats = isCandidate ? [
-    { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: stats?.applications > 0 ? "Real-time" : "Ready to start", up: true },
-    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Next session", up: true },
-    { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Pipeline status", up: false },
-    { label: "PROFILE VIEWS", value: stats?.profileViews || 0, icon: Eye, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "Total activity", up: true },
+    { label: "APPLIED", value: stats?.applications || 0, icon: FileText, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: stats?.applications > 0 ? "Real-time" : "Ready to start", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#E17055", bg: "rgba(225, 112, 85, 0.1)", trend: "Next session", up: true },
+    { label: "OFFERS", value: stats?.offers || 0, icon: Award, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: "Pipeline status", up: false },
+    { label: "PROFILE VIEWS", value: stats?.profileViews || 0, icon: Eye, color: "#E17055", bg: "rgba(225, 112, 85, 0.1)", trend: "Total activity", up: true },
   ] : isAdmin ? [
-    { label: "TOTAL USERS", value: stats?.candidates || 0, icon: Users, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "Platform size", up: true },
-    { label: "ALL JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Market volume", up: true },
-    { label: "TOTAL APPS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "System traffic", up: true },
+    { label: "TOTAL USERS", value: stats?.candidates || 0, icon: Users, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: "Platform size", up: true },
+    { label: "ALL JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#E17055", bg: "rgba(225, 112, 85, 0.1)", trend: "Market volume", up: true },
+    { label: "TOTAL APPS", value: stats?.applications || 0, icon: FileText, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: "System traffic", up: true },
     { label: "PENDING VERIF", value: stats?.pendingVerifications || 0, icon: ShieldAlert, color: "#ef4444", bg: "rgba(239,68,68,0.15)", trend: "Needs review", up: false },
   ] : [
-    { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#6366f1", bg: "rgba(99,102,241,0.15)", trend: "Network size", up: true },
-    { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#f59e0b", bg: "rgba(245,158,11,0.15)", trend: "Open requirements", up: false },
-    { label: "APPLICATIONS", value: stats?.applications || 0, icon: FileText, color: "#10b981", bg: "rgba(16,185,129,0.15)", trend: "Queue volume", up: true },
-    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#c084fc", bg: "rgba(192,132,252,0.15)", trend: "Schedule load", up: true },
+    { label: "TOTAL CANDIDATES", value: stats?.candidates || 0, icon: User, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: "Network size", up: true },
+    { label: "ACTIVE JOBS", value: stats?.jobs || 0, icon: Briefcase, color: "#E17055", bg: "rgba(225, 112, 85, 0.1)", trend: "Open requirements", up: false },
+    { label: "APPLICATIONS", value: stats?.applications || 0, icon: FileText, color: "#1E3A8A", bg: "rgba(30, 58, 138, 0.1)", trend: "Queue volume", up: true },
+    { label: "INTERVIEWS", value: stats?.interviews || 0, icon: Zap, color: "#E17055", bg: "rgba(225, 112, 85, 0.1)", trend: "Schedule load", up: true },
   ];
 
   const profileTasks = isCandidate ? PROFILE_ITEMS : RECRUITER_TASKS;
@@ -256,8 +256,8 @@ export default function Dashboard() {
                         </div>
                         <div className={styles.jobRight}>
                           <div className={`${styles.matchBadge} ${match >= 90 ? styles.matchHigh : styles.matchMed}`} style={{ 
-                            background: match >= 90 ? 'rgba(16,185,129,0.15)' : 'rgba(99,102,241,0.15)',
-                            color: match >= 90 ? '#34d399' : '#818cf8'
+                            background: match >= 90 ? 'rgba(30, 58, 138, 0.1)' : 'rgba(225, 112, 85, 0.1)',
+                            color: match >= 90 ? '#1E3A8A' : '#E17055'
                           }}>
                             {match}% match
                           </div>
@@ -345,25 +345,25 @@ export default function Dashboard() {
                   <AreaChart data={chartData} margin={{ top: 0, right: 0, bottom: 0, left: -24 }}>
                     <defs>
                       <linearGradient id="gApp" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                        <stop offset="0%" stopColor="#1E3A8A" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#1E3A8A" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="gInt" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
-                        <stop offset="100%" stopColor="#f59e0b" stopOpacity={0} />
+                        <stop offset="0%" stopColor="#E17055" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#E17055" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="gOff" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.3} />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                        <stop offset="0%" stopColor="#1E3A8A" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#1E3A8A" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="month" tick={{ fill: "#475569", fontSize: 11, fontFamily: "Outfit" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: "#475569", fontSize: 10, fontFamily: "Outfit" }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="Applications" stroke="#6366f1" strokeWidth={2} fill="url(#gApp)" dot={false} />
-                    <Area type="monotone" dataKey="Interviews" stroke="#f59e0b" strokeWidth={2} fill="url(#gInt)" dot={false} />
-                    <Area type="monotone" dataKey="Hired" stroke="#10b981" strokeWidth={2} fill="url(#gOff)" dot={false} />
+                    <Area type="monotone" dataKey="Applications" stroke="#1E3A8A" strokeWidth={2} fill="url(#gApp)" dot={false} />
+                    <Area type="monotone" dataKey="Interviews" stroke="#E17055" strokeWidth={2} fill="url(#gInt)" dot={false} />
+                    <Area type="monotone" dataKey="Hired" stroke="#1E3A8A" strokeWidth={2} fill="url(#gOff)" dot={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -376,7 +376,7 @@ export default function Dashboard() {
                 <div className={styles.cardTitle}>{isCandidate ? 'Profile Strength' : 'Recruitment Health'}</div>
                 <div className={styles.cardSubtitle}>{doneTasks} of {profileTasks.length} objectives met</div>
               </div>
-              <div style={{ fontSize: 22, fontWeight: 800, background: "linear-gradient(135deg,#818cf8,#c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>{taskPct}%</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#E17055" }}>{taskPct}%</div>
             </div>
             <div className={styles.cardBody}>
               <div className={styles.progressBar} style={{ marginBottom: 14 }}>

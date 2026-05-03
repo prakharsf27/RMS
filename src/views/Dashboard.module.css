@@ -9,8 +9,8 @@
 .hero {
   border-radius: 28px;
   padding: 40px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 35%, #312e81 65%, #1e1b4b 100%);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+  border: 1px solid rgba(225, 112, 85, 0.2);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -27,7 +27,7 @@
   right: -5%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(30, 58, 138, 0.3) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   filter: blur(40px);
@@ -41,7 +41,7 @@
   left: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(225, 112, 85, 0.2) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   filter: blur(40px);
@@ -115,8 +115,8 @@
   border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
-  background: white;
-  color: #3730a3;
+  background: #FFFCF5;
+  color: #1E3A8A;
   border: none;
   cursor: pointer;
   font-family: inherit;
@@ -127,7 +127,7 @@
 }
 
 .heroCta:hover {
-  background: #e0e7ff;
+  background: #fffaf0;
   transform: translateY(-1px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
@@ -641,7 +641,7 @@
 .progressFill {
   height: 100%;
   border-radius: 100px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  background: linear-gradient(90deg, #1E3A8A, #E17055);
   transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
