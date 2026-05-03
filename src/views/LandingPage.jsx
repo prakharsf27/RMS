@@ -141,8 +141,8 @@ const LandingPage = () => {
       {/* --- NAV --- */}
       <nav className={cn(styles.nav, scrolled && styles.navScrolled)}>
         <Link className={styles.navLogo} href="/" onClick={closeMenu}>
-          <div className={styles.navLogoIcon}>T</div>
-          <span className={styles.navLogoText}>TalentFlow</span>
+          <img src="/logo.png" alt="TalentFlow AI" className={styles.navLogoImg} />
+          <span className={styles.navLogoText}>TalentFlow AI</span>
         </Link>
         <div className={styles.navLinks}>
           <a href="#features" className={activeHash === "#features" ? styles.active : ""}>Features</a>
@@ -789,8 +789,8 @@ const LandingPage = () => {
       <footer className={styles.footer}>
         <div className={styles.footBrand}>
           <Link className={styles.footLogo} href="/">
-            <div className={styles.footLogoIco}>T</div>
-            <span className={styles.footLogoTxt}>TalentFlow</span>
+            <img src="/logo.png" alt="TalentFlow AI" className={styles.footLogoImg} />
+            <span className={styles.footLogoTxt}>TalentFlow AI</span>
           </Link>
           <p className={styles.footDesc}>AI-powered career platform helping ambitious people land jobs at dream companies.</p>
         </div>

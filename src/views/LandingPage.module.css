@@ -55,17 +55,10 @@
   text-decoration: none;
 }
 
-.navLogoIcon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--premium-gradient);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 15px;
-  color: white;
+.navLogoImg {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
 }
 
 .navLogoText {
@@ -251,7 +244,7 @@
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 64px 64px;
-  opacity: 0.3;
+  opacity: 0.15;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
 }
 
@@ -705,7 +698,7 @@
 .bentoCard {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 40px;
   position: relative;
   overflow: hidden;
@@ -915,7 +908,7 @@
 /* --- TESTIMONIALS --- */
 .testiSection { padding: 0 48px 120px; }
 .testiGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
-.testiCard { background: var(--bg2); border: 1px solid var(--border); border-radius: 24px; padding: 40px; transition: all 0.3s ease; }
+.testiCard { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 40px; transition: all 0.3s ease; }
 .testiCard:hover { border-color: var(--primary); transform: translateY(-4px); }
 .testiStars { display: flex; gap: 4px; margin-bottom: 24px; }
 .testiQuote { font-size: 17px; color: var(--text); line-height: 1.7; font-style: italic; margin-bottom: 32px; }
@@ -928,7 +921,7 @@
 /* --- PRICING --- */
 .pricingSection { padding: 0 48px 120px; }
 .pricingGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
-.pricingCard { background: var(--bg2); border: 1px solid var(--border); border-radius: 28px; padding: 48px; position: relative; }
+.pricingCard { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 48px; position: relative; }
 .pricingFeatured { border: 2px solid var(--primary); background: rgba(99, 102, 241, 0.05); }
 .pricingTag { position: absolute; top: 24px; right: 24px; padding: 6px 16px; background: var(--premium-gradient); color: white; font-size: 11px; font-weight: 800; border-radius: 100px; }
 .pricingPlanName { font-size: 14px; font-weight: 800; color: var(--muted); letter-spacing: 2px; margin-bottom: 16px; }
@@ -956,7 +949,11 @@
 /* --- FOOTER --- */
 .footer { border-top: 1px solid var(--border); padding: 80px 48px 48px; max-width: 1250px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
 .footLogo { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; text-decoration: none; }
-.footLogoIco { width: 34px; height: 34px; border-radius: 9px; background: var(--premium-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; }
+.footLogoImg {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}
 .footLogoTxt { color: var(--text); font-weight: 700; font-size: 18px; }
 .footDesc { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 280px; }
 .footColTitle { font-size: 12px; font-weight: 800; color: var(--text); letter-spacing: 1px; margin-bottom: 20px; }
