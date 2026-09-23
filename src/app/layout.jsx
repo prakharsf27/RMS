@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { SITE_CONFIG, OrganizationSchema, WebsiteSchema } from '../lib/seo';
 import JsonLd from '../components/JsonLd';
 import Providers from '../components/Providers';
@@ -76,6 +77,7 @@ export default function RootLayout({ children }) {
           {children}
         </Providers>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
