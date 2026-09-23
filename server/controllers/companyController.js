@@ -14,11 +14,11 @@ exports.getCompanies = async (req, res) => {
 
 // @desc    Get recruiter's company
 // @route   GET /api/companies/my
-// @access  Private (Recruiter)
+// @access  Private (Recruiter/Admin)
 exports.getMyCompany = async (req, res) => {
   try {
     const company = await Company.findOne({ recruiterId: req.user._id });
-    if (!company) return res.status(404).json({ message: 'Company not found' });
+    if (!company) return res.status(200).json(null);
     res.json(company);
   } catch (error) {
     res.status(500).json({ message: error.message });

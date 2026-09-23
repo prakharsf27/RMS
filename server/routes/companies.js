@@ -4,8 +4,8 @@ const { getCompanies, getMyCompany, upsertCompany, verifyCompany } = require('..
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 router.get('/', getCompanies);
-router.get('/my', protect, authorize('recruiter'), getMyCompany);
-router.post('/', protect, authorize('recruiter'), upsertCompany);
+router.get('/my', protect, authorize('recruiter', 'admin'), getMyCompany);
+router.post('/', protect, authorize('recruiter', 'admin'), upsertCompany);
 router.put('/:id/verify', protect, authorize('admin'), verifyCompany);
 router.put('/:id', protect, authorize('admin'), require('../controllers/companyController').updateCompanyAdmin);
 

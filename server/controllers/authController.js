@@ -349,6 +349,34 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
+    // Sync company profile for recruiter
+    if (req.body.companyName) {
+      user.companyName = req.body.companyName;
+    }
+    if (user.role === 'recruiter' && (req.body.companyName || req.body.name)) {
+      try {
+        const Company = require('../models/Company');
+        await Company.findOneAndUpdate(
+          { recruiterId: user._id },
+          {
+            name: req.body.companyName || req.body.name,
+            industry: req.body.companyIndustry || req.body.industry,
+            website: req.body.companyWebsite || req.body.website,
+            email: req.body.companyEmail || req.body.email,
+            location: req.body.companyLocation || req.body.location,
+            logo: req.body.companyLogo || req.body.logo,
+            cinOrGst: req.body.cinOrGst || req.body.taxId,
+            country: req.body.country,
+            description: req.body.companyDescription || req.body.description,
+            recruiterId: user._id
+          },
+          { upsert: true, new: true }
+        );
+      } catch (err) {
+        console.warn('Company sync in updateProfile warning:', err.message);
+      }
+    }
+
     user.profileCompletion = calculateProfileCompletion(user);
     const updatedUser = await user.save();
 
@@ -435,6 +463,32 @@ exports.completeOnboarding = async (req, res) => {
 
     user.onboardingCompleted = true;
     user.profileCompletion = Math.max(85, calculateProfileCompletion(user));
+
+    // If recruiter, automatically create or update the Company record
+    if (user.role === 'recruiter') {
+      const Company = require('../models/Company');
+      const companyName = req.body.companyName || req.body.name || user.companyName;
+      if (companyName) {
+        await Company.findOneAndUpdate(
+          { recruiterId: user._id },
+          {
+            name: companyName,
+            industry: req.body.companyIndustry || req.body.industry || 'Enterprise Cloud Infrastructure',
+            website: req.body.companyWebsite || req.body.website || '',
+            email: req.body.companyEmail || req.body.email || user.email,
+            logo: req.body.companyLogo || req.body.logo || '',
+            location: req.body.companyLocation || req.body.location || 'San Francisco, CA',
+            cinOrGst: req.body.cinOrGst || req.body.taxId || '',
+            country: req.body.country || 'United States',
+            description: req.body.companyDescription || req.body.description || '',
+            recruiterId: user._id
+          },
+          { upsert: true, new: true }
+        );
+        user.companyName = companyName;
+      }
+    }
+
     await user.save();
 
     res.json({
