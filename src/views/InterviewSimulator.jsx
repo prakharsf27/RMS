@@ -76,7 +76,7 @@ export default function InterviewSimulator() {
         setHasStarted(true);
 
         const candName = user?.fname || "there";
-        const qText = res.data.currentQuestion?.questionText || "Could you introduce your technical background?";
+        const qText = res.data.currentQuestion?.question || res.data.currentQuestion?.questionText || "Could you introduce your technical background?";
         const category = res.data.currentQuestion?.category || "Technical Assessment";
 
         setMessages([
@@ -154,7 +154,7 @@ export default function InterviewSimulator() {
             ...prev,
             {
               sender: "ai",
-              text: `${interviewerFeedback}\n\n**Next Question [${(nextQ.category || 'General').toUpperCase()}]:**\n${nextQ.questionText}`
+              text: `${interviewerFeedback}\n\n**Next Question [${(nextQ.category || 'General').toUpperCase()}]:**\n${nextQ.question || nextQ.questionText}`
             }
           ]);
         }
