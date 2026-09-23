@@ -431,7 +431,7 @@ export default function Profile() {
               <div>
                 <label className={styles.label}>Verified Technical Competencies</label>
                 <div className={styles.tagPillWrap} style={{ marginTop: '0.75rem' }}>
-                  {formData.skills.map((skill, i) => (
+                  {(Array.isArray(formData.skills) ? formData.skills : (typeof formData.skills === 'string' ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : [])).map((skill, i) => (
                     <span key={i} className={styles.tagPill}>
                       <Sparkles size={11} style={{ color: 'var(--primary)' }} /> {skill}
                     </span>

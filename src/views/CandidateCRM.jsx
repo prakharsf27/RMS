@@ -37,7 +37,7 @@ export default function CandidateCRM() {
     setLoading(true);
     try {
       const { data } = await api.get("/applications");
-      const enriched = (data || []).map(app => {
+      const enriched = (Array.isArray(data) ? data : []).map(app => {
         const appliedDate = new Date(app.createdAt || app.appliedAt || Date.now());
         const daysSinceUpdate = differenceInDays(new Date(), new Date(app.updatedAt || appliedDate));
         

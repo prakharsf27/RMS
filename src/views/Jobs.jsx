@@ -70,7 +70,8 @@ export default function Jobs() {
 
       if (user?.role === 'candidate') {
         const appsRes = await api.get('/applications').catch(() => ({ data: [] }));
-        const appliedIds = new Set(appsRes.data.map(app => app.jobId?._id).filter(Boolean));
+        const appsList = Array.isArray(appsRes.data) ? appsRes.data : [];
+        const appliedIds = new Set(appsList.map(app => app.jobId?._id).filter(Boolean));
         setAppliedJobIds(appliedIds);
       }
     } catch (err) {
@@ -84,12 +85,16 @@ export default function Jobs() {
     if (user?.role === 'recruiter') {
       try {
         const { data } = await api.get("/companies/my");
-        setHasCompanyProfile(true);
-        setIsCompanyVerified(data.isVerified);
-      } catch (err) {
-        if (err.response?.status === 404) {
+        if (data && data._id) {
+          setHasCompanyProfile(true);
+          setIsCompanyVerified(!!data.isVerified);
+        } else {
           setHasCompanyProfile(false);
+          setIsCompanyVerified(false);
         }
+      } catch (err) {
+        setHasCompanyProfile(false);
+        setIsCompanyVerified(false);
       }
     }
   };
@@ -299,10 +304,14 @@ export default function Jobs() {
         </Card>
       ) : viewMode === 'grid' ? (
         <div className={styles.cardsGrid}>
-          {jobs.map((job) => {
+          {(Array.isArray(jobs) ? jobs : []).map((job) => {
             const hasApplied = appliedJobIds.has(job._id);
-            const matchScore = job.matchScore || (job.title.includes('Frontend') ? 94 : 88);
-            const skillsList = job.requirements?.slice(0, 3) || ['React', 'TypeScript', 'Node.js'];
+            const matchScore = job.matchScore || (job.title?.includes('Frontend') ? 94 : 88);
+            const skillsList = Array.isArray(job.requirements)
+              ? job.requirements.slice(0, 3)
+              : (typeof job.requirements === 'string'
+                  ? job.requirements.split(',').map(s => s.trim()).filter(Boolean).slice(0, 3)
+                  : ['React', 'TypeScript', 'Node.js']);
 
             return (
               <div 
@@ -523,11 +532,15 @@ export default function Jobs() {
                 <p>{selectedJob.description || "Join our high-performance engineering team building modern distributed web applications. You will collaborate closely with design and backend teams to ship performant features."}</p>
               </section>
 
-              {selectedJob.requirements?.length > 0 && (
+              {selectedJob.requirements && (
                 <section className={styles.jobSection}>
                   <h4>Key Technical Qualifications</h4>
                   <ul className={styles.reqList}>
-                    {selectedJob.requirements.map((req, i) => (
+                    {(Array.isArray(selectedJob.requirements)
+                      ? selectedJob.requirements
+                      : (typeof selectedJob.requirements === 'string'
+                          ? selectedJob.requirements.split(',').map(s => s.trim()).filter(Boolean)
+                          : [])).map((req, i) => (
                       <li key={i}>
                         <CheckCircle2 size={14} style={{ color: 'var(--success)', marginTop: 2, flexShrink: 0 }} />
                         <span>{req}</span>

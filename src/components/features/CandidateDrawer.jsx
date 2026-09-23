@@ -333,9 +333,9 @@ export const CandidateDrawer = ({
                 {user.bio || `${user.fname} is a skilled software engineer with strong background in modern web platforms, component driven architecture, and scalable full stack systems.`}
               </p>
 
-              {user.experience && user.experience.length > 0 ? (
+              {((Array.isArray(user.workExperience) ? user.workExperience : (Array.isArray(user.experience) ? user.experience : [])).length > 0) ? (
                 <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {user.experience.map((exp, idx) => (
+                  {(Array.isArray(user.workExperience) ? user.workExperience : (Array.isArray(user.experience) ? user.experience : [])).map((exp, idx) => (
                     <div key={idx} className={styles.timelineItem}>
                       <div className={styles.timelineDot} />
                       <div>

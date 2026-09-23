@@ -113,6 +113,12 @@ export default function Candidates() {
         ? new Date(app.updatedAt).toLocaleDateString()
         : new Date().toLocaleDateString();
 
+      const candidateSkills = Array.isArray(cand.skills)
+        ? cand.skills
+        : (typeof cand.skills === 'string'
+            ? cand.skills.split(',').map(s => s.trim()).filter(Boolean)
+            : []);
+
       return {
         id: cand._id,
         user: cand,
@@ -122,7 +128,7 @@ export default function Candidates() {
         stage,
         matchScore,
         experience,
-        skills: cand.skills?.length ? cand.skills : ['React', 'TypeScript', 'Node.js', 'Next.js'],
+        skills: candidateSkills.length > 0 ? candidateSkills : ['React', 'TypeScript', 'Node.js', 'Next.js'],
         lastActivity
       };
     });
@@ -449,10 +455,10 @@ export default function Candidates() {
 
                       <td>
                         <div className={styles.skillsList}>
-                          {row.skills.slice(0, 3).map((sk, i) => (
+                          {(Array.isArray(row.skills) ? row.skills.slice(0, 3) : []).map((sk, i) => (
                             <span key={i} className={styles.skillChip}>{sk}</span>
                           ))}
-                          {row.skills.length > 3 && (
+                          {Array.isArray(row.skills) && row.skills.length > 3 && (
                             <span className={styles.skillChip}>+{row.skills.length - 3}</span>
                           )}
                         </div>
