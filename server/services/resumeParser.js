@@ -1,7 +1,29 @@
 const fs = require('fs');
 const path = require('path');
-const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
+
+// Ensure DOMMatrix polyfill exists in serverless Node.js environments (AWS Lambda / Vercel)
+if (typeof global.DOMMatrix === 'undefined') {
+  global.DOMMatrix = class DOMMatrix {
+    constructor() {
+      this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0;
+      this.m11 = 1; this.m12 = 0; this.m13 = 0; this.m14 = 0;
+      this.m21 = 0; this.m22 = 1; this.m23 = 0; this.m24 = 0;
+      this.m31 = 0; this.m32 = 0; this.m33 = 1; this.m34 = 0;
+      this.m41 = 0; this.m42 = 0; this.m43 = 0; this.m44 = 1;
+    }
+  };
+}
+if (typeof globalThis.DOMMatrix === 'undefined') {
+  globalThis.DOMMatrix = global.DOMMatrix;
+}
+
+let pdfParse = null;
+try {
+  pdfParse = require('pdf-parse');
+} catch (e) {
+  console.warn('pdf-parse module warning:', e.message);
+}
 
 /**
  * Normalizes raw text by removing non-printable characters, 
@@ -23,6 +45,13 @@ async function extractTextFromFile(filePath, originalname = '') {
   const ext = (path.extname(originalname || filePath) || '').toLowerCase();
 
   if (ext === '.pdf') {
+    if (!pdfParse) {
+      try {
+        pdfParse = require('pdf-parse');
+      } catch (err) {
+        throw new Error('PDF parsing library is unavailable in this environment. Please paste your resume text or upload a DOCX file.');
+      }
+    }
     const dataBuffer = fs.readFileSync(filePath);
     const pdfData = await pdfParse(dataBuffer);
     return normalizeText(pdfData.text);
