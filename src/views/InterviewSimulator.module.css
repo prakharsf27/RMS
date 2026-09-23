@@ -1,456 +1,348 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .headerRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.workspace {
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pageTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  color: var(--text-secondary);
+  font-size: 0.938rem;
+}
+
+/* ─── Pre-interview Configuration Wizard ─── */
+.configGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.setupSection {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionHeading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.formGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  flex: 1;
-  min-height: 0;
-}
-
-@media (max-width: 900px) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-}
-
-.simulatorPane {
-  display: flex;
-  flex-direction: column;
-  min-height: 500px;
-}
-
-.setupCard {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-}
-
-.setupCard h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  color: var(--text-primary);
+  gap: 1rem;
 }
 
 .inputGroup {
-  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.4rem;
 }
 
 .inputGroup label {
-  font-size: 13px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.inputGroup input, .inputGroup textarea {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-subtle);
-  color: var(--text-primary);
-  font-family: inherit;
-  resize: vertical;
-}
-
-.inputGroup input:focus, .inputGroup textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-}
-
-.startBtn {
-  margin-top: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.videoRoom {
-  flex: 1;
-  background-color: #111827;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.mainVideo {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.aiAvatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #374151, #1f2937);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-
-.videoLabel {
-  position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.pulsingIndicator {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: flex;
-  gap: 4px;
-  background: rgba(0,0,0,0.6);
-  padding: 8px;
-  border-radius: 16px;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: var(--success-color);
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
-}
-
-.selfVideo {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  width: 140px;
-  height: 90px;
-  background-color: #374151;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.videoControls {
-  height: 64px;
-  background-color: #1f2937;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.ctrlBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ctrlBtn:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.endCall {
-  background: var(--danger-color);
-}
-.endCall:hover {
-  background: #dc2626;
-}
-
-.chatPane {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.placeholderChat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  color: var(--text-muted);
-  text-align: center;
-  padding: 40px;
-}
-
-.chatWrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.chatMessages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.msgRow {
-  display: flex;
-  width: 100%;
-}
-
-.msgLeft {
-  justify-content: flex-start;
-}
-.msgLeft .bubble {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  border-bottom-left-radius: 4px;
-}
-
-.msgRight {
-  justify-content: flex-end;
-}
-.msgRight .bubble {
-  background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.bubble {
-  max-width: 80%;
-  padding: 12px 16px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-.chatInputRow {
-  border-top: 1px solid var(--border-color);
-  padding: 16px;
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  background: rgba(0,0,0,0.1);
-}
-
-.chatInputRow textarea {
-  flex: 1;
-  resize: none;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-subtle);
-  color: var(--text-primary);
-  border-radius: 8px;
-  padding: 10px 14px;
-  height: 44px;
-  font-family: inherit;
-  font-size: 14px;
-}
-.chatInputRow textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.debriefPane {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.debriefPane h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 12px;
-}
-
-.scoreGrid {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.scoreBox {
-  flex: 1;
-  background: rgba(99, 102, 241, 0.05);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-}
-
-.scoreBox span {
-  display: block;
-  font-size: 11px;
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  color: var(--text-secondary);
-  font-weight: 600;
-  margin-bottom: 8px;
+  letter-spacing: 0.05em;
 }
 
-.scoreVal {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--primary-color);
-}
-
-.debriefSection {
-  margin-bottom: 20px;
-}
-
-.debriefSection h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
+.inputField, .selectField {
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
   color: var(--text-primary);
-  font-size: 15px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
 }
 
-.debriefSection ul {
-  margin: 0;
-  padding-left: 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
+.inputField:focus, .selectField:focus {
+  border-color: var(--primary);
 }
 
-.debriefSection p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.6;
+.dimensionsList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
 }
 
-.mediaNotice {
+.dimensionCard {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.dimensionName {
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dimensionDesc {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 0.15rem;
+}
+
+/* Device Tests */
+.deviceCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.devicePreview {
+  width: 100%;
+  height: 180px;
+  background: #0f172a;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 13px;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.userStream {
+.videoElement {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.cameraOff {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #1f2937;
+.deviceStatusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  font-size: 0.813rem;
+}
+
+.privacyNotice {
+  padding: 0.85rem;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ─── Active Simulation Workspace ─── */
+.workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  min-height: 580px;
+}
+
+.videoRoom {
+  background-color: #0f172a;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+}
+
+.mainVideo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.aiAvatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  border: 2px solid var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,0.2);
+  color: var(--primary);
 }
 
-.inputActions {
+.videoLabel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.selfVideo {
+  position: absolute;
+  bottom: 4.5rem;
+  right: 1rem;
+  width: 150px;
+  height: 100px;
+  background: #1e293b;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.videoControls {
+  height: 60px;
+  background: rgba(15, 23, 42, 0.85);
+  border-top: 1px solid var(--border-color);
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.voiceBtn {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.1);
+.ctrlBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ctrlBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.ctrlBtn.off {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.ctrlBtn.endCall {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.chatWrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chatMessages {
+  flex: 1;
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.msgRow {
+  display: flex;
+}
+
+.msgLeft {
+  justify-content: flex-start;
+}
+
+.msgRight {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.msgLeft .bubble {
+  background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
-.voiceBtn.listening {
-  background: var(--danger-color);
-  border-color: var(--danger-color);
+.msgRight .bubble {
+  background: var(--primary);
   color: #fff;
-  animation: pulse-danger 1.5s infinite;
 }
 
-@keyframes pulse-danger {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-.off {
-  background: var(--danger-color) !important;
-}
-
-.sendBtn {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  background: var(--primary-color);
-  color: white;
-  border: none;
+.chatInputRow {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border-color);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  gap: 0.5rem;
 }
 
-@media (max-width: 640px) {
-  .scoreGrid {
-    flex-direction: column;
-  }
-  .scoreBox {
-    width: 100%;
+.chatInput {
+  flex: 1;
+  padding: 0.5rem 0.85rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.813rem;
+  outline: none;
+}
+
+@media (max-width: 960px) {
+  .configGrid, .workspace {
+    grid-template-columns: 1fr;
   }
 }

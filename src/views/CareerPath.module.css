@@ -1,286 +1,281 @@
-.header {
-  margin-bottom: 32px;
-}
-
-.searchBar {
+.pageContainer {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 8px 8px 8px 16px;
-  margin-bottom: 32px;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.searchIcon {
-  color: var(--text-tertiary);
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.searchBar input {
-  flex: 1;
-  background: transparent;
-  border: none;
+.titleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pageTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
   color: var(--text-primary);
-  font-size: 16px;
-  outline: none;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  color: var(--text-secondary);
+  font-size: 0.938rem;
+}
+
+.trackSelector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-surface);
+  padding: 0.35rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.trackTab {
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.trackTab.active {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 1.5rem;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;
   }
 }
 
-.canvas {
+/* Roadmap Flow */
+.roadmapCard {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 1.25rem;
 }
 
-.pathTrack {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-}
-
-.trackTitle {
-  margin-top: 0;
-  margin-bottom: 24px;
-  color: var(--text-primary);
-  font-size: 16px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.nodesContainer {
+.roadmapTimeline {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  padding-left: 0.5rem;
 }
 
-.nodeWrapper {
+.stageRow {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 1.25rem;
+  position: relative;
+  padding-bottom: 2rem;
 }
 
-.nodeBox {
-  background-color: var(--bg-elevated);
+.stageRow:last-child {
+  padding-bottom: 0;
+}
+
+.lineConnector {
+  position: absolute;
+  left: 17px;
+  top: 36px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.stageNode {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
   border: 2px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 140px;
-}
-
-.nodeBox:hover {
-  border-color: var(--primary-light);
-  transform: translateY(-2px);
-}
-
-.nodeBox.selected {
-  border-color: var(--primary-color);
-  background-color: rgba(99, 102, 241, 0.1);
-}
-
-.nodeTitle {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.nodeTime {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.connector {
-  color: var(--text-tertiary);
-  opacity: 0.5;
-}
-
-.sideDrawer {
-  display: flex;
-  flex-direction: column;
-}
-
-.drawerCard {
-  padding: 24px;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  position: sticky;
-  top: 24px;
-}
-
-.drawerCard h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  color: var(--text-primary);
-  font-size: 20px;
-}
-
-.desc {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.section {
-  margin-bottom: 20px;
-}
-
-.section h4 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.skillsLabels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.skillTag {
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 12px;
-  color: var(--text-primary);
-}
-
-.emptyDrawer {
-  padding: 40px;
-  text-align: center;
-  color: var(--text-tertiary);
-  background-color: var(--bg-subtle);
-  border: 1px dashed var(--border-color);
-  border-radius: 12px;
-  position: sticky;
-  top: 24px;
-  font-size: 14px;
-}
-.stepsList {
-  padding-left: 20px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 8px;
-}
-
-.stepsList li {
-  margin-bottom: 8px;
-}
-
-.followUpSection {
-  margin-top: 32px;
-  padding: 24px;
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-}
-
-.followUpHeader {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-  color: var(--primary);
-}
-
-.followUpHeader h3 {
-  margin: 0;
-  font-size: 18px;
-  color: var(--text-primary);
-}
-
-.followUpHint {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-}
-
-.followUpInput {
-  display: flex;
-  gap: 12px;
-  background-color: var(--bg-subtle);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.followUpInput textarea {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 14px;
-  resize: none;
-  outline: none;
-  padding: 8px;
-}
-
-.followUpInput button {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background-color: var(--primary);
-  color: white;
-  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  align-self: flex-end;
-}
-
-.followUpInput button:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.followUpInput button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.answerBox {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-color);
-}
-
-.answerHeader {
-  font-size: 12px;
+  font-size: 0.813rem;
   font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 12px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  transition: all var(--transition-fast);
 }
 
-.answerText {
-  font-size: 14px;
-  line-height: 1.6;
+.stageRow.active .stageNode {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+.stageRow.current .stageNode {
+  border-color: var(--success);
+  background: var(--success);
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+.stageContent {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.stageContent:hover {
+  border-color: var(--primary);
+  transform: translateX(4px);
+}
+
+.stageRow.selected .stageContent {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.stageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.stageTitle {
+  font-size: 1rem;
+  font-weight: 700;
   color: var(--text-primary);
-  white-space: pre-wrap;
+}
+
+.stageTime {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.stageSummary {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Inspector Details Panel */
+.detailPane {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: fit-content;
+}
+
+.detailHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.detailTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detailSubtitle {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+}
+
+.sectionBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.blockTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.skillsPillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.skillPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.missingSkillPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-elevated);
+  color: var(--warning);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+}
+
+.jobsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.jobItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.813rem;
 }

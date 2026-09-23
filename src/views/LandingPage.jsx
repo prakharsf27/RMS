@@ -222,7 +222,7 @@ const LandingPage = () => {
         <div className={styles.heroGlow2}></div>
 
         <div className={styles.heroBadge}>
-          <span className={styles.heroBadgeDot} style={{ background: "#E17055", boxShadow: "0 0 8px rgba(225, 112, 85, 0.4)" }}></span>
+          <span className={styles.heroBadgeDot} style={{ background: "var(--primary)", boxShadow: "0 0 8px rgba(79, 70, 229, 0.4)" }}></span>
           Now in Beta · Join {globalStats.users.toLocaleString()}+ job seekers
         </div>
 
@@ -236,7 +236,7 @@ const LandingPage = () => {
 
         <div className={styles.heroCtas}>
           <Link href="/register" className={cn(styles.btnHero, styles.primary)}>
-            <Rocket size={16} color="#E17055" />
+            <Rocket size={16} color="#6366f1" />
             Start for free — no card needed
           </Link>
           <a href="#features" className={cn(styles.btnHero, styles.secondary)}>
@@ -398,8 +398,8 @@ const LandingPage = () => {
                   </div>
                   <div className={styles.intBarRow}>
                     <div className={styles.intBarLbl}>Depth</div>
-                    <div className={styles.intBarOuter}><div className={styles.intBarFill} style={{ width: "93%", background: "linear-gradient(90deg, #1E3A8A, #E17055)" }}></div></div>
-                    <span className={styles.intBarVal} style={{ color: "#E17055" }}>93%</span>
+                    <div className={styles.intBarOuter}><div className={styles.intBarFill} style={{ width: "93%", background: "linear-gradient(90deg, #1E3A8A, #6366f1)" }}></div></div>
+                    <span className={styles.intBarVal} style={{ color: "#6366f1" }}>93%</span>
                   </div>
                   <div className={styles.intScoreRow}>
                     <div className={styles.intScoreBox}>
@@ -416,14 +416,14 @@ const LandingPage = () => {
           {/* Resume Builder */}
           <div className={cn(styles.bentoCard, styles.span4)}>
             <Reveal delay={0.1}>
-              <div className={styles.bentoIcon} style={{ background: "rgba(225, 112, 85, 0.1)" }}>
-                <FileText size={22} color="#E17055" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(99, 102, 241, 0.1)" }}>
+                <FileText size={22} color="#6366f1" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>AI Resume Builder</div>
               <div className={styles.bentoDesc}>Build, tailor, and score your resume with AI. Paste any job description and watch every bullet rewrite itself to match.</div>
               <div className={cn(styles.featPreview, styles.resPreviewContainer)}>
                 <div className={styles.resPreview}>
-                  <div className={styles.resName}>Prakhar Singh</div>
+                  <div className={styles.resName}>Aarav Sharma</div>
                   <div className={styles.resRoleText}>SENIOR FRONTEND ENGINEER</div>
                   <div className={styles.resSection}>EXPERIENCE</div>
                   <div className={styles.resBullet}>Led React migration saving 40% bundle size across 3 product teams</div>
@@ -452,9 +452,9 @@ const LandingPage = () => {
               <div className={styles.featPreview}>
                 <div className={styles.trkPreview}>
                   {[
-                    { co: "Stripe", role: "Frontend Eng", status: "Interviewing", color: "#635bff", badge: { bg: "rgba(16,185,129,0.15)", text: "#34d399" }, day: 3 },
-                    { co: "Linear", role: "Designer", status: "Viewed", color: "#5e6ad2", badge: { bg: "rgba(245,158,11,0.15)", text: "#fbbf24" }, day: 7 },
-                    { co: "Figma", role: "UI Eng", status: "Ghosted", color: "#a259ff", badge: { bg: "rgba(239,68,68,0.15)", text: "#f87171" }, day: 21 }
+                    { co: "TalentFlow", role: "Frontend Eng", status: "Interviewing", color: "#635bff", badge: { bg: "rgba(16,185,129,0.15)", text: "#34d399" }, day: 3 },
+                    { co: "Nova Systems", role: "Designer", status: "Viewed", color: "#5e6ad2", badge: { bg: "rgba(245,158,11,0.15)", text: "#fbbf24" }, day: 7 },
+                    { co: "Apex Cloud", role: "UI Eng", status: "Ghosted", color: "#a259ff", badge: { bg: "rgba(239,68,68,0.15)", text: "#f87171" }, day: 21 }
                   ].map((item, i) => (
                     <div key={i} className={styles.trkRow}>
                       <div className={styles.trkCoIco} style={{ background: item.color }}>{item.co[0]}</div>
@@ -471,8 +471,8 @@ const LandingPage = () => {
           {/* Salary Intelligence */}
           <div className={cn(styles.bentoCard, styles.span4)}>
             <Reveal delay={0.1}>
-              <div className={styles.bentoIcon} style={{ background: "rgba(225, 112, 85, 0.1)" }}>
-                <DollarSign size={22} color="#E17055" strokeWidth={1.8} />
+              <div className={styles.bentoIcon} style={{ background: "rgba(99, 102, 241, 0.1)" }}>
+                <DollarSign size={22} color="#6366f1" strokeWidth={1.8} />
               </div>
               <div className={styles.bentoTitle}>Salary Intelligence</div>
               <div className={styles.bentoDesc}>See real salary bands before you apply. Then let AI coach you on how to negotiate your offer with actual leverage points.</div>
@@ -624,23 +624,23 @@ const LandingPage = () => {
             { 
               name: "Arjun Reddy", 
               role: "Senior Frontend Engineer", 
-              co: "Stripe", 
-              quote: "The interview simulator is genuinely scary good. It asked me the exact question Stripe asked in my actual interview — word for word.",
+              co: "TalentFlow Technologies", 
+              quote: "The interview simulator is genuinely scary good. It asked me the exact question asked in my actual technical architecture round — word for word.",
               initials: "AR",
-              grad: "linear-gradient(135deg,#1E3A8A,#E17055)"
+              grad: "linear-gradient(135deg, #1E3A8A, #6366f1)"
             },
             { 
               name: "Sana Khan", 
               role: "Product Designer", 
-              co: "Figma", 
+              co: "Vertex Labs", 
               quote: "I went from 0 callbacks in 3 weeks to 4 interviews in one week. The resume tailor found keywords I'd never have thought to include.",
               initials: "SK",
-              grad: "rgba(225, 112, 85, 0.15)"
+              grad: "rgba(99, 102, 241, 0.15)"
             },
             { 
               name: "Marcus Powell", 
               role: "Full Stack Engineer", 
-              co: "Vercel", 
+              co: "Nova Systems", 
               quote: "The ghosting tracker changed everything for me. I actually negotiated a $22K higher offer using the salary tool.",
               initials: "MP",
               grad: "rgba(30, 58, 138, 0.15)"
@@ -649,7 +649,7 @@ const LandingPage = () => {
             <div key={i} className={styles.testiCard}>
               <Reveal delay={i * 0.1}>
                 <div className={styles.testiStars}>
-                  {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="#E17055" color="#E17055" />)}
+                  {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="#f59e0b" color="#f59e0b" />)}
                 </div>
                 <p className={styles.testiQuote}>"{item.quote}"</p>
                 <div className={styles.testiPerson}>
@@ -742,7 +742,7 @@ const LandingPage = () => {
             <p className={styles.ctaSub}>Join {globalStats.users.toLocaleString()}+ candidates who landed interviews at dream companies. Start free in under 60 seconds.</p>
             <div className={styles.ctaBtns}>
               <Link href="/login" className={cn(styles.btnHero, styles.primary)}>
-                <Rocket size={16} color="#E17055" />
+                <Rocket size={16} color="#6366f1" />
                 Get started — it's free
               </Link>
               <button className={cn(styles.btnHero, styles.secondary)} style={{ borderColor: "rgba(255,255,255,0.25)", color: "#c7d2fe" }}>

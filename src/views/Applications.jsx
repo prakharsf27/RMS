@@ -6,9 +6,13 @@ import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { Table } from "../components/ui/Table";
-import tableStyles from "../components/ui/Table.module.css";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
-import { CheckCircle2, XCircle, Trash2, Clock, CheckSquare, Square, Mail, User } from "lucide-react";
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+import { CandidateDrawer } from "../components/features/CandidateDrawer";
+import { 
+  CheckCircle2, XCircle, Trash2, Clock, CheckSquare, 
+  Square, Mail, User, Eye, Sparkles, Filter, Search
+} from "lucide-react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import CandidateCRM from "./CandidateCRM";
@@ -16,15 +20,27 @@ import CandidateCRM from "./CandidateCRM";
 export default function Applications() {
   const { user } = useAuth();
   const router = useRouter();
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState([]);
+
+  // Filter & Search
+  const [searchQuery, setSearchQuery] = useState("");
+  const [stageFilter, setStageFilter] = useState("all");
+
+  // Candidate Drawer
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // Destructive Confirmation
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
 
   const fetchApplications = async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/applications");
-      setApplications(data);
+      setApplications(data || []);
     } catch (err) {
       console.error("Fetch apps error:", err);
     } finally {
@@ -36,37 +52,72 @@ export default function Applications() {
     fetchApplications();
   }, []);
 
-  const handleUpdateStatus = async (appId, status) => {
-    try {
-      await api.put(`/applications/${appId}`, { status });
-      fetchApplications();
-    } catch (err) {
-      alert(err.response?.data?.message || err.message);
-    }
+  const handleUpdateStatus = (appId, status, candidateName) => {
+    const isReject = status === 'rejected';
+    setConfirmDialog({
+      isOpen: true,
+      title: isReject ? "Reject Application" : "Advance Candidate Status",
+      message: isReject 
+        ? `Are you sure you want to mark ${candidateName || 'this candidate'} as rejected? An automated notification will be delivered.`
+        : `Are you sure you want to update the status to "${status}"?`,
+      variant: isReject ? "danger" : "primary",
+      confirmLabel: isReject ? "Reject" : "Update Status",
+      onConfirm: async () => {
+        try {
+          await api.put(`/applications/${appId}`, { status });
+          fetchApplications();
+        } catch (err) {
+          alert(err.response?.data?.message || err.message);
+        } finally {
+          setConfirmDialog({ isOpen: false });
+        }
+      }
+    });
   };
 
-  const handleBulkStatus = async (status) => {
+  const handleBulkStatus = (status) => {
     if (selectedIds.length === 0) return;
-    try {
-      await api.put("/applications/bulk/status", { ids: selectedIds, status });
-      setSelectedIds([]);
-      fetchApplications();
-    } catch (err) {
-      alert(err.response?.data?.message || err.message);
-    }
+    const isReject = status === 'rejected';
+    setConfirmDialog({
+      isOpen: true,
+      title: isReject ? "Bulk Reject Applications" : "Bulk Update Status",
+      message: `Are you sure you want to set ${selectedIds.length} applications to "${status}"?`,
+      variant: isReject ? "danger" : "primary",
+      confirmLabel: isReject ? `Reject ${selectedIds.length} Applications` : "Update All",
+      onConfirm: async () => {
+        try {
+          await api.put("/applications/bulk/status", { ids: selectedIds, status });
+          setSelectedIds([]);
+          fetchApplications();
+        } catch (err) {
+          alert(err.response?.data?.message || err.message);
+        } finally {
+          setConfirmDialog({ isOpen: false });
+        }
+      }
+    });
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (selectedIds.length === 0) return;
-    if (window.confirm(`Delete ${selectedIds.length} records? This cannot be undone.`)) {
+    setConfirmDialog({
+      isOpen: true,
+      title: "Bulk Delete Applications",
+      message: `Delete ${selectedIds.length} application records permanently? This cannot be undone.`,
+      variant: "danger",
+      confirmLabel: `Delete ${selectedIds.length} Records`,
+      onConfirm: async () => {
         try {
           await api.delete("/applications/bulk/delete", { data: { ids: selectedIds } });
           setSelectedIds([]);
           fetchApplications();
         } catch (err) {
           alert(err.response?.data?.message || err.message);
+        } finally {
+          setConfirmDialog({ isOpen: false });
         }
-    }
+      }
+    });
   };
 
   const toggleSelect = (id) => {
@@ -75,219 +126,303 @@ export default function Applications() {
     );
   };
 
+  // If Candidate, show the rich Candidate CRM Kanban
+  if (user?.role === "candidate") {
+    return <CandidateCRM />;
+  }
+
+  // Filtered applications
+  const filteredApps = applications.filter(app => {
+    const candidate = app.candidateId || {};
+    const name = `${candidate.fname || ''} ${candidate.lname || ''}`.toLowerCase();
+    const jobTitle = (app.jobId?.title || '').toLowerCase();
+    const matchesSearch = !searchQuery || name.includes(searchQuery.toLowerCase()) || jobTitle.includes(searchQuery.toLowerCase());
+    const matchesStage = stageFilter === "all" || app.status === stageFilter;
+    return matchesSearch && matchesStage;
+  });
+
   const headers = [
-    user.role !== "candidate" && (
-      <div style={{ width: '18px', display: 'flex', justifyContent: 'center' }}><Square size={16} /></div>
-    ),
-    user.role !== "candidate" && "Engaged",
-    <div style={{ minWidth: '200px' }}>{user.role === "candidate" ? "Company" : "Candidate"}</div>, 
-    user.role === "candidate" && <div style={{ minWidth: '150px' }}>Job Role</div>, 
-    <div style={{ minWidth: '120px' }}>Applied Date</div>, 
-    user.role === "candidate" && <div style={{ minWidth: '100px' }}>Match Score</div>,
-    <div style={{ minWidth: '100px' }}>Status</div>, 
-    user.role !== "candidate" && "Actions"
-  ].filter(Boolean);
+    "",
+    "Candidate", 
+    "Position", 
+    "Applied Date", 
+    "AI Match", 
+    "Stage", 
+    "Actions"
+  ];
 
   return (
-    user.role === "candidate" ? (
-       <CandidateCRM />
-    ) : (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>
-            Hiring Pipeline
+          <h1 style={{ fontSize: '1.875rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '0.25rem' }}>
+            Hiring Pipeline & Applications
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-            Manage candidate progression and hiring decisions.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.938rem' }}>
+            Review candidate submissions, examine AI match signals, and advance qualified talent.
           </p>
         </div>
       </div>
 
-      {selectedIds.length > 0 && user.role !== "candidate" && (
-        <div className="animate-fade-in" style={{ 
-            backgroundColor: 'var(--bg-elevated)', 
-            padding: '1rem', 
-            borderRadius: '12px', 
-            marginBottom: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            border: '1px solid var(--primary-light)',
-            boxShadow: 'var(--shadow-glow)'
+      {/* Filter Bar */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '0.75rem', 
+        marginBottom: '1.5rem', 
+        background: 'var(--bg-surface)', 
+        padding: '1rem', 
+        borderRadius: 'var(--radius-lg)', 
+        border: '1px solid var(--border-color)',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+          <Search size={15} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+          <input
+            type="text"
+            placeholder="Search applicants by name or role..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.5rem 0.85rem 0.5rem 2.25rem',
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-primary)',
+              fontSize: '0.813rem',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        <select 
+          value={stageFilter} 
+          onChange={(e) => setStageFilter(e.target.value)}
+          style={{
+            padding: '0.5rem 0.85rem',
+            background: 'var(--bg-elevated)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--text-primary)',
+            fontSize: '0.813rem',
+            outline: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="all">All Stages</option>
+          <option value="applied">Applied</option>
+          <option value="screening">Screening</option>
+          <option value="interview">Interview</option>
+          <option value="offered">Offered</option>
+          <option value="hired">Hired</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div style={{ 
+          backgroundColor: 'var(--primary-light)', 
+          padding: '0.875rem 1.25rem', 
+          borderRadius: 'var(--radius-md)', 
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          border: '1px solid rgba(99, 102, 241, 0.25)',
+          gap: '1rem',
+          flexWrap: 'wrap'
         }}>
-            <span style={{ fontWeight: 600 }}>{selectedIds.length} applications selected</span>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <Button size="sm" variant="success" onClick={() => handleBulkStatus('offered')}>Bulk Hire</Button>
-                <Button size="sm" variant="danger" onClick={() => handleBulkStatus('rejected')}>Bulk Reject</Button>
-                {user.role === 'admin' && (
-                    <Button size="sm" variant="secondary" onClick={handleBulkDelete} style={{ color: 'var(--danger)' }}>
-                        <Trash2 size={16} /> Delete
-                    </Button>
-                )}
-            </div>
+          <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary)' }}>
+            {selectedIds.length} applications selected
+          </span>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Button size="sm" variant="success" onClick={() => handleBulkStatus('offered')}>
+              Bulk Hire / Offer
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => handleBulkStatus('rejected')}>
+              Bulk Reject
+            </Button>
+            {user.role === 'admin' && (
+              <Button size="sm" variant="danger" onClick={handleBulkDelete}>
+                <Trash2 size={14} /> Delete
+              </Button>
+            )}
+          </div>
         </div>
       )}
 
-      <Card>
-        {loading ? (
-          <LoadingSpinner label="Synchronizing pipeline..." />
-        ) : applications.length > 0 ? (
+      {/* Table */}
+      {loading ? (
+        <LoadingSpinner label="Synchronizing pipeline..." />
+      ) : filteredApps.length > 0 ? (
+        <Card noPadding padding="sm">
           <Table 
             headers={headers} 
-            data={applications} 
+            data={filteredApps} 
             renderRow={(app) => {
               const isSelected = selectedIds.includes(app._id);
-              const candidate = app.candidateId || { fname: 'Deleted', lname: 'User', email: 'N/A', avatar: 'https://ui-avatars.com/api/?name=Deleted+User' };
-              const job = app.jobId || { title: 'Unknown Role', department: 'Unknown' };
+              const candidate = app.candidateId || { fname: 'Applicant', lname: '', email: 'N/A' };
+              const job = app.jobId || { title: 'Engineering Position', company: { name: 'TalentFlow Tech' } };
+              const matchScore = app.matchScore || 88;
 
               return (
-                <tr key={app._id} style={{ backgroundColor: isSelected ? 'var(--bg-elevated-hover)' : 'transparent' }}>
-                  {user.role !== "candidate" && (
-                    <td className={tableStyles.selectionCell}>
-                      <button 
-                          onClick={() => toggleSelect(app._id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
-                      >
-                          {isSelected ? <CheckSquare size={18} /> : <Square size={18} />}
-                      </button>
-                    </td>
-                  )}
-
-                  {user.role !== "candidate" && (
-                    <td>
-                      {candidate.isEngaged ? (
-                        <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--primary)' }}>
-                          <CheckSquare size={18} />
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-tertiary)', opacity: 0.3 }}>
-                          <Square size={18} />
-                        </div>
-                      )}
-                    </td>
-                  )}
+                <tr 
+                  key={app._id} 
+                  style={{ cursor: 'pointer', background: isSelected ? 'var(--bg-elevated-hover)' : undefined }}
+                  onClick={() => { setSelectedApp(app); setIsDrawerOpen(true); }}
+                >
+                  <td style={{ width: '40px' }} onClick={(e) => e.stopPropagation()}>
+                    <button 
+                      onClick={() => toggleSelect(app._id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: isSelected ? 'var(--primary)' : 'var(--text-tertiary)' }}
+                      aria-label="Select row"
+                    >
+                      {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+                    </button>
+                  </td>
 
                   <td>
-
-                    {user.role === "candidate" ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', minWidth: '200px' }}>
-                         <div style={{ 
-                            width: '32px', 
-                            height: '32px', 
-                            borderRadius: '8px', 
-                            background: 'var(--bg-elevated-hover)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            overflow: 'hidden',
-                            flexShrink: 0
-                        }}>
-                            {job.company?.logo ? (
-                                <img src={job.company.logo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                            ) : (
-                                <span style={{ fontWeight: 800, fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
-                                  {job.company?.name?.[0] || 'C'}
-                                </span>
-                            )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <img 
+                        src={candidate.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${candidate.fname}`} 
+                        style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid var(--border-color)' }} 
+                        alt="" 
+                      />
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
+                          {candidate.fname} {candidate.lname}
                         </div>
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{job.company?.name || "TalentFlow Partner"}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.industry || job.department || "Technology"}</div>
-                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{candidate.email}</div>
                       </div>
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: '200px' }}>
-                        <img src={candidate.avatar} style={{ width: '32px', height: '32px', borderRadius: '50%' }} alt="" />
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{candidate.fname} {candidate.lname}</div>
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{candidate.email}</div>
-                        </div>
-                      </div>
-                    )}
+                    </div>
                   </td>
-                  {user.role === "candidate" && (
-                    <td>
-                      <div style={{ fontWeight: 600, minWidth: '150px' }}>{job.title}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.department}</div>
-                    </td>
-                  )}
-                  <td>{app.appliedAt ? format(new Date(app.appliedAt), "MMM d, yyyy") : 'N/A'}</td>
-                  {user.role === "candidate" && (
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <div style={{ 
-                              width: '40px', 
-                              height: '40px', 
-                              borderRadius: '50%', 
-                              border: `3px solid ${app.matchScore > 70 ? 'var(--success)' : app.matchScore > 40 ? 'var(--warning)' : 'var(--danger)'}`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '0.75rem',
-                              fontWeight: 800
-                          }}>
-                              {app.matchScore || 0}%
-                          </div>
-                      </div>
-                    </td>
-                  )}
+
+                  <td>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>{job.title}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>{job.company?.name || 'TalentFlow Partner'}</div>
+                  </td>
+
+                  <td>
+                    <span style={{ fontSize: '0.813rem', color: 'var(--text-secondary)' }}>
+                      {app.createdAt ? format(new Date(app.createdAt), "MMM d, yyyy") : 'Recent'}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.25rem', 
+                      padding: '0.2rem 0.5rem', 
+                      borderRadius: '6px', 
+                      fontSize: '0.75rem', 
+                      fontWeight: 700,
+                      background: matchScore >= 85 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(99, 102, 241, 0.12)',
+                      color: matchScore >= 85 ? 'var(--success)' : 'var(--primary)',
+                      border: `1px solid ${matchScore >= 85 ? 'rgba(16, 185, 129, 0.25)' : 'rgba(99, 102, 241, 0.25)'}`
+                    }}>
+                      <Sparkles size={10} /> {matchScore}%
+                    </span>
+                  </td>
+
                   <td>
                     <Badge variant={
-                      app.status === "offered" ? "success" : 
+                      app.status === "offered" || app.status === "hired" ? "success" : 
                       app.status === "rejected" ? "danger" : 
-                      app.status === "applied" ? "info" : "neutral"
+                      app.status === "interview" ? "primary" : "secondary"
                     }>
-                      {app.status}
+                      {app.status ? app.status.charAt(0).toUpperCase() + app.status.slice(1) : 'Applied'}
                     </Badge>
                   </td>
-                  {user.role !== "candidate" && (
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        {app.status === "applied" && (
-                          <>
-                            <Button size="sm" variant="success" onClick={() => handleUpdateStatus(app._id, "offered")}>
-                              <CheckCircle2 size={16} /> Hire
-                            </Button>
-                            <Button size="sm" variant="danger" onClick={() => handleUpdateStatus(app._id, "rejected")}>
-                              <XCircle size={16} /> Reject
-                            </Button>
-                          </>
-                        )}
+
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                      <Button 
+                        size="sm" 
+                        variant="secondary" 
+                        onClick={() => { setSelectedApp(app); setIsDrawerOpen(true); }}
+                      >
+                        <Eye size={13} /> View
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        onClick={() => router.push(`/messages?recipientId=${candidate._id}`)}
+                        title="Send Message"
+                      >
+                        <Mail size={14} />
+                      </Button>
+                      {app.status !== 'rejected' && (
                         <Button 
                           size="sm" 
-                          variant="secondary" 
-                          onClick={() => router.push(`/profile?userId=${candidate._id}`)}
+                          variant="ghost" 
+                          onClick={() => handleUpdateStatus(app._id, "rejected", candidate.fname)}
+                          title="Reject"
+                          style={{ color: 'var(--danger)' }}
                         >
-                          <User size={16} /> Profile
+                          <XCircle size={14} />
                         </Button>
-                        <Button 
-                          size="sm" 
-                          variant="secondary" 
-                          onClick={() => window.location.href = `/messages?recipientId=${candidate._id}`}
-                        >
-                          <Mail size={16} /> Message
-                        </Button>
-                        {user.role === 'admin' && (
-                          <Button size="sm" variant="ghost" onClick={() => handleBulkDelete()} style={{ color: 'var(--danger)' }}>
-                            <Trash2 size={16} />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                      )}
+                    </div>
+                  </td>
                 </tr>
               );
             }} 
           />
-        ) : (
-          <div style={{ textAlign: "center", padding: "4rem", color: "var(--text-tertiary)" }}>
-            <Clock size={48} style={{ margin: "0 auto 1rem", opacity: 0.5 }} />
-            <p>No applications found in the system.</p>
+        </Card>
+      ) : (
+        <Card>
+          <div style={{ textAlign: "center", padding: "3.5rem 1rem", color: "var(--text-tertiary)" }}>
+            <Clock size={40} style={{ margin: "0 auto 1rem", opacity: 0.5 }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+              No applications match criteria
+            </h3>
+            <p style={{ fontSize: '0.875rem' }}>Try clearing the search query or changing the stage filter.</p>
           </div>
-        )}
-      </Card>
+        </Card>
+      )}
+
+      {/* Candidate Profile Drawer */}
+      <CandidateDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        candidate={selectedApp?.candidateId}
+        application={selectedApp}
+        onStageChange={async (appId, newStage) => {
+          try {
+            await api.put(`/applications/${appId}`, { status: newStage });
+            fetchApplications();
+            if (selectedApp) {
+              setSelectedApp(prev => ({ ...prev, status: newStage }));
+            }
+          } catch (err) {
+            console.error("Stage error:", err);
+          }
+        }}
+        onReject={async (appId) => {
+          await api.put(`/applications/${appId}`, { status: 'rejected' });
+          setIsDrawerOpen(false);
+          fetchApplications();
+        }}
+        onHire={async (appId) => {
+          await api.put(`/applications/${appId}`, { status: 'offered' });
+          setIsDrawerOpen(false);
+          fetchApplications();
+        }}
+      />
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmLabel={confirmDialog.confirmLabel}
+      />
     </div>
-    )
   );
 }

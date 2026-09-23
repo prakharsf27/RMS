@@ -1,0 +1,55 @@
+.dialogModal {
+  max-width: 480px !important;
+}
+
+.body {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0 1.5rem 0;
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.danger {
+  background-color: var(--danger-light, rgba(239, 68, 68, 0.1));
+  color: var(--danger, #ef4444);
+}
+
+.warning {
+  background-color: var(--warning-light, rgba(245, 158, 11, 0.1));
+  color: var(--warning, #f59e0b);
+}
+
+.primary {
+  background-color: var(--primary-light, #e0e7ff);
+  color: var(--primary-accent, #4f46e5);
+}
+
+.textWrap {
+  flex: 1;
+}
+
+.message {
+  font-size: 14px;
+  color: var(--text-secondary, #475569);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  padding-top: 1.25rem;
+}

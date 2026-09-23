@@ -2,22 +2,20 @@
 import { useState, useEffect } from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-;
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import api from "../../lib/api";
 import { cn } from "../../lib/utils";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 import {
-  Home,
   LayoutDashboard,
   Briefcase,
   Users,
   FileText,
   Calendar,
-  BarChart,
+  BarChart3,
   ShieldAlert,
   LogOut,
-  Mail,
   Building,
   User,
   Sun,
@@ -27,22 +25,37 @@ import {
   Sparkles,
   Inbox,
   Video,
-  Menu,
-  Map
+  ChevronLeft,
+  ChevronRight,
+  Map,
+  Shield,
+  Layers,
+  Compass
 } from "lucide-react";
-
 import styles from "./Sidebar.module.css";
 
 export const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(JSON.parse(localStorage.getItem("rms_sidebar_collapsed") || "false"));
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("rms_sidebar_collapsed", JSON.stringify(isCollapsed));
-  }, [isCollapsed]);
+    try {
+      const saved = localStorage.getItem("rms_sidebar_collapsed");
+      if (saved) setIsCollapsed(JSON.parse(saved));
+    } catch (e) {}
+  }, []);
+
+  const toggleCollapse = () => {
+    const next = !isCollapsed;
+    setIsCollapsed(next);
+    try {
+      localStorage.setItem("rms_sidebar_collapsed", JSON.stringify(next));
+    } catch (e) {}
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -52,7 +65,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
         const total = data.reduce((acc, conv) => acc + (conv.unreadCount || 0), 0);
         setUnreadMessages(total);
       } catch (err) {
-        console.error("Fetch unread messages error:", err);
+        // silent fail
       }
     };
     fetchUnread();
@@ -60,23 +73,36 @@ export const Sidebar = ({ isOpen, onClose }) => {
     return () => clearInterval(interval);
   }, [user]);
 
-
   const navLinks = [
-    { href: "/", icon: Home, label: "Home", roles: ["admin", "recruiter", "candidate"] },
+    // Core
     { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "recruiter", "candidate"] },
-    { href: "/jobs", icon: Briefcase, label: "Jobs", roles: ["admin", "recruiter", "candidate"] },
-    { href: "/company", icon: Building, label: "Company", roles: ["recruiter"] },
-    { href: "/candidates", icon: Users, label: "Candidates", roles: ["admin", "recruiter"] },
-    { href: "/applications", icon: FileText, label: "Applications", roles: ["admin", "recruiter", "candidate"] },
-    { href: "/messages", icon: MessageSquare, label: "Messages", roles: ["admin", "recruiter", "candidate"], badge: unreadMessages },
+    
+    // Candidate Workflow
+    { href: "/jobs", icon: Briefcase, label: "Browse Jobs", roles: ["candidate"] },
+    { href: "/applications", icon: Layers, label: "Application Tracker", roles: ["candidate"] },
     { href: "/resume-ai", icon: Sparkles, label: "Resume AI", roles: ["candidate"] },
-    { href: "/recruiter-inbox", icon: Inbox, label: "ATS Validator", roles: ["candidate"] },
+    { href: "/recruiter-inbox", icon: Inbox, label: "ATS Checker", roles: ["candidate"] },
     { href: "/interview-simulator", icon: Video, label: "Mock Interview", roles: ["candidate"] },
-    { href: "/career-path", icon: Map, label: "Career Path", roles: ["candidate"] },
-    { href: "/interviews", icon: Calendar, label: "Interviews", roles: ["admin", "recruiter", "candidate"] },
-    { href: "/reports", icon: BarChart, label: "Reports", roles: ["admin", "recruiter"] },
-    { href: "/verification", icon: ShieldAlert, label: "Verification", roles: ["admin"] },
-    { href: "/profile", icon: User, label: "Profile", roles: ["candidate"] }
+    { href: "/career-path", icon: Compass, label: "Career Path", roles: ["candidate"] },
+    { href: "/interviews", icon: Calendar, label: "My Interviews", roles: ["candidate"] },
+    { href: "/messages", icon: MessageSquare, label: "Messages", roles: ["candidate"], badge: unreadMessages },
+    { href: "/profile", icon: User, label: "Profile", roles: ["candidate"] },
+
+    // Recruiter Workflow
+    { href: "/candidates", icon: Users, label: "Candidates", roles: ["recruiter"] },
+    { href: "/jobs", icon: Briefcase, label: "Job Postings", roles: ["recruiter"] },
+    { href: "/applications", icon: Layers, label: "Hiring Pipeline", roles: ["recruiter"] },
+    { href: "/interviews", icon: Calendar, label: "Interviews", roles: ["recruiter"] },
+    { href: "/messages", icon: MessageSquare, label: "Messages", roles: ["recruiter"], badge: unreadMessages },
+    { href: "/company", icon: Building, label: "Company Profile", roles: ["recruiter"] },
+    { href: "/reports", icon: BarChart3, label: "Reports & Analytics", roles: ["recruiter"] },
+
+    // Admin Workflow
+    { href: "/candidates", icon: Users, label: "User Management", roles: ["admin"] },
+    { href: "/jobs", icon: Briefcase, label: "Platform Jobs", roles: ["admin"] },
+    { href: "/verification", icon: ShieldAlert, label: "Company Verification", roles: ["admin"] },
+    { href: "/audit", icon: Shield, label: "Security & Audit Logs", roles: ["admin"] },
+    { href: "/reports", icon: BarChart3, label: "Platform Reports", roles: ["admin"] },
   ];
 
   const allowedLinks = navLinks.filter(link => link.roles.includes(user?.role));
@@ -85,66 +111,132 @@ export const Sidebar = ({ isOpen, onClose }) => {
     if (onClose) onClose();
   };
 
+  const getRoleDisplayName = (r) => {
+    if (r === 'candidate') return 'Candidate';
+    if (r === 'recruiter') return 'Recruiter';
+    if (r === 'admin') return 'Admin';
+    return r;
+  };
+
   return (
-    <aside className={cn(
-      styles.sidebar, 
-      isOpen && styles.open,
-      isCollapsed && styles.collapsed
-    )}>
-      <div className={styles.logo}>
-        <button 
-           className={styles.collapseToggle} 
-           onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-           <Menu size={18} className={isCollapsed ? styles.rotated : ""} />
-        </button>
-        <img src="/logo.png" className={styles.logoImg} alt="TalentFlow AI" />
-        <span className={styles.logoText}>TalentFlow AI</span>
-        <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
-          <X size={20} />
-        </button>
-      </div>
-
-      <nav className={styles.nav}>
-        {allowedLinks.map((link) => {
-          const isActive = pathname === link.href;
-          const displayLabel = (link.href === "/candidates" && user?.role === "admin") ? "Users" : link.label;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={handleNavClick}
-              className={cn(styles.navItem, isActive && styles.active)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                <link.icon size={20} />
-                <span className={styles.linkText}>{displayLabel}</span>
+    <>
+      <aside className={cn(
+        styles.sidebar, 
+        isOpen && styles.open,
+        isCollapsed && styles.collapsed
+      )}>
+        {/* Brand Header */}
+        <div className={styles.logo}>
+          <Link href="/dashboard" className={styles.brandLink}>
+            <div className={styles.brandIcon}>
+              <span className={styles.brandLetter}>T</span>
+              <span className={styles.brandDot}></span>
+            </div>
+            {!isCollapsed && (
+              <div className={styles.brandMeta}>
+                <span className={styles.brandName}>TalentFlow</span>
+                <span className={styles.brandBadge}>AI</span>
               </div>
-              {link.badge > 0 && (
-                <span className={styles.navBadge}>{link.badge}</span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+            )}
+          </Link>
 
-      <div className={styles.footer}>
-        <button className={styles.themeToggle} onClick={toggleTheme}>
-           {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-           <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
-        </button>
-        <div className={styles.userInfo}>
-          <img src={user.avatar} alt="Avatar" className={styles.avatar} />
-          <div className={styles.userDetails}>
-            <span className={styles.userName}>{user.fname} {user.lname}</span>
-            <span className={styles.userRole}>{user.role}</span>
-          </div>
+          <button 
+            className={styles.collapseToggle} 
+            onClick={toggleCollapse}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
+
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Close menu">
+            <X size={18} />
+          </button>
         </div>
-        <button onClick={logout} className={styles.logoutBtn}>
-          <LogOut size={18} />
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
+
+        {/* Workspace Role Label */}
+        {!isCollapsed && (
+          <div className={styles.workspaceLabel}>
+            <span>{getRoleDisplayName(user?.role)} Workspace</span>
+          </div>
+        )}
+
+        {/* Navigation List */}
+        <nav className={styles.nav}>
+          {allowedLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                onClick={handleNavClick}
+                className={cn(styles.navItem, isActive && styles.active)}
+                title={isCollapsed ? link.label : undefined}
+              >
+                <link.icon size={18} className={styles.navIcon} />
+                {!isCollapsed && <span className={styles.linkText}>{link.label}</span>}
+                {link.badge > 0 && (
+                  <span className={styles.navBadge}>
+                    {link.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* User Card & Actions Footer */}
+        <div className={styles.footer}>
+          <button 
+            className={styles.themeToggle} 
+            onClick={toggleTheme}
+            aria-label="Toggle color theme"
+            title="Toggle color theme"
+          >
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            {!isCollapsed && <span>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>}
+          </button>
+
+          <div className={styles.userInfo}>
+            <img 
+              src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.fname || 'User'}+${user?.lname || ''}&background=6366f1&color=fff`} 
+              alt="Avatar" 
+              className={styles.avatar} 
+            />
+            {!isCollapsed && (
+              <div className={styles.userDetails}>
+                <span className={styles.userName}>{user?.fname} {user?.lname}</span>
+                <span className={styles.userRole}>{getRoleDisplayName(user?.role)}</span>
+              </div>
+            )}
+          </div>
+
+          <button 
+            onClick={() => setShowLogoutConfirm(true)} 
+            className={styles.logoutBtn}
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut size={16} />
+            {!isCollapsed && <span>Sign Out</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Confirmed Sign Out Dialog */}
+      <ConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={() => {
+          setShowLogoutConfirm(false);
+          logout();
+        }}
+        title="Sign Out of TalentFlow"
+        message="Are you sure you want to end your session? You will be redirected to the sign-in screen."
+        confirmLabel="Sign Out"
+        cancelLabel="Stay Logged In"
+        variant="danger"
+      />
+    </>
   );
 };

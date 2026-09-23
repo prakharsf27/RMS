@@ -84,12 +84,17 @@ export const AppLayout = ({ children, noPadding = false }) => {
           </div>
 
           <div className={styles.actions}>
+            <span className={styles.rolePill}>
+              {user.role === 'admin' ? 'Admin Console' : user.role === 'recruiter' ? 'Recruiter ATS' : 'Candidate Portal'}
+            </span>
+
             <div style={{ position: 'relative' }}>
               <button 
                 className={styles.iconBtn} 
                 onClick={() => setShowNotifications(!showNotifications)}
+                aria-label="View notifications"
               >
-                <Bell size={20} />
+                <Bell size={18} />
                 {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
               </button>
               
@@ -104,6 +109,19 @@ export const AppLayout = ({ children, noPadding = false }) => {
                 />
               )}
             </div>
+
+            <button 
+              className={styles.userBtn}
+              onClick={() => router.push('/profile')}
+              title="View profile settings"
+            >
+              <img 
+                src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.fname || 'user'}`}
+                alt=""
+                className={styles.headerAvatar}
+              />
+              <span className={styles.headerUserName}>{user.fname}</span>
+            </button>
           </div>
         </header>
 

@@ -8,10 +8,10 @@
   flex: 1;
   display: flex;
   background-color: var(--bg-elevated);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Sidebar */
@@ -24,23 +24,24 @@
 }
 
 .sidebarHeader {
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-bottom: 1px solid var(--border-color);
-}
-
-.sidebarHeader h2 {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
 }
 
 .searchBar {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: var(--bg-elevated-hover);
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
+  background-color: var(--bg-subtle);
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   color: var(--text-tertiary);
+  transition: border-color 0.2s;
+}
+
+.searchBar:focus-within {
+  border-color: var(--ai-accent);
 }
 
 .searchBar input {
@@ -203,15 +204,17 @@
 .messageBubble {
   max-width: 70%;
   padding: 0.75rem 1rem;
-  background-color: var(--bg-elevated-hover);
-  border-radius: 16px 16px 16px 4px;
-  box-shadow: var(--shadow-sm);
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: 12px 12px 12px 2px;
+  box-shadow: var(--shadow-xs);
 }
 
 .messageBubble p {
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--text-primary);
+  font-size: 0.875rem;
 }
 
 .messageTime {
@@ -228,29 +231,37 @@
 
 .ownMessage .messageBubble {
   background-color: var(--primary);
-  border-radius: 16px 16px 4px 16px;
+  border-color: var(--primary);
+  border-radius: 12px 12px 2px 12px;
 }
 
 .ownMessage .messageBubble p {
-  color: white;
+  color: #ffffff;
 }
 
 .ownMessage .messageTime {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .chatInputArea {
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-top: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
 }
 
 .inputContainer {
   display: flex;
   gap: 0.75rem;
-  background-color: var(--bg-elevated-hover);
-  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
-  border-radius: 16px;
+  background-color: var(--bg-subtle);
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   align-items: center;
+  transition: border-color 0.2s;
+}
+
+.inputContainer:focus-within {
+  border-color: var(--ai-accent);
 }
 
 .inputContainer input {
@@ -258,13 +269,14 @@
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.9375rem;
+  outline: none;
 }
 
 .sendBtn {
-  border-radius: 12px;
-  height: 44px;
-  width: 44px;
+  border-radius: var(--radius-sm);
+  height: 38px;
+  width: 38px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -296,35 +308,34 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  text-align: center;
 }
 
 .noChatIconWrapper {
-  width: 96px;
-  height: 96px;
-  background: var(--bg-elevated-hover);
-  border-radius: 24px;
+  width: 72px;
+  height: 72px;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-light);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 0.5rem;
+  color: var(--ai-accent);
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--border-color);
 }
 
 .noChat h3 {
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 700;
   margin: 0;
-  background: linear-gradient(135deg, var(--primary), var(--primary-light));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .noChat p {
   color: var(--text-secondary);
   line-height: 1.6;
+  font-size: 0.875rem;
   margin: 0;
 }
 
@@ -334,9 +345,9 @@
   gap: 0.5rem;
   font-size: 0.75rem;
   color: var(--text-tertiary);
-  background: var(--bg-elevated-hover);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
+  background: var(--bg-subtle);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
 }
 

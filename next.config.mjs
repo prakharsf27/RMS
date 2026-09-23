@@ -24,6 +24,18 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/chat',
+        destination: '/api/chat',
+      },
+      {
+        source: '/api/:path*',
+        destination: `http://127.0.0.1:${process.env.BACKEND_PORT || 5050}/api/:path*`,
+      },
+    ];
+  },
   compress: true,
   reactStrictMode: true,
   images: {

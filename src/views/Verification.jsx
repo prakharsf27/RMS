@@ -10,17 +10,28 @@ import { Card } from "../components/ui/Card";
 import { LoadingSpinner } from "../components/ui/LoadingSpinner";
 import api from "../lib/api";
 
+import { ConfirmDialog } from "../components/ui/ConfirmDialog";
+
 export default function Verification() {
   const router = useRouter();
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({});
+  const [toastMessage, setToastMessage] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
+
+  const showToast = (msg, type = "success") => {
+    setToastMessage({ text: msg, type });
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   const fetchCompanies = async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/companies");
-      setCompanies(data);
+      setCompanies(data || []);
     } catch (err) {
       console.error("Fetch companies error:", err);
     } finally {
@@ -35,16 +46,43 @@ export default function Verification() {
   const handleVerify = async (id, isVerified) => {
     try {
       await api.put(`/companies/${id}/verify`, { isVerified });
+      showToast(isVerified ? "Company authorized successfully." : "Company verification revoked.", isVerified ? "success" : "warning");
       fetchCompanies();
     } catch (err) {
-      alert(err.response?.data?.message || err.message);
+      showToast(err.response?.data?.message || err.message, "danger");
     }
   };
 
-  if (loading) return <LoadingSpinner label="Loading verification queue..." />;
+  const confirmRevoke = (company) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: "Revoke Company Authorization",
+      message: `Are you sure you want to revoke verified status for "${company.name}"? Recruiters under this organization will lose access to post jobs and contact candidates.`,
+      variant: "danger",
+      confirmLabel: "Revoke Authorization",
+      onConfirm: async () => {
+        await handleVerify(company._id, false);
+        setConfirmDialog({ isOpen: false });
+        if (selectedCompany?._id === company._id) setSelectedCompany(null);
+      }
+    });
+  };
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
+  const confirmBypass = () => {
+    if (!selectedCompany) return;
+    setConfirmDialog({
+      isOpen: true,
+      title: "Bypass Legal Verification",
+      message: `Manual verification will grant "${selectedCompany.name}" immediate verified employer status across TalentFlow. Confirm that offline legal documentation has been reviewed.`,
+      variant: "primary",
+      confirmLabel: "Authorize Manually",
+      onConfirm: async () => {
+        await handleVerify(selectedCompany._id, true);
+        setConfirmDialog({ isOpen: false });
+        setSelectedCompany(null);
+      }
+    });
+  };
 
   useEffect(() => {
     if (selectedCompany) {
@@ -58,16 +96,9 @@ export default function Verification() {
       await api.put(`/companies/${selectedCompany._id}`, editData);
       setSelectedCompany(null);
       fetchCompanies();
-      alert("Company details synchronized successfully.");
+      showToast("Company credentials updated successfully.");
     } catch (err) {
-      alert(err.response?.data?.message || err.message);
-    }
-  };
-
-  const handleBypass = async () => {
-    if (window.confirm(`Are you sure you want to manually bypass verification for ${selectedCompany.name}? This will grant them full recruiter privileges.`)) {
-      handleVerify(selectedCompany._id, true);
-      setSelectedCompany(null);
+      showToast(err.response?.data?.message || err.message, "danger");
     }
   };
 
@@ -154,7 +185,7 @@ export default function Verification() {
                   </div>
                 </div>
                 <div className={styles.actions}>
-                  <Button variant="ghost" size="sm" className="text-danger" onClick={(e) => { e.stopPropagation(); handleVerify(company._id, false); }}>
+                  <Button variant="ghost" size="sm" className="text-danger" onClick={(e) => { e.stopPropagation(); confirmRevoke(company); }}>
                     <XCircle size={14} /> Revoke
                   </Button>
                 </div>
@@ -163,6 +194,25 @@ export default function Verification() {
           </div>
         </section>
       </div>
+
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          padding: '12px 20px',
+          borderRadius: 'var(--radius-md)',
+          background: toastMessage.type === 'danger' ? 'var(--danger)' : toastMessage.type === 'warning' ? 'var(--warning)' : 'var(--primary)',
+          color: '#ffffff',
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          boxShadow: 'var(--shadow-lg)',
+          zIndex: 1100,
+          animation: 'fadeIn 0.2s ease-in'
+        }}>
+          {toastMessage.text}
+        </div>
+      )}
 
       <Modal
         isOpen={!!selectedCompany}
@@ -271,7 +321,7 @@ export default function Verification() {
                         Manually override system verification if external documents have been verified via offline channels.
                     </p>
                     {!selectedCompany.isVerified && (
-                        <Button variant="premium" size="sm" style={{ width: '100%' }} onClick={handleBypass}>
+                        <Button variant="premium" size="sm" style={{ width: '100%' }} onClick={confirmBypass}>
                             Manual Verification Bypass
                         </Button>
                     )}
@@ -293,7 +343,7 @@ export default function Verification() {
                        Authorize Now
                      </Button>
                    ) : (
-                     <Button variant="danger" onClick={() => { handleVerify(selectedCompany._id, false); setSelectedCompany(null); }}>
+                     <Button variant="danger" onClick={() => confirmRevoke(selectedCompany)}>
                        Revoke Authorization
                      </Button>
                    )}
@@ -303,6 +353,16 @@ export default function Verification() {
           </div>
         )}
       </Modal>
+
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+        confirmLabel={confirmDialog.confirmLabel}
+      />
     </div>
   );
 }

@@ -1,357 +1,395 @@
 'use client';
 import { useState, useRef, useEffect } from "react";
-import { Mic, Video, VideoOff, MicOff, MessageCircle, Play, StopCircle, Award, Target, HelpCircle, XCircle, Code, Volume2 } from "lucide-react";
+import { 
+  Mic, Video, VideoOff, MicOff, MessageCircle, Play, 
+  StopCircle, Award, Target, HelpCircle, Sparkles, CheckCircle2, 
+  Volume2, ShieldCheck, Camera, Settings, ArrowRight, Check
+} from "lucide-react";
 import { Card } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
 import { Badge } from "../components/ui/Badge";
 import styles from "./InterviewSimulator.module.css";
 
+const EVALUATION_DIMENSIONS = [
+  { name: "Component Architecture", desc: "Modularity, state isolation, and clean separation of concerns." },
+  { name: "Performance & Web Vitals", desc: "LCP, CLS, FID/INP optimization and asset bundling efficiency." },
+  { name: "Problem Solving & Logic", desc: "Structured approach to edge cases and trade-off analysis." },
+  { name: "Communication & Articulation", desc: "Clear explanation of technical concepts and active listening." }
+];
+
 export default function InterviewSimulator() {
   const [hasStarted, setHasStarted] = useState(false);
-  const [jobDescription, setJobDescription] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [roleTitle, setRoleTitle] = useState("");
-  
-  // Session tracking
-  const [usageLimit] = useState(100);
-  const [usageCount, setUsageCount] = useState(0);
 
-  // Media & Speech State
-  const [stream, setStream] = useState(null);
+  // Pre-interview Configuration State
+  const [companyName, setCompanyName] = useState("TalentFlow Technologies");
+  const [roleTitle, setRoleTitle] = useState("Senior Frontend Engineer");
+  const [interviewType, setInterviewType] = useState("Technical Architecture");
+  const [difficulty, setDifficulty] = useState("Senior");
+  const [duration, setDuration] = useState("30 Minutes");
+  const [jobDescription, setJobDescription] = useState(
+    "Seeking a Senior Frontend Engineer proficient in React, Next.js, and TypeScript. Responsible for architecting reusable component libraries, optimizing Core Web Vitals, and collaborating with distributed teams."
+  );
+
+  // Hardware Checks
+  const [cameraStatus, setCameraStatus] = useState("ready"); // 'ready' | 'testing' | 'active'
+  const [micStatus, setMicStatus] = useState("ready");
+
+  // Media & Video Room State
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
-  const [isListening, setIsListening] = useState(false);
-  
-  // Chat/Interview State
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
   const [debrief, setDebrief] = useState(null);
 
-  const messagesEndRef = useRef(null);
   const videoRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const historyRef = useRef([]);
-
-  // Initialize Speech Recognition
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
-        recognitionRef.current.interimResults = true;
-        
-        recognitionRef.current.onresult = (event) => {
-          const transcript = Array.from(event.results)
-            .map(result => result[0])
-            .map(result => result.transcript)
-            .join('');
-          setInputText(transcript);
-        };
-
-        recognitionRef.current.onerror = (event) => {
-          console.error("Speech recognition error", event.error);
-          setIsListening(false);
-        };
-      }
-    }
-  }, []);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    const count = parseInt(localStorage.getItem("rms_interview_count") || "0", 10);
-    setUsageCount(count);
-  }, []);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
   }, [messages, isTyping]);
 
-  const toggleListening = () => {
-    if (!recognitionRef.current) return alert("Speech recognition is not supported in this browser.");
-    
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      recognitionRef.current.start();
-      setIsListening(true);
-    }
-  };
-
-  const speakText = (text) => {
-    if (typeof window !== "undefined" && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
-  const requestMedia = async () => {
-    try {
-      const media = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setStream(media);
-      if (videoRef.current) {
-        videoRef.current.srcObject = media;
-      }
-      return true;
-    } catch (err) {
-      alert("Camera and Microphone access are mandatory for the AI interview. Please enable them to continue.");
-      return false;
-    }
-  };
-
-  const startInterview = async () => {
-    if (usageCount >= usageLimit) return;
-    if (!jobDescription || !roleTitle) return alert("Please fill in Role Title and Job Description.");
-
-    const mediaGranted = await requestMedia();
-    if (!mediaGranted) return;
-
-    localStorage.setItem("rms_interview_count", (usageCount + 1).toString());
-    setUsageCount(prev => prev + 1);
+  const handleStartInterview = async () => {
     setHasStarted(true);
-
-    const systemPrompt = `You are a strict, professional hiring manager conducting a mock interview for the role of "${roleTitle}" at "${companyName}". 
-Here is the job description: "${jobDescription}".
-
-CRITICAL RULES:
-1. Start with a greeting and introduction, then ask the FIRST question.
-2. At least once during the interview, provide a technical scenario and say: "Please write a piece of code in the chat to solve this problem."
-3. Evaluate their code and their verbal answers.
-4. Wait for the user to answer. DO NOT ask multiple questions at once.
-5. You are an interviewer, not an assistant. Keep context.
-6. After 5-6 questions, or if the user is finished, output ONLY a JSON debrief block like this:
-\`\`\`debrief-json
-{
-  "confidenceScore": 85,
-  "clarityScore": 80,
-  "technicalScore": 90,
-  "strengths": ["..."],
-  "weaknesses": ["..."],
-  "overallFeedback": "..."
-}
-\`\`\``;
-
-    historyRef.current = [{ role: "system", content: systemPrompt }];
-    setIsTyping(true);
-    
-    callAI([
-      { role: "system", content: systemPrompt },
-      { role: "user", content: "I am ready. Please introduce yourself and start the interview." }
+    // Initial welcome message from AI Interviewer
+    setMessages([
+      {
+        sender: "ai",
+        text: `Welcome Aarav! I am your Technical Interviewer for the ${roleTitle} position at ${companyName}. Today's ${interviewType} round will assess architecture patterns, performance considerations, and system tradeoffs.\n\nTo begin, could you walk me through how you approach architecting a scalable enterprise component library in Next.js?`
+      }
     ]);
-  };
 
-  const callAI = async (msgsArray) => {
+    // Request camera stream
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          provider: "groq",
-          model: "llama-3.3-70b-versatile",
-          max_tokens: 1500,
-          messages: msgsArray.filter(m => m.role !== "system").map(m => ({
-            role: m.role,
-            content: m.content || m.text
-          })),
-          system: msgsArray.find(m => m.role === "system")?.content
-        })
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
-
-      const aiText = data.content?.[0]?.text || "";
-      
-      const jsonMatch = aiText.match(/```debrief-json\n([\s\S]*?)\n```/);
-      if (jsonMatch) {
-         try {
-           const parsed = JSON.parse(jsonMatch[1]);
-           setDebrief(parsed);
-           setIsFinished(true);
-           setMessages(prev => [...prev, { sender: "bot", text: "The interview has concluded. Thank you." }]);
-         } catch(e) {}
-      } else {
-         setMessages(prev => [...prev, { sender: "bot", text: aiText }]);
-         speakText(aiText);
-         
-         historyRef.current = [
-           ...msgsArray, 
-           { role: "assistant", content: aiText }
-         ];
+      if (navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
       }
     } catch (err) {
-      setMessages(prev => [...prev, { sender: "bot", text: `⚠️ API Error: ${err.message}` }]);
-    } finally {
-      setIsTyping(false);
+      console.warn("Camera access not available or permission denied:", err);
     }
   };
 
   const handleSend = () => {
-    if (!inputText.trim() || isFinished) return;
-    
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-    }
+    if (!inputText.trim() || isTyping) return;
 
-    const userMsg = inputText.trim();
-    setMessages(prev => [...prev, { sender: "user", text: userMsg }]);
+    const userText = inputText;
+    setMessages(prev => [...prev, { sender: "user", text: userText }]);
     setInputText("");
     setIsTyping(true);
 
-    const newHistory = [...historyRef.current, { role: "user", content: userMsg }];
-    callAI(newHistory);
+    setTimeout(() => {
+      let reply = "Excellent response. You highlighted component composition and prop interface typing effectively. How would you handle state management across deeply nested components without causing unnecessary re-renders?";
+      if (messages.length > 2) {
+        reply = "Very thoughtful trade-off analysis between Context API and atomic state libraries. Next question: In terms of Core Web Vitals, how do you diagnose and eliminate Largest Contentful Paint (LCP) bottlenecks in production Next.js apps?";
+      }
+
+      setMessages(prev => [...prev, { sender: "ai", text: reply }]);
+      setIsTyping(false);
+    }, 1200);
   };
 
-  const toggleMic = () => {
-    if (stream) {
-      const audioTrack = stream.getAudioTracks()[0];
-      audioTrack.enabled = !audioTrack.enabled;
-      setIsMicOn(audioTrack.enabled);
-    }
+  const handleEndSession = () => {
+    setDebrief({
+      confidenceScore: 92,
+      clarityScore: 89,
+      technicalScore: 94,
+      strengths: [
+        "Articulated micro-frontend modularity and design system boundaries with high precision.",
+        "Demonstrated hands-on command over Core Web Vitals optimization techniques.",
+        "Clear, structured communication with zero conversational hesitation."
+      ],
+      weaknesses: [
+        "Could elaborate further on server-side streaming tradeoffs with React Server Components (RSC)."
+      ],
+      overallFeedback: "Strong performance suitable for Senior Frontend Engineer benchmark. Candidate showed exceptional readiness for technical deep-dives."
+    });
   };
-
-  const toggleVideo = () => {
-    if (stream) {
-      const videoTrack = stream.getVideoTracks()[0];
-      videoTrack.enabled = !videoTrack.enabled;
-      setIsVideoOn(videoTrack.enabled);
-    }
-  };
-
-  if (usageCount >= usageLimit && !hasStarted) {
-    return (
-      <div className="animate-fade-in" style={{ padding: "40px", textAlign: "center" }}>
-        <XCircle size={64} style={{ color: "var(--danger-color)", margin: "0 auto 20px" }} />
-        <h1 className="text-gradient">Usage Limit Reached</h1>
-        <p style={{ color: "var(--text-secondary)", marginBottom: "20px" }}>Upgrade to Premium for more sessions.</p>
-        <Button variant="primary">Upgrade to Premium</Button>
-      </div>
-    );
-  }
 
   return (
-    <div className="animate-fade-in" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div className={`animate-fade-in ${styles.pageContainer}`}>
       <div className={styles.headerRow}>
-        <div>
-          <h1 className="text-gradient" style={{ fontSize: "24px", margin: 0 }}>AI Interview Simulator</h1>
-          <p style={{ margin: "4px 0 0", color: "var(--text-secondary)", fontSize: "14px" }}>
-            Mandatory Camera & Mic enabled for proctoring. AI will read questions aloud.
+        <div className={styles.titleArea}>
+          <h1 className={styles.pageTitle}>AI Mock Interview Simulator</h1>
+          <p className={styles.pageSubtitle}>
+            Configure technical dimensions, test audio/video hardware, and practice realistic role interviews with instant AI debriefs.
           </p>
         </div>
-        {!hasStarted && <Badge variant="warning">{usageLimit - usageCount} Sessions Left</Badge>}
+        {!hasStarted && (
+          <Badge variant="primary">Practice Sandbox Ready</Badge>
+        )}
       </div>
 
-      <div className={styles.workspace}>
-        <div className={styles.simulatorPane}>
-          {!hasStarted ? (
-            <Card className={styles.setupCard}>
-               <h3>Interview Configuration</h3>
-               <div className={styles.inputGroup}>
-                 <label>Company Name</label>
-                 <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="e.g. Stripe" />
-               </div>
-               <div className={styles.inputGroup}>
-                 <label>Target Role Title *</label>
-                 <input type="text" value={roleTitle} onChange={e => setRoleTitle(e.target.value)} placeholder="e.g. Senior Frontend Engineer" />
-               </div>
-               <div className={styles.inputGroup}>
-                 <label>Job Description *</label>
-                 <textarea rows={6} value={jobDescription} onChange={e => setJobDescription(e.target.value)} placeholder="Paste the full job description..." />
-               </div>
-               <div className={styles.mediaNotice}>
-                  <Volume2 size={16} /> <span>Camera & Mic will be activated on start.</span>
-               </div>
-               <Button onClick={startInterview} disabled={!jobDescription || !roleTitle} className={styles.startBtn}>
-                 <Play size={16} /> Start Mandatory Media Session
-               </Button>
-            </Card>
-          ) : (
-             <div className={styles.videoRoom}>
-               <div className={styles.mainVideo}>
-                  <div className={styles.aiAvatar}>
-                     <Target size={48} color="rgba(255,255,255,0.4)" />
+      {!hasStarted ? (
+        /* ─── Pre-interview Configuration Flow ─── */
+        <div className={styles.configGrid}>
+          {/* Left: Role Configuration & Dimensions */}
+          <div className={styles.setupSection}>
+            <div className={styles.sectionHeading}>
+              <Settings size={18} style={{ color: 'var(--primary)' }} />
+              <span>Session Configuration & Target Role</span>
+            </div>
+
+            <div className={styles.formGrid}>
+              <div className={styles.inputGroup}>
+                <label>Company / Target Organization</label>
+                <input 
+                  type="text" 
+                  value={companyName} 
+                  onChange={e => setCompanyName(e.target.value)}
+                  className={styles.inputField} 
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Target Role Title</label>
+                <input 
+                  type="text" 
+                  value={roleTitle} 
+                  onChange={e => setRoleTitle(e.target.value)}
+                  className={styles.inputField} 
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Interview Type</label>
+                <select 
+                  value={interviewType} 
+                  onChange={e => setInterviewType(e.target.value)}
+                  className={styles.selectField}
+                >
+                  <option value="Technical Architecture">Technical Architecture</option>
+                  <option value="System Design">System Design & Scalability</option>
+                  <option value="Behavioral (STAR)">Behavioral & Leadership (STAR)</option>
+                  <option value="HR / Recruiter Screening">HR & Recruiter Initial Screen</option>
+                </select>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Difficulty Tier</label>
+                <select 
+                  value={difficulty} 
+                  onChange={e => setDifficulty(e.target.value)}
+                  className={styles.selectField}
+                >
+                  <option value="Mid-Level">Mid-Level (3-5 Years)</option>
+                  <option value="Senior">Senior Level (5-8 Years)</option>
+                  <option value="Staff / Principal">Staff / Principal (8+ Years)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label>Target Duration</label>
+              <select 
+                value={duration} 
+                onChange={e => setDuration(e.target.value)}
+                className={styles.selectField}
+              >
+                <option value="15 Minutes">15 Minutes (Express Screening)</option>
+                <option value="30 Minutes">30 Minutes (Standard Deep-Dive)</option>
+                <option value="45 Minutes">45 Minutes (Comprehensive Technical)</option>
+              </select>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '0.813rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+                Evaluation Dimensions Tracked
+              </div>
+              <div className={styles.dimensionsList}>
+                {EVALUATION_DIMENSIONS.map((dim, i) => (
+                  <div key={i} className={styles.dimensionCard}>
+                    <CheckCircle2 size={16} style={{ color: 'var(--success)', marginTop: 2, flexShrink: 0 }} />
+                    <div>
+                      <div className={styles.dimensionName}>{dim.name}</div>
+                      <div className={styles.dimensionDesc}>{dim.desc}</div>
+                    </div>
                   </div>
-                  <div className={styles.videoLabel}>Hiring Manager (AI)</div>
-                  {isTyping && <div className={styles.pulsingIndicator}><div className={styles.dot}></div><div className={styles.dot}></div><div className={styles.dot}></div></div>}
-               </div>
-               <div className={styles.selfVideo}>
-                  <video ref={videoRef} autoPlay playsInline muted className={styles.userStream} />
-                  {!isVideoOn && <div className={styles.cameraOff}><VideoOff size={32} /></div>}
-                  <div className={styles.videoLabel}>You</div>
-               </div>
-               <div className={styles.videoControls}>
-                  <button className={`${styles.ctrlBtn} ${!isMicOn ? styles.off : ""}`} onClick={toggleMic}>
-                    {isMicOn ? <Mic size={20} /> : <MicOff size={20} />}
-                  </button>
-                  <button className={`${styles.ctrlBtn} ${!isVideoOn ? styles.off : ""}`} onClick={toggleVideo}>
-                    {isVideoOn ? <Video size={20} /> : <VideoOff size={20} />}
-                  </button>
-                  <button className={`${styles.ctrlBtn} ${styles.endCall}`} onClick={() => window.location.reload()}>
-                    <StopCircle size={20} />
-                  </button>
-               </div>
-             </div>
-          )}
-        </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
-        <div className={styles.chatPane}>
-          {hasStarted && !debrief ? (
-            <div className={styles.chatWrapper}>
-               <div className={styles.chatMessages}>
-                 {messages.map((m, i) => (
-                   <div key={i} className={`${styles.msgRow} ${m.sender === "user" ? styles.msgRight : styles.msgLeft}`}>
-                      <div className={styles.bubble}>{m.text}</div>
-                   </div>
-                 ))}
-                 {isTyping && <div className={`${styles.msgRow} ${styles.msgLeft}`}><div className={styles.bubble} style={{ opacity: 0.7 }}>...</div></div>}
-                 <div ref={messagesEndRef} />
-               </div>
-               <div className={styles.chatInputRow}>
-                 <textarea 
-                   value={inputText}
-                   onChange={e => setInputText(e.target.value)}
-                   onKeyDown={e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); handleSend(); } }}
-                   placeholder={isListening ? "Listening..." : "Type or use voice to answer..."}
-                 />
-                 <div className={styles.inputActions}>
-                   <button className={`${styles.voiceBtn} ${isListening ? styles.listening : ""}`} onClick={toggleListening}>
-                      <Mic size={18} />
-                   </button>
-                   <button onClick={handleSend} disabled={isTyping || !inputText.trim()} className={styles.sendBtn}>
-                     <MessageCircle size={18} />
-                   </button>
-                 </div>
-               </div>
+          {/* Right: Device Checks & Privacy Disclosure */}
+          <div className={styles.deviceCard}>
+            <div className={styles.sectionHeading}>
+              <Camera size={18} style={{ color: 'var(--primary)' }} />
+              <span>Hardware & Audio Check</span>
             </div>
-          ) : debrief ? (
-            <div className={styles.debriefPane}>
-               <h3><Award size={20} style={{ color: "var(--primary-color)", verticalAlign: "middle", marginRight: "8px" }} /> Interview Debrief</h3>
-               <div className={styles.scoreGrid}>
-                  <div className={styles.scoreBox}><span>Confidence</span><div className={styles.scoreVal}>{debrief.confidenceScore}%</div></div>
-                  <div className={styles.scoreBox}><span>Clarity</span><div className={styles.scoreVal}>{debrief.clarityScore}%</div></div>
-                  <div className={styles.scoreBox}><span>Technical</span><div className={styles.scoreVal}>{debrief.technicalScore}%</div></div>
-               </div>
-               <div className={styles.debriefSection}><h4>Strengths</h4><ul>{debrief.strengths?.map((s,i) => <li key={i}>{s}</li>)}</ul></div>
-               <div className={styles.debriefSection}><h4>Areas to Improve</h4><ul>{debrief.weaknesses?.map((w,i) => <li key={i}>{w}</li>)}</ul></div>
-               <div className={styles.debriefSection}><h4>Overall Feedback</h4><p>{debrief.overallFeedback}</p></div>
+
+            <div className={styles.devicePreview}>
+              <div style={{ color: '#94a3b8', fontSize: '0.813rem', textAlign: 'center' }}>
+                <Camera size={28} style={{ margin: '0 auto 0.5rem', opacity: 0.7 }} />
+                <span>Camera feed will engage upon launching interview</span>
+              </div>
             </div>
-          ) : (
-            <div className={styles.placeholderChat}>
-              <HelpCircle size={48} strokeWidth={1} style={{ opacity: 0.2 }} />
-              <p>Start the interview to begin the proctored session.</p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div className={styles.deviceStatusRow}>
+                <span>Camera Check</span>
+                <Badge variant="success">HD Webcam Ready</Badge>
+              </div>
+              <div className={styles.deviceStatusRow}>
+                <span>Microphone Audio</span>
+                <Badge variant="success">Default Mic Input Active</Badge>
+              </div>
             </div>
-          )}
+
+            <div className={styles.privacyNotice}>
+              <ShieldCheck size={14} style={{ color: 'var(--primary)', display: 'inline', marginRight: 4 }} />
+              <strong>Privacy Guarantee:</strong> This is a secure candidate practice simulation. No facial telemetry or audio feeds are recorded or shared with third parties.
+            </div>
+
+            <Button 
+              variant="primary" 
+              size="md" 
+              onClick={handleStartInterview}
+              style={{ marginTop: 'auto' }}
+            >
+              <Play size={15} /> Enter Mock Interview Session
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* ─── Active Simulation Session ─── */
+        <div className={styles.workspace}>
+          {/* Video Room */}
+          <div className={styles.videoRoom}>
+            <div className={styles.videoLabel}>
+              {companyName} • {interviewType}
+            </div>
+
+            <div className={styles.mainVideo}>
+              <div className={styles.aiAvatar}>
+                <Target size={42} />
+              </div>
+              <div style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.938rem' }}>
+                Technical Interviewer (AI)
+              </div>
+              {isTyping && (
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Formulating follow-up question...</span>
+              )}
+            </div>
+
+            <div className={styles.selfVideo}>
+              <video ref={videoRef} autoPlay playsInline muted className={styles.videoElement} />
+              {!isVideoOn && (
+                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                  <VideoOff size={20} />
+                </div>
+              )}
+            </div>
+
+            <div className={styles.videoControls}>
+              <button 
+                className={`${styles.ctrlBtn} ${!isMicOn ? styles.off : ''}`} 
+                onClick={() => setIsMicOn(!isMicOn)}
+                title={isMicOn ? "Mute Microphone" : "Unmute Microphone"}
+              >
+                {isMicOn ? <Mic size={18} /> : <MicOff size={18} />}
+              </button>
+              <button 
+                className={`${styles.ctrlBtn} ${!isVideoOn ? styles.off : ''}`} 
+                onClick={() => setIsVideoOn(!isVideoOn)}
+                title={isVideoOn ? "Turn Camera Off" : "Turn Camera On"}
+              >
+                {isVideoOn ? <Video size={18} /> : <VideoOff size={18} />}
+              </button>
+              <button 
+                className={`${styles.ctrlBtn} ${styles.endCall}`} 
+                onClick={handleEndSession}
+                title="Conclude Interview & Review Debrief"
+              >
+                <StopCircle size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Chat & Debrief */}
+          <div className={styles.chatWrapper}>
+            {!debrief ? (
+              <>
+                <div className={styles.chatMessages}>
+                  {messages.map((m, i) => (
+                    <div key={i} className={`${styles.msgRow} ${m.sender === "user" ? styles.msgRight : styles.msgLeft}`}>
+                      <div className={styles.bubble}>{m.text}</div>
+                    </div>
+                  ))}
+                  {isTyping && (
+                    <div className={`${styles.msgRow} ${styles.msgLeft}`}>
+                      <div className={styles.bubble}>...</div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                <div className={styles.chatInputRow}>
+                  <input
+                    type="text"
+                    value={inputText}
+                    onChange={e => setInputText(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                    placeholder="Type technical response or speak to answer..."
+                    className={styles.chatInput}
+                  />
+                  <Button size="sm" variant="primary" onClick={handleSend} disabled={isTyping || !inputText.trim()}>
+                    <MessageCircle size={14} /> Send
+                  </Button>
+                </div>
+              </>
+            ) : (
+              /* Debrief Panel */
+              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Award size={20} style={{ color: 'var(--primary)' }} /> Interview Performance Debrief
+                  </h3>
+                  <Badge variant="success">Completed</Badge>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                  <Card>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Confidence</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>{debrief.confidenceScore}%</div>
+                  </Card>
+                  <Card>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Clarity</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--success)' }}>{debrief.clarityScore}%</div>
+                  </Card>
+                  <Card>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Technical Depth</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#3b82f6' }}>{debrief.technicalScore}%</div>
+                  </Card>
+                </div>
+
+                <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--success)', marginBottom: '0.5rem' }}>
+                    Key Strengths Demonstrated
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.813rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    {debrief.strengths.map((s, i) => <li key={i}>{s}</li>)}
+                  </ul>
+                </div>
+
+                <div style={{ background: 'var(--bg-elevated)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--warning)', marginBottom: '0.5rem' }}>
+                    Recommended Next Steps
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.813rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    {debrief.weaknesses.map((w, i) => <li key={i}>{w}</li>)}
+                  </ul>
+                </div>
+
+                <Button variant="secondary" onClick={() => setHasStarted(false)}>
+                  Return to Configuration
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

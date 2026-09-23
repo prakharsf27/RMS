@@ -202,16 +202,54 @@ export default function Login({ initialMode = "login" }) {
               <Button 
                 type="button" 
                 size="lg" 
-                variant="primary" 
+                variant="outline" 
                 className={styles.backHomeBtn}
                 onClick={() => router.push("/")}
               >
                 Back to Home
               </Button>
             </div>
+
+            {/* Quick Enterprise Demo Access */}
+            {!isRegister && (
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.75rem', textAlign: 'center' }}>
+                  Quick Demo Access
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDemoLogin("candidate@rms.com", "password123")}
+                    title="Log in as Candidate Aarav Sharma"
+                  >
+                    Candidate
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDemoLogin("recruiter@rms.com", "password123")}
+                    title="Log in as Recruiter Sarah Jenkins"
+                  >
+                    Recruiter
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleDemoLogin("admin@rms.com", "password123")}
+                    title="Log in as Administrator Alexander Vance"
+                  >
+                    Admin
+                  </Button>
+                </div>
+              </div>
+            )}
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+          <div style={{ textAlign: "center", marginTop: "1.25rem" }}>
             <button 
               className={styles.toggleBtn}
               onClick={() => { setIsRegister(!isRegister); setError(""); }}

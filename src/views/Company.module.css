@@ -9,17 +9,17 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 1.875rem;
+  font-weight: 800;
   margin-bottom: 0.25rem;
-  background: linear-gradient(135deg, var(--primary), var(--info));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .statusBadge {
@@ -103,17 +103,17 @@
 }
 
 .logoWrapper {
-  width: 80px;
-  height: 80px;
-  background: var(--primary-light);
-  color: var(--primary);
-  border-radius: 20px;
-  margin: 0 auto 1.5rem;
+  width: 72px;
+  height: 72px;
+  background: var(--bg-subtle);
+  color: var(--primary-accent);
+  border-radius: var(--radius-lg);
+  margin: 0 auto 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   border: 1px solid var(--border-color);
 }
 

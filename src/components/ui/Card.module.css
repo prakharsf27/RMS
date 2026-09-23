@@ -1,20 +1,26 @@
 .card {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  background-color: var(--bg-elevated, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
   padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   position: relative;
-  overflow: hidden;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--primary);
-  transform: translateY(-2px);
+.hoverable:hover,
+.interactive:hover {
+  box-shadow: var(--shadow-sm);
+  border-color: var(--text-tertiary, #94a3b8);
+  transform: translateY(-1px);
 }
 
 .glow {
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.12);
+}
+
+.subtle {
+  background-color: var(--bg-subtle, #f8fafc);
+  border-color: var(--border-subtle, #f1f5f9);
+  box-shadow: none;
 }

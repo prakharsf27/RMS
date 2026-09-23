@@ -17,6 +17,7 @@ export default function Messages() {
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const scrollRef = useRef();
@@ -27,13 +28,12 @@ export default function Messages() {
       setLoading(true);
       try {
         const { data: convos } = await api.get("/messages/conversations");
-
-        setConversations(convos);
+        setConversations(convos || []);
         
         // If navigated from elsewhere with a specific user to chat with
         const initialRecipientId = searchParams.get('recipientId');
         if (initialRecipientId) {
-          const existing = convos.find(c => c.contact._id === initialRecipientId);
+          const existing = (convos || []).find(c => c.contact?._id === initialRecipientId);
           if (existing) {
             setActiveChat(existing.contact);
           } else {
@@ -45,7 +45,7 @@ export default function Messages() {
               console.error("Fetch contact error:", err);
             }
           }
-        } else if (convos.length > 0) {
+        } else if (convos && convos.length > 0) {
           setActiveChat(convos[0].contact);
         }
       } catch (err) {
@@ -63,15 +63,14 @@ export default function Messages() {
     const fetchMessages = async () => {
       try {
         const { data } = await api.get(`/messages/${activeChat._id || activeChat.id}`);
-
-        setMessages(data);
+        setMessages(data || []);
       } catch (err) {
         console.error("Fetch messages error:", err);
       }
     };
     fetchMessages();
 
-    // Poll for new messages every 5 seconds (simplification for real-time without sockets)
+    // Poll for new messages every 5 seconds
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [activeChat]);
@@ -82,14 +81,14 @@ export default function Messages() {
   }, [messages]);
 
   const handleSendMessage = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     if (!newMessage.trim() || !activeChat) return;
 
     setSending(true);
     try {
       const { data } = await api.post("/messages", {
         receiverId: activeChat._id || activeChat.id,
-        content: newMessage
+        content: newMessage.trim()
       });
 
       setMessages(prev => [...prev, data]);
@@ -97,12 +96,12 @@ export default function Messages() {
       
       // Update sidebar conversation preview
       setConversations(prev => {
-        const existing = prev.find(c => c.contact._id === (activeChat._id || activeChat.id));
+        const existing = prev.find(c => c.contact?._id === (activeChat._id || activeChat.id));
         if (existing) {
-          return prev.map(c => c.contact._id === (activeChat._id || activeChat.id) 
+          return prev.map(c => c.contact?._id === (activeChat._id || activeChat.id) 
             ? { ...c, lastMessage: data } 
             : c
-          ).sort((a,b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
+          ).sort((a,b) => new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0));
         }
         return [{ contact: activeChat, lastMessage: data, unreadCount: 0 }, ...prev];
       });
@@ -113,7 +112,22 @@ export default function Messages() {
     }
   };
 
-  if (loading && conversations.length === 0) return <LoadingSpinner label="Opening secure gateway..." />;
+  // Filter conversations
+  const filteredConversations = (() => {
+    let list = [...conversations];
+    if (activeChat && !list.find(c => c.contact?._id === activeChat._id)) {
+      list = [{ contact: activeChat, lastMessage: null, unreadCount: 0 }, ...list];
+    }
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase();
+    return list.filter(c => {
+      const name = `${c.contact?.fname || ''} ${c.contact?.lname || ''}`.toLowerCase();
+      const content = (c.lastMessage?.content || '').toLowerCase();
+      return name.includes(q) || content.includes(q);
+    });
+  })();
+
+  if (loading && conversations.length === 0) return <LoadingSpinner label="Opening secure messaging channel..." />;
 
   return (
     <div className={styles.container + " animate-fade-in"}>
@@ -121,56 +135,63 @@ export default function Messages() {
         {/* Sidebar */}
         <aside className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
-            <h2 className="text-gradient">Chats</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>Conversations</h2>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', background: 'var(--bg-elevated-hover)', padding: '2px 8px', borderRadius: '12px' }}>
+                {conversations.length} active
+              </span>
+            </div>
             <div className={styles.searchBar}>
-              <Search size={18} />
-              <input type="text" placeholder="Search conversations..." />
+              <Search size={16} />
+              <input 
+                type="text" 
+                placeholder="Search candidates or messages..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
           </div>
           
           <div className={styles.conversationList}>
-            {(() => {
-              // Merge activeChat into conversations list if it's not already there
-              let displayConvos = [...conversations];
-              if (activeChat && !conversations.find(c => c.contact._id === activeChat._id)) {
-                displayConvos = [{ contact: activeChat, lastMessage: null, unreadCount: 0 }, ...displayConvos];
-              }
-
-              if (displayConvos.length === 0) {
+            {filteredConversations.length === 0 ? (
+              <div className={styles.sidebarEmpty}>
+                <MessageSquare size={36} className={styles.emptyIcon} />
+                <p>No conversations found</p>
+                <span>{searchQuery ? "Try a different search term" : "Conversations with applicants and recruiters will appear here."}</span>
+              </div>
+            ) : (
+              filteredConversations.map(convo => {
+                const isSelected = activeChat?._id === convo.contact?._id;
+                const contact = convo.contact || {};
+                const fullName = `${contact.fname || 'Applicant'} ${contact.lname || ''}`.trim();
+                const avatarUrl = contact.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0f172a&color=fff`;
+                
                 return (
-                  <div className={styles.sidebarEmpty}>
-                    <MessageSquare size={40} className={styles.emptyIcon} />
-                    <p>No conversations yet</p>
-                    <span>Reach out to candidates or recruiters from the pipeline to start chatting.</span>
+                  <div 
+                    key={contact._id || Math.random()} 
+                    className={`${styles.convoItem} ${isSelected ? styles.active : ""}`}
+                    onClick={() => setActiveChat(contact)}
+                  >
+                    <div className={styles.avatarWrapper}>
+                      <img src={avatarUrl} alt={fullName} className={styles.avatar} />
+                      <div className={styles.statusDot}></div>
+                    </div>
+                    <div className={styles.convoBody}>
+                      <div className={styles.convoHeader}>
+                        <span className={styles.convoName}>{fullName}</span>
+                        <span className={styles.convoTime}>
+                          {convo.lastMessage?.createdAt ? format(new Date(convo.lastMessage.createdAt), "HH:mm") : ""}
+                        </span>
+                      </div>
+                      <div className={styles.convoPreview}>
+                        <p>{convo.lastMessage?.content || "Conversation started"}</p>
+                        {convo.unreadCount > 0 && <span className={styles.unreadCount}>{convo.unreadCount}</span>}
+                      </div>
+                    </div>
                   </div>
                 );
-              }
-
-              return displayConvos.map(convo => (
-                <div 
-                  key={convo.contact._id} 
-                  className={`${styles.convoItem} ${activeChat?._id === convo.contact._id ? styles.active : ""}`}
-                  onClick={() => setActiveChat(convo.contact)}
-                >
-                  <div className={styles.avatarWrapper}>
-                    <img src={convo.contact.avatar || `https://ui-avatars.com/api/?name=${convo.contact.fname}+${convo.contact.lname}`} alt="" className={styles.avatar} />
-                    <div className={styles.statusDot}></div>
-                  </div>
-                  <div className={styles.convoBody}>
-                    <div className={styles.convoHeader}>
-                      <span className={styles.convoName}>{convo.contact.fname} {convo.contact.lname}</span>
-                      <span className={styles.convoTime}>
-                        {convo.lastMessage ? format(new Date(convo.lastMessage.createdAt), "HH:mm") : ""}
-                      </span>
-                    </div>
-                    <div className={styles.convoPreview}>
-                      <p>{convo.lastMessage?.content || "New conversation"}</p>
-                      {convo.unreadCount > 0 && <span className={styles.unreadCount}>{convo.unreadCount}</span>}
-                    </div>
-                  </div>
-                </div>
-              ));
-            })()}
+              })
+            )}
           </div>
         </aside>
 
@@ -180,35 +201,47 @@ export default function Messages() {
             <>
               <header className={styles.chatHeader}>
                 <div className={styles.activeContact}>
-                  <img src={activeChat.avatar} alt="" className={styles.avatarSm} />
+                  <img 
+                    src={activeChat.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(`${activeChat.fname || ''} ${activeChat.lname || ''}`)}&background=0f172a&color=fff`} 
+                    alt="" 
+                    className={styles.avatarSm} 
+                  />
                   <div>
-                    <h4>{activeChat.fname} {activeChat.lname}</h4>
-                    <span>{activeChat.role === 'candidate' ? 'Candidate' : 'Recruitment Team'}</span>
+                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700 }}>
+                      {activeChat.fname} {activeChat.lname}
+                    </h4>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                      {activeChat.role === 'candidate' ? 'Candidate' : 'Recruitment Team'} • TalentFlow Enterprise Network
+                    </span>
                   </div>
                 </div>
                 <div className={styles.headerActions}>
-                  <Button variant="ghost" size="sm"><Phone size={18} /></Button>
-                  <Button variant="ghost" size="sm"><Video size={18} /></Button>
-                  <Button variant="ghost" size="sm"><Info size={18} /></Button>
+                  <Button variant="ghost" size="sm" title="Audio call placeholder"><Phone size={16} /></Button>
+                  <Button variant="ghost" size="sm" title="Video room placeholder"><Video size={16} /></Button>
+                  <Button variant="ghost" size="sm" title="Contact information"><Info size={16} /></Button>
                 </div>
               </header>
 
               <div className={styles.messageHistory}>
                 {messages.length === 0 ? (
                   <div className={styles.chatStart}>
-                    <User size={48} style={{ opacity: 0.1, marginBottom: '1rem' }} />
-                    <p>Start your conversation with {activeChat.fname}</p>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Messages are end-to-end encrypted</span>
+                    <User size={40} style={{ opacity: 0.15, marginBottom: '0.75rem' }} />
+                    <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                      Start your conversation with {activeChat.fname}
+                    </p>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
+                      Direct messages are encrypted and archived for compliant audit logging.
+                    </span>
                   </div>
                 ) : (
                   messages.map((msg, i) => {
-                    const isOwn = msg.senderId === currentUser._id;
+                    const isOwn = msg.senderId === currentUser?._id;
                     return (
                       <div key={msg._id || i} className={`${styles.messageWrapper} ${isOwn ? styles.ownMessage : ""}`}>
                         <div className={styles.messageBubble}>
                           <p>{msg.content}</p>
                           <span className={styles.messageTime}>
-                            {format(new Date(msg.createdAt), "HH:mm")}
+                            {msg.createdAt ? format(new Date(msg.createdAt), "HH:mm") : ""}
                           </span>
                         </div>
                       </div>
@@ -222,13 +255,13 @@ export default function Messages() {
                 <form onSubmit={handleSendMessage} className={styles.inputContainer}>
                   <input 
                     type="text" 
-                    placeholder="Type your message..." 
+                    placeholder={`Message ${activeChat.fname || 'contact'}...`} 
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     disabled={sending}
                   />
-                  <Button type="submit" disabled={!newMessage.trim() || sending} className={styles.sendBtn}>
-                    <Send size={18} />
+                  <Button type="submit" disabled={!newMessage.trim() || sending} className={styles.sendBtn} variant="primary">
+                    <Send size={16} />
                   </Button>
                 </form>
               </footer>
@@ -237,12 +270,12 @@ export default function Messages() {
             <div className={styles.noChat}>
               <div className={styles.noChatContent}>
                  <div className={styles.noChatIconWrapper}>
-                    <MessageSquare size={48} />
+                    <MessageSquare size={36} />
                  </div>
-                 <h3>TalentFlow Messenger</h3>
-                 <p>Select a candidate or recruiter from your list to begin a professional recruitment conversation.</p>
+                 <h3>Recruitment Inbox</h3>
+                 <p>Select a candidate or hiring team member from the sidebar to view their message history.</p>
                  <span className={styles.encryptionNotice}>
-                    <ShieldAlert size={12} /> Messages are secure and private
+                    <ShieldAlert size={14} /> End-to-end encrypted recruitment channel
                  </span>
               </div>
             </div>
