@@ -23,8 +23,9 @@ const {
 } = require('../controllers/otpController');
 
 
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect, authorize, optionalProtect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
+const { uploadAvatar, removeAvatar, completeOnboarding } = require('../controllers/authController');
 
 router.post('/register', register);
 router.post('/login', login);
@@ -35,9 +36,16 @@ router.route('/profile')
     { name: 'resume', maxCount: 1 }
   ]), updateProfile);
 
-// OTP Verification Routes
-router.post('/send-email-otp', protect, sendEmailOTP);
-router.post('/verify-email-otp', protect, verifyEmailOTP);
+// Avatar Upload & Remove
+router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
+router.delete('/upload-avatar', protect, removeAvatar);
+
+// Onboarding completion
+router.post('/complete-onboarding', protect, completeOnboarding);
+
+// OTP Verification Routes (Supports both logged-in and newly registered pre-auth)
+router.post('/send-email-otp', optionalProtect, sendEmailOTP);
+router.post('/verify-email-otp', optionalProtect, verifyEmailOTP);
 router.post('/send-phone-otp', protect, sendPhoneOTP);
 router.post('/verify-phone-otp', protect, verifyPhoneOTP);
 

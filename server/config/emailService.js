@@ -32,64 +32,51 @@ const createTemplate = (title, body) => `
   </html>
 `;
 
+const emailService = require('../services/emailService');
+
+// Backward compatibility bridge for old sendEmail signature
 const sendEmail = async ({ email, subject, type, data = {} }) => {
-  const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  let htmlBody = '';
-  let emailTitle = subject;
-
   switch (type) {
     case 'WELCOME':
-      emailTitle = `Welcome to TalentFlow, ${data.name}!`;
-      htmlBody = `<p>We're excited to help you find your next career opportunity. Your profile is now active and ready for applications.</p>`;
-      break;
+      return emailService.sendWelcomeEmail({ email, name: data.name, role: data.role });
     case 'APPLICATION_CONFIRM':
-      emailTitle = 'Application Received';
-      htmlBody = `<p>Your application for the <strong>${data.jobTitle}</strong> position at <strong>${data.companyName}</strong> has been received. We'll review it and get back to you soon.</p>`;
-      break;
+      return emailService.sendApplicationSubmitted({ 
+        email, 
+        candidateName: data.name, 
+        jobTitle: data.jobTitle, 
+        companyName: data.companyName 
+      });
     case 'STATUS_UPDATE':
-      emailTitle = 'Update on your Application';
-      htmlBody = `<p>There has been an update regarding your application for <strong>${data.jobTitle}</strong>.</p>
-                  <div style="padding: 15px; background: #f1f5f9; border-radius: 8px; margin: 20px 0;">
-                    <strong>New Status:</strong> ${data.status.toUpperCase()}
-                  </div>
-                  <p>${data.message}</p>`;
-      break;
+      return emailService.sendApplicationStatusUpdate({
+        email,
+        candidateName: data.name,
+        jobTitle: data.jobTitle,
+        companyName: data.companyName,
+        status: data.status,
+        notes: data.message
+      });
     case 'INTERVIEW_SCHEDULED':
-      emailTitle = 'Interview Scheduled';
-      htmlBody = `<p>An interview has been scheduled for the <strong>${data.jobTitle}</strong> position.</p>
-                  <div style="padding: 15px; border-left: 4px solid #6366f1; background: #f8fafc; margin: 20px 0;">
-                    <p style="margin: 5px 0;"><strong>Date:</strong> ${data.date}</p>
-                    <p style="margin: 5px 0;"><strong>Time:</strong> ${data.time}</p>
-                    <p style="margin: 5px 0;"><strong>Location:</strong> ${data.location}</p>
-                  </div>
-                  <p><strong>Notes:</strong> ${data.notes || 'None'}</p>`;
-      break;
+      return emailService.sendInterviewScheduled({
+        email,
+        candidateName: data.name,
+        jobTitle: data.jobTitle,
+        date: data.date,
+        time: data.time,
+        location: data.location,
+        meetLink: data.meetLink
+      });
+    case 'OTP':
+      return emailService.sendVerificationOTP({
+        email,
+        name: data.name,
+        otp: data.otp || data.message
+      });
     default:
-      htmlBody = `<p>${data.message || 'No message content provided.'}</p>`;
-  }
-
-  const message = {
-    from: `${process.env.FROM_NAME || 'TalentFlow RMS'} <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: emailTitle,
-    html: createTemplate(emailTitle, htmlBody),
-  };
-
-  try {
-    const info = await transporter.sendMail(message);
-    console.log('Email sent: %s', info.messageId);
-    return info;
-  } catch (error) {
-    console.error('Email send failure:', error.message);
-    // Suppress error in production to avoid crashing the main request
-    return null;
+      return emailService.sendVerificationOTP({
+        email,
+        name: data.name,
+        otp: data.otp || '000000'
+      });
   }
 };
 

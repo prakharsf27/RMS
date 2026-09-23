@@ -1,6 +1,9 @@
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const sendEmail = require('../config/emailService');
+const EmailVerification = require('../models/EmailVerification');
+const emailService = require('../services/emailService');
 
 // Generate Token
 const generateToken = (id) => {
@@ -16,28 +19,51 @@ exports.register = async (req, res) => {
   const { fname, lname, email, password, role } = req.body;
 
   try {
-    const userExists = await User.findOne({ email });
+    const normalizedEmail = email ? email.toLowerCase().trim() : '';
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'An account with this email already exists' });
     }
 
+    // New user starts with real user settings (never demo data)
     const user = await User.create({
-      fname,
-      lname,
-      email,
+      fname: fname.trim(),
+      lname: lname.trim(),
+      email: normalizedEmail,
       password,
-      role: role === 'admin' ? 'candidate' : (role || 'candidate'),
-      avatar: `https://ui-avatars.com/api/?name=${fname}+${lname}&background=random`
+      role: role === 'admin' ? 'candidate' : (role || 'candidate'), // Admin not publicly creatable
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fname)}+${encodeURIComponent(lname)}&background=random`,
+      isDemoAccount: false,
+      emailVerified: false,
+      isEmailVerified: false,
+      onboardingCompleted: false,
+      profileCompletion: 15
     });
 
     if (user) {
-      // Send Welcome Email
-      sendEmail({
+      // 1. Generate cryptographically secure 6-digit OTP
+      const plainOtp = crypto.randomInt(100000, 1000000).toString();
+      const otpHash = await bcrypt.hash(plainOtp, 10);
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+      // 2. Invalidate any prior records and save hashed OTP
+      await EmailVerification.deleteMany({ email: user.email });
+      await EmailVerification.create({
+        userId: user._id,
         email: user.email,
-        type: 'WELCOME',
-        data: { name: user.fname }
+        otpHash,
+        expiresAt,
+        attempts: 0,
+        resendCooldownUntil: new Date(Date.now() + 60 * 1000)
       });
+
+      // 3. Send Transactional Verification OTP
+      emailService.sendVerificationOTP({
+        email: user.email,
+        name: user.fname,
+        otp: plainOtp
+      }).catch(err => console.warn('Verification email dispatch error:', err.message));
 
       res.status(201).json({
         _id: user._id,
@@ -46,11 +72,18 @@ exports.register = async (req, res) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
+        profileImageUrl: user.avatar,
+        isDemoAccount: false,
+        emailVerified: false,
+        onboardingCompleted: false,
+        profileCompletion: 15,
+        emailVerificationSent: true,
         token: generateToken(user._id),
       });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Registration error:', error);
+    res.status(500).json({ message: error.message || 'Registration failed' });
   }
 };
 
@@ -61,7 +94,8 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const normalizedEmail = email ? email.toLowerCase().trim() : '';
+    const user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found. Please register if you are new.' });
@@ -79,6 +113,11 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role,
         avatar: user.avatar,
+        profileImageUrl: user.profileImageUrl || user.avatar,
+        isDemoAccount: !!user.isDemoAccount,
+        emailVerified: !!user.emailVerified,
+        onboardingCompleted: !!user.onboardingCompleted,
+        profileCompletion: user.profileCompletion || (user.isDemoAccount ? 100 : 0),
         token: generateToken(user._id),
       });
     } else {
@@ -209,6 +248,31 @@ exports.getProfile = async (req, res) => {
     res.status(404).json({ message: 'User not found' });
   }
 };
+// Calculate real profile completion percentage
+const calculateProfileCompletion = (user) => {
+  if (user.isDemoAccount) return 100;
+  let score = 20; // Base registered & email verified
+
+  if (user.role === 'recruiter') {
+    if (user.phone) score += 15;
+    if (user.professionalHeadline || user.bio) score += 15;
+    if (user.address || user.state) score += 10;
+    if (user.avatar && !user.avatar.includes('ui-avatars.com')) score += 15;
+    if (user.onboardingCompleted) score = Math.max(score, 100);
+    return Math.min(100, score);
+  }
+
+  // Candidate
+  if (user.phone) score += 10;
+  if (user.professionalHeadline || user.careerObjective) score += 10;
+  if (user.skills && user.skills.length >= 3) score += 15;
+  if (user.education && user.education.length > 0) score += 15;
+  if ((user.workExperience && user.workExperience.length > 0) || (user.projects && user.projects.length > 0)) score += 15;
+  if (user.resume) score += 10;
+  if (user.avatar && !user.avatar.includes('ui-avatars.com')) score += 5;
+  return Math.min(100, score);
+};
+
 // @desc    Update user profile
 // @route   PUT /api/auth/profile
 // @access  Private
@@ -276,6 +340,7 @@ exports.updateProfile = async (req, res) => {
         user.avatar = req.files.avatar[0].path.startsWith('http') 
           ? req.files.avatar[0].path 
           : `/uploads/avatars/${req.files.avatar[0].filename}`;
+        user.profileImageUrl = user.avatar;
       }
       if (req.files.resume) {
         user.resume = req.files.resume[0].path.startsWith('http') 
@@ -284,6 +349,7 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
+    user.profileCompletion = calculateProfileCompletion(user);
     const updatedUser = await user.save();
 
     res.json({
@@ -292,6 +358,105 @@ exports.updateProfile = async (req, res) => {
     });
   } else {
     res.status(404).json({ message: 'User not found' });
+  }
+};
+
+// @desc    Upload profile photo
+// @route   POST /api/auth/upload-avatar
+// @access  Private
+exports.uploadAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please select an image file (PNG, JPG, or WEBP)' });
+    }
+
+    const avatarUrl = req.file.path.startsWith('http') 
+      ? req.file.path 
+      : `/uploads/avatars/${req.file.filename}`;
+
+    user.avatar = avatarUrl;
+    user.profileImageUrl = avatarUrl;
+    user.profileCompletion = calculateProfileCompletion(user);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile photo updated successfully',
+      avatar: avatarUrl,
+      profileImageUrl: avatarUrl,
+      profileCompletion: user.profileCompletion
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Avatar upload failed' });
+  }
+};
+
+// @desc    Remove profile photo
+// @route   DELETE /api/auth/upload-avatar
+// @access  Private
+exports.removeAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fname)}+${encodeURIComponent(user.lname)}&background=random`;
+    user.avatar = defaultAvatar;
+    user.profileImageUrl = '';
+    user.profileCompletion = calculateProfileCompletion(user);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile photo removed',
+      avatar: defaultAvatar,
+      profileImageUrl: '',
+      profileCompletion: user.profileCompletion
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Complete profile onboarding
+// @route   POST /api/auth/complete-onboarding
+// @access  Private
+exports.completeOnboarding = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Validate required identity
+    if (!user.fname || !user.lname || !user.email) {
+      return res.status(400).json({ message: 'Required identity fields are incomplete' });
+    }
+
+    user.onboardingCompleted = true;
+    user.profileCompletion = Math.max(85, calculateProfileCompletion(user));
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Onboarding completed successfully!',
+      user: {
+        _id: user._id,
+        fname: user.fname,
+        lname: user.lname,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        profileImageUrl: user.profileImageUrl || user.avatar,
+        isDemoAccount: !!user.isDemoAccount,
+        emailVerified: !!user.emailVerified,
+        onboardingCompleted: true,
+        profileCompletion: user.profileCompletion,
+        token: generateToken(user._id)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to complete onboarding' });
   }
 };
 

@@ -33,13 +33,30 @@ const protect = async (req, res, next) => {
 // Role-based access control middleware
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.user?.role)) {
       return res.status(403).json({ 
-        message: `User role ${req.user.role} is not authorized to access this route` 
+        message: `User role ${req.user?.role} is not authorized to access this route` 
       });
     }
     next();
   };
 };
 
-module.exports = { protect, authorize };
+// Optional auth middleware — populates req.user if token is present, but does not reject if missing
+const optionalProtect = async (req, res, next) => {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+    } catch (error) {
+      // Ignore token error for optional auth
+    }
+  }
+  next();
+};
+
+module.exports = { protect, authorize, optionalProtect };

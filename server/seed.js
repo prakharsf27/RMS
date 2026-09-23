@@ -52,7 +52,11 @@ const seed = async () => {
         role: 'admin',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
         bio: 'Platform Operations Director at TalentFlow AI.',
-        status: 'active'
+        status: 'active',
+        isDemoAccount: true,
+        emailVerified: true,
+        onboardingCompleted: true,
+        profileCompletion: 100
       },
       // Primary Demo Recruiter (Sarah Jenkins at TalentFlow Technologies)
       {
@@ -63,7 +67,11 @@ const seed = async () => {
         role: 'recruiter',
         avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
         bio: 'Lead Technical Talent Partner at TalentFlow Technologies. Specializing in high-growth engineering teams.',
-        status: 'active'
+        status: 'active',
+        isDemoAccount: true,
+        emailVerified: true,
+        onboardingCompleted: true,
+        profileCompletion: 100
       },
       // Primary Demo Candidate (Aarav Sharma)
       {
@@ -73,6 +81,10 @@ const seed = async () => {
         password: hashedPassword,
         role: 'candidate',
         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        isDemoAccount: true,
+        emailVerified: true,
+        onboardingCompleted: true,
+        profileCompletion: 100,
         bio: 'Senior Frontend Engineer passionate about React 19, TypeScript, and high-performance design systems.',
         professionalHeadline: 'Senior Frontend Engineer | React, TypeScript, Next.js',
         careerObjective: 'To architect scalable, accessible, and delightful web applications in an AI-first product ecosystem.',

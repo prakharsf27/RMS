@@ -70,10 +70,16 @@ const fileFilter = (req, file, cb) => {
       cb(new Error('Only images are allowed for profile photos!'), false);
     }
   } else if (file.fieldname === 'resume') {
-    if (file.mimetype === 'application/pdf') {
+    const isDoc = file.mimetype === 'application/pdf' ||
+      file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+      file.mimetype === 'application/msword' ||
+      file.mimetype === 'text/plain' ||
+      /\.(pdf|docx|doc|txt)$/i.test(file.originalname);
+
+    if (isDoc) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF resumes are supported!'), false);
+      cb(new Error('Only PDF, DOCX, DOC, and TXT resumes are supported!'), false);
     }
   } else {
     cb(null, false);
