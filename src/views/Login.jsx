@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
@@ -14,10 +14,20 @@ export default function Login({ initialMode = "login" }) {
   const { login, register, user } = useAuth();
   const router = useRouter();
   
-  // Redirect to dashboard if user is already logged in
-  if (user) {
-    router.push("/dashboard");
-  }
+  // Guarded client-side redirect when user state becomes active
+  useEffect(() => {
+    if (user) {
+      if (user.isDemoAccount || (user.emailVerified && user.onboardingCompleted)) {
+        router.replace('/dashboard');
+      } else if (user.emailVerified === false && user.isEmailVerified === false) {
+        router.replace('/verify-email');
+      } else if (user.onboardingCompleted === false) {
+        router.replace('/onboarding');
+      } else {
+        router.replace('/dashboard');
+      }
+    }
+  }, [user, router]);
   
   const [isRegister, setIsRegister] = useState(initialMode === "register");
   const [email, setEmail] = useState("");
@@ -53,7 +63,16 @@ export default function Login({ initialMode = "login" }) {
       if (!res.success) {
         throw new Error(res.error);
       } else {
-        router.push("/dashboard");
+        const loggedUser = res.user;
+        if (loggedUser?.isDemoAccount) {
+          router.replace('/dashboard');
+        } else if (loggedUser?.emailVerified === false && loggedUser?.isEmailVerified === false) {
+          router.replace('/verify-email');
+        } else if (loggedUser?.onboardingCompleted === false) {
+          router.replace('/onboarding');
+        } else {
+          router.replace('/dashboard');
+        }
       }
     } catch (err) {
       clearTimeout(authTimeout);

@@ -417,20 +417,36 @@ export const CandidateDrawer = ({
                   </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const resume = app.resumeUrl || user.resumeUrl;
-                    if (resume) {
-                      window.open(resume, '_blank');
-                    } else {
-                      alert('Displaying sample verified resume for demonstration.');
-                    }
-                  }}
-                >
-                  View Document
-                </Button>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const resume = app.resumeUrl || user.resumeUrl;
+                      if (resume) {
+                        window.open(resume, '_blank');
+                      } else {
+                        alert('Displaying sample verified resume for demonstration.');
+                      }
+                    }}
+                  >
+                    View PDF
+                  </Button>
+                  {(app.resumeUrl || user.resumeUrl)?.includes('res.cloudinary.com') && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      title="Instant High-Resolution Image Preview"
+                      onClick={() => {
+                        const resume = app.resumeUrl || user.resumeUrl;
+                        const previewUrl = resume.replace(/\.pdf$/i, '.jpg');
+                        window.open(previewUrl, '_blank');
+                      }}
+                    >
+                      Image Preview
+                    </Button>
+                  )}
+                </div>
               </div>
 
               <div style={{ background: 'var(--bg-surface)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>

@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 
 const InterviewSchema = new mongoose.Schema({
-  applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true },
+  applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: false },
   candidateId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   recruiterId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   jobTitle: { type: String, required: true },
-  candidateName: { type: String, required: true },
+  candidateName: { type: String, default: 'Candidate' },
   date: { type: Date, required: true },
   time: { type: String, required: true },
   type: { 
     type: String, 
     enum: ['virtual', 'in-person'], 
-    required: true 
+    default: 'virtual'
   },
   location: { type: String, required: true }, // Meeting link or address
   notes: { type: String },

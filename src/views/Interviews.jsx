@@ -13,7 +13,7 @@ import {
   XCircle, MessageSquare, Users as UsersIcon, Sparkles, 
   ExternalLink, CalendarDays, ArrowRight
 } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import styles from "./Interviews.module.css";
 import { format, isValid, parseISO } from "date-fns";
 
@@ -30,6 +30,9 @@ const safeFormat = (dateStr, formatStr) => {
 export default function Interviews() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const paramCandidateId = searchParams?.get('candidateId');
+  const paramJobId = searchParams?.get('jobId');
 
   const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,8 @@ export default function Interviews() {
   // Form State
   const [formData, setFormData] = useState({
     candidateId: "",
+    candidateName: "",
+    applicationId: "",
     jobTitle: "Senior Frontend Engineer",
     stage: "Technical Architecture",
     date: "",
@@ -51,6 +56,17 @@ export default function Interviews() {
     location: "https://meet.google.com/talentflow-demo",
     notes: "Review component architecture and Core Web Vitals optimization experience."
   });
+
+  // Handle URL query parameters for direct scheduling from candidates/applications
+  useEffect(() => {
+    if (paramCandidateId) {
+      setShowModal(true);
+      setFormData(prev => ({
+        ...prev,
+        candidateId: paramCandidateId
+      }));
+    }
+  }, [paramCandidateId, paramJobId]);
 
   // Destructive Confirmation
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false });
@@ -103,7 +119,30 @@ export default function Interviews() {
   const handleSchedule = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/interviews", formData);
+      let candName = formData.candidateName;
+      if (!candName && formData.candidateId) {
+        const found = candidates.find(c => c._id === formData.candidateId);
+        if (found) {
+          candName = `${found.fname} ${found.lname}`.trim();
+        } else if (formData.candidateId === 'aarav-demo') {
+          candName = 'Aarav Sharma';
+        }
+      }
+
+      // Check if candidate has an application
+      let appId = formData.applicationId;
+      if (!appId && formData.candidateId) {
+        const matchedApp = applications.find(a => (a.candidateId?._id || a.candidateId) === formData.candidateId);
+        if (matchedApp) appId = matchedApp._id;
+      }
+
+      const payload = {
+        ...formData,
+        candidateName: candName || "Candidate",
+        applicationId: appId || undefined
+      };
+
+      await api.post("/interviews", payload);
       setShowModal(false);
       fetchData();
     } catch (err) {
@@ -327,7 +366,18 @@ export default function Interviews() {
             <select
               className={styles.select}
               value={formData.candidateId}
-              onChange={(e) => setFormData({ ...formData, candidateId: e.target.value })}
+              onChange={(e) => {
+                const selId = e.target.value;
+                const found = candidates.find(c => c._id === selId);
+                const matchedApp = applications.find(a => (a.candidateId?._id || a.candidateId) === selId);
+                setFormData(prev => ({
+                  ...prev,
+                  candidateId: selId,
+                  candidateName: found ? `${found.fname} ${found.lname}`.trim() : (selId === 'aarav-demo' ? 'Aarav Sharma' : ''),
+                  applicationId: matchedApp?._id || prev.applicationId,
+                  jobTitle: matchedApp?.jobId?.title || prev.jobTitle
+                }));
+              }}
               required
             >
               <option value="">Select candidate from pipeline...</option>

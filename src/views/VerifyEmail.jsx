@@ -9,7 +9,7 @@ import styles from "./VerifyEmail.module.css";
 import { cn } from "../lib/utils";
 
 export default function VerifyEmail() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const router = useRouter();
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -24,7 +24,7 @@ export default function VerifyEmail() {
   // Redirect if already verified or demo account
   useEffect(() => {
     if (user) {
-      if (user.isDemoAccount || user.emailVerified) {
+      if (user.isDemoAccount || user.emailVerified || user.isEmailVerified) {
         if (user.onboardingCompleted) {
           router.replace('/dashboard');
         } else {
@@ -32,7 +32,7 @@ export default function VerifyEmail() {
         }
       }
     }
-  }, [user, router]);
+  }, [user?.emailVerified, user?.isEmailVerified, user?.onboardingCompleted, user?.isDemoAccount, router]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -109,16 +109,19 @@ export default function VerifyEmail() {
         otp: code
       });
 
-      setSuccessMsg("Email verified successfully! Redirecting to onboarding...");
+      setSuccessMsg("Email verified successfully! Redirecting...");
       
-      // Update local storage and context
+      // Update local storage and context immediately
       if (data.user) {
+        updateUser(data.user);
         localStorage.setItem("rms_user", JSON.stringify(data.user));
+      } else {
+        updateUser({ emailVerified: true, isEmailVerified: true });
       }
 
       setTimeout(() => {
-        router.push('/onboarding');
-      }, 1000);
+        router.replace(data.user?.onboardingCompleted ? '/dashboard' : '/onboarding');
+      }, 500);
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Verification failed");
     } finally {

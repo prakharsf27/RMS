@@ -36,7 +36,7 @@ const RECRUITER_STEPS = [
 ];
 
 export default function Onboarding() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const router = useRouter();
 
   const isRecruiter = user?.role === 'recruiter';
@@ -85,10 +85,12 @@ export default function Onboarding() {
 
   const [newSkillInput, setNewSkillInput] = useState("");
   const fileInputRef = useRef(null);
+  const hasInitializedRef = useRef(false);
 
-  // Initialize with user profile if already present
+  // Initialize with user profile once on mount
   useEffect(() => {
-    if (user) {
+    if (user && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       if (user.isDemoAccount || user.onboardingCompleted) {
         router.replace('/dashboard');
         return;
@@ -210,9 +212,12 @@ export default function Onboarding() {
         // Final Step: Complete Onboarding!
         const { data } = await api.post('/auth/complete-onboarding');
         if (data.user) {
+          updateUser(data.user);
           localStorage.setItem("rms_user", JSON.stringify(data.user));
+        } else {
+          updateUser({ onboardingCompleted: true });
         }
-        router.push('/dashboard');
+        router.replace('/dashboard');
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to save profile progress.");
@@ -238,18 +243,21 @@ export default function Onboarding() {
         <div>
           <div className={styles.brand}>
             <div className={styles.brandLogo}>TF</div>
-            <div className={styles.brandText}>TalentFlow <span style={{ color: '#818cf8' }}>AI</span></div>
+            <div className={styles.brandText}>
+              <span>TalentFlow</span>
+              <span className={styles.brandBadge}>AI</span>
+            </div>
           </div>
 
           <div className={styles.completionCard}>
             <div className={styles.completionHeader}>
               <span>Profile Setup</span>
-              <span style={{ color: '#818cf8' }}>{Math.min(100, completionPct)}%</span>
+              <span className={styles.completionPct}>{Math.min(100, completionPct)}%</span>
             </div>
             <div className={styles.progressBarBg}>
               <div className={styles.progressBarFill} style={{ width: `${Math.min(100, completionPct)}%` }} />
             </div>
-            <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.6rem' }}>
+            <p className={styles.stepSubtext}>
               Step {currentStep} of {steps.length}: {steps[currentStep - 1]?.name}
             </p>
           </div>
@@ -309,11 +317,11 @@ export default function Onboarding() {
       <main className={styles.mainContent}>
         <div className={styles.topBar}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.813rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <span className={styles.topBarRole}>
               {isRecruiter ? 'Recruiter Onboarding' : 'Candidate Onboarding'}
             </span>
           </div>
-          <span style={{ fontSize: '0.813rem', color: '#94a3b8' }}>
+          <span className={styles.topBarEmail}>
             {user?.email}
           </span>
         </div>
@@ -337,8 +345,8 @@ export default function Onboarding() {
                   className={styles.avatarPreview}
                 />
                 <div className={styles.avatarActions}>
-                  <div style={{ fontWeight: 600, fontSize: '0.938rem' }}>Profile Photo</div>
-                  <div style={{ fontSize: '0.813rem', color: '#94a3b8' }}>Supports PNG, JPG, or WEBP under 5MB.</div>
+                  <div className={styles.avatarTitle}>Profile Photo</div>
+                  <div className={styles.avatarDesc}>Supports PNG, JPG, or WEBP under 5MB.</div>
                   <div className={styles.btnRow}>
                     <input 
                       type="file" 
@@ -676,8 +684,8 @@ export default function Onboarding() {
                   ))}
                 </div>
 
-                <div style={{ marginTop: '1.5rem', fontSize: '0.813rem', color: '#94a3b8' }}>
-                  <span>Quick suggestions: </span>
+                <div style={{ marginTop: '1.5rem', fontSize: '0.813rem', color: '#475569' }}>
+                  <span style={{ fontWeight: 600 }}>Quick suggestions: </span>
                   {['React', 'TypeScript', 'Node.js', 'Next.js', 'Python', 'SQL', 'GraphQL', 'AWS', 'Tailwind CSS'].map(s => (
                     <button
                       key={s}
@@ -688,13 +696,14 @@ export default function Onboarding() {
                         }
                       }}
                       style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: '#cbd5e1',
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        color: '#1e293b',
                         borderRadius: '6px',
-                        padding: '2px 8px',
+                        padding: '3px 9px',
                         margin: '0 4px 4px 0',
                         fontSize: '0.75rem',
+                        fontWeight: 600,
                         cursor: 'pointer'
                       }}
                     >
@@ -787,11 +796,11 @@ export default function Onboarding() {
                   placeholder="e.g. US-EIN-98-7654321"
                 />
               </div>
-              <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.25)', borderRadius: '10px', marginTop: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#34d399', fontWeight: 600 }}>
+              <div style={{ padding: '1rem', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', marginTop: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065f46', fontWeight: 700 }}>
                   <ShieldCheck size={18} /> Ready for Verified Employer Review
                 </div>
-                <p style={{ fontSize: '0.813rem', color: '#94a3b8', marginTop: '0.35rem' }}>
+                <p style={{ fontSize: '0.813rem', color: '#047857', marginTop: '0.35rem', margin: 0 }}>
                   Upon completion, your profile will be authorized to publish verified listings and invite candidates to interview rounds.
                 </p>
               </div>

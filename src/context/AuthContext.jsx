@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post("/auth/login", { email, password });
       setUser(data);
       localStorage.setItem("rms_token", data.token);
-      return { success: true };
+      return { success: true, user: data };
     } catch (err) {
       return { 
         success: false, 
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post("/auth/register", userData);
       setUser(data);
       localStorage.setItem("rms_token", data.token);
-      return { success: true };
+      return { success: true, user: data };
     } catch (err) {
       return { 
         success: false, 

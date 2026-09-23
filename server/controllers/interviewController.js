@@ -8,18 +8,56 @@ const sendEmail = require('../config/emailService');
 // @access  Private (Recruiter/Admin)
 exports.scheduleInterview = async (req, res) => {
   try {
+    let { candidateId, candidateName, applicationId, jobTitle, date, time, type, location, notes } = req.body;
+
+    // 1. Resolve candidate name if not supplied
+    if (candidateId && !candidateName) {
+      const candidateUser = await User.findById(candidateId);
+      if (candidateUser) {
+        candidateName = `${candidateUser.fname || ''} ${candidateUser.lname || ''}`.trim() || candidateUser.email;
+      }
+    }
+
+    // 2. Resolve applicationId if not supplied
+    if (candidateId && !applicationId) {
+      try {
+        const Application = require('../models/Application');
+        const latestApp = await Application.findOne({ candidateId }).sort({ createdAt: -1 });
+        if (latestApp) {
+          applicationId = latestApp._id;
+          if (!jobTitle && latestApp.jobId) {
+            const Job = require('../models/Job');
+            const job = await Job.findById(latestApp.jobId);
+            if (job) jobTitle = job.title;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not auto-resolve applicationId:', e.message);
+      }
+    }
+
     const interview = await Interview.create({
-      ...req.body,
-      recruiterId: req.user._id
+      candidateId,
+      candidateName: candidateName || 'Candidate',
+      applicationId: applicationId || undefined,
+      recruiterId: req.user._id,
+      jobTitle: jobTitle || 'General Assessment',
+      date: date || new Date(),
+      time: time || '14:00',
+      type: type || 'virtual',
+      location: location || 'https://meet.google.com/talentflow-demo',
+      notes: notes || ''
     });
 
     // Notify candidate via system
-    await Notification.create({
+    if (interview.candidateId) {
+      await Notification.create({
         userId: interview.candidateId,
         subject: 'Interview Scheduled',
         message: `A new interview for the ${interview.jobTitle} position has been scheduled.`,
         sender: 'TalentFlow System'
-    });
+      }).catch(err => console.warn('Notification create warning:', err.message));
+    }
 
     // Send Interview Email
     const candidate = await User.findById(interview.candidateId);

@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from 'next/navigation';
-;
+import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../lib/api";
@@ -11,10 +10,10 @@ import { Input } from "../ui/Input";
 import { NotificationDropdown } from "../ui/NotificationDropdown";
 import { AIWidget } from "../ui/AIWidget";
 
-
 export const AppLayout = ({ children, noPadding = false }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -24,7 +23,7 @@ export const AppLayout = ({ children, noPadding = false }) => {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.replace('/login');
+      if (pathname !== '/login') router.replace('/login');
       return;
     }
 
@@ -33,16 +32,16 @@ export const AppLayout = ({ children, noPadding = false }) => {
 
     // Real user email verification guard
     if (user.emailVerified === false && user.isEmailVerified === false) {
-      router.replace('/verify-email');
+      if (pathname !== '/verify-email') router.replace('/verify-email');
       return;
     }
 
     // Real user onboarding guard
     if (user.onboardingCompleted === false) {
-      router.replace('/onboarding');
+      if (pathname !== '/onboarding') router.replace('/onboarding');
       return;
     }
-  }, [user, loading, router]);
+  }, [user?.emailVerified, user?.isEmailVerified, user?.onboardingCompleted, user?.isDemoAccount, loading, router, pathname]);
 
   const fetchNotifications = useCallback(async () => {
     try {
