@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import { Card } from "../components/ui/Card";
@@ -10,7 +11,7 @@ import {
   Mail, Inbox, Clock, CheckCircle2, ArrowRight, 
   ExternalLink, Bell, Calendar, Sparkles, MessageSquare
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { getNotificationRoute } from "../lib/notificationRoutes";
 import styles from "./NotificationCenter.module.css";
 import { format } from "date-fns";
 
@@ -45,33 +46,29 @@ export default function NotificationCenter() {
   }, [user]);
 
   const handleRead = async (id) => {
+    // Immediate optimistic update
+    setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true, isRead: true } : n));
+    if (selectedNote?._id === id) {
+      setSelectedNote(prev => prev ? { ...prev, read: true, isRead: true } : prev);
+    }
     try {
-      await api.put(`/notifications/${id}`);
-      setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
+      await api.put(`/notifications/${id}/read`).catch(() => api.put(`/notifications/${id}`));
     } catch (err) {
       console.error("Mark read error:", err);
     }
   };
 
+  const isNoteUnread = (note) => !note.read && !note.isRead;
+
   const filteredNotes = notifications.filter(note => {
-    if (activeTab === "unread") return !note.read;
-    if (activeTab === "applications") return /applied|application|candidate/i.test(note.subject + " " + note.message);
-    if (activeTab === "interviews") return /interview|schedule/i.test(note.subject + " " + note.message);
+    if (activeTab === "unread") return isNoteUnread(note);
+    if (activeTab === "applications") return /applied|application|candidate/i.test((note.subject || note.title || "") + " " + (note.message || ""));
+    if (activeTab === "interviews") return /interview|schedule/i.test((note.subject || note.title || "") + " " + (note.message || ""));
     return true;
   });
 
   const getActionForNote = (note) => {
-    const text = (note.subject + " " + note.message).toLowerCase();
-    if (text.includes("interview")) {
-      return { label: "View Interview Schedule", path: "/interviews" };
-    }
-    if (text.includes("applied") || text.includes("application")) {
-      return { label: user?.role === "candidate" ? "View Application Pipeline" : "Manage Candidates", path: user?.role === "candidate" ? "/applications" : "/candidates" };
-    }
-    if (text.includes("message")) {
-      return { label: "Open Messaging Inbox", path: "/messages" };
-    }
-    return { label: "Go to Dashboard", path: "/dashboard" };
+    return getNotificationRoute(note, user?.role);
   };
 
   return (
@@ -138,7 +135,8 @@ export default function NotificationCenter() {
               ) : (
                 filteredNotes.map(note => {
                   const isSelected = selectedNote?._id === note._id;
-                  const isUnread = !note.read;
+                  const isUnread = isNoteUnread(note);
+                  const displayTitle = note.subject || note.title || "Notification";
 
                   return (
                     <div 
@@ -146,7 +144,7 @@ export default function NotificationCenter() {
                       className={`${styles.noteItem} ${isSelected ? styles.active : ''} ${isUnread ? styles.unread : ''}`}
                       onClick={() => { 
                         setSelectedNote(note); 
-                        if (!note.read) handleRead(note._id); 
+                        if (isUnread) handleRead(note._id); 
                       }}
                     >
                       <div className={styles.noteIndicator} />
@@ -154,10 +152,10 @@ export default function NotificationCenter() {
                         <div className={styles.senderRow}>
                           <span className={styles.noteSender}>{note.sender || "TalentFlow"}</span>
                           <span className={styles.noteTime}>
-                            {note.createdAt ? format(new Date(note.createdAt), "MMM d") : "Today"}
+                            {note.createdAt || note.timestamp ? format(new Date(note.createdAt || note.timestamp), "MMM d") : "Today"}
                           </span>
                         </div>
-                        <span className={styles.noteSubject}>{note.subject}</span>
+                        <span className={styles.noteSubject}>{displayTitle}</span>
                         <span className={styles.noteSnippet}>{note.message}</span>
                       </div>
                     </div>
@@ -173,14 +171,14 @@ export default function NotificationCenter() {
               <>
                 <div className={styles.detailHeader}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Badge variant={selectedNote.read ? "secondary" : "primary"}>
-                      {selectedNote.read ? "Read" : "Unread Notification"}
+                    <Badge variant={isNoteUnread(selectedNote) ? "primary" : "secondary"}>
+                      {isNoteUnread(selectedNote) ? "Unread Notification" : "Read"}
                     </Badge>
                     <span style={{ fontSize: '0.813rem', color: 'var(--text-tertiary)' }}>
-                      {selectedNote.createdAt ? format(new Date(selectedNote.createdAt), "EEEE, MMMM d, yyyy • h:mm a") : "Recent"}
+                      {selectedNote.createdAt || selectedNote.timestamp ? format(new Date(selectedNote.createdAt || selectedNote.timestamp), "EEEE, MMMM d, yyyy • h:mm a") : "Recent"}
                     </span>
                   </div>
-                  <h2 className={styles.detailSubject}>{selectedNote.subject}</h2>
+                  <h2 className={styles.detailSubject}>{selectedNote.subject || selectedNote.title}</h2>
                   <div className={styles.detailSenderRow}>
                     <span>From: <strong>{selectedNote.sender || "TalentFlow Recruitment"}</strong></span>
                   </div>

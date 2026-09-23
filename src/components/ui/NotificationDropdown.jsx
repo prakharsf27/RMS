@@ -1,26 +1,69 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, CheckCheck, X, ArrowRight, ExternalLink } from "lucide-react";
+import { Bell, X, ArrowRight, ArrowUpRight, CheckCheck } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
+import { getNotificationRoute } from "../../lib/notificationRoutes";
 import styles from "./NotificationDropdown.module.css";
-import { Button } from "./Button";
 import { cn } from "../../lib/utils";
 
 export const NotificationDropdown = ({ 
-  notifications, 
+  notifications = [], 
   onMarkAsRead, 
   onClose 
 }) => {
+  const { user } = useAuth();
+  const router = useRouter();
   const [filter, setFilter] = useState('all'); // 'all' | 'unread'
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const dropdownRef = useRef(null);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose?.();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const isNotificationUnread = (n) => !n.read && !n.isRead;
+
+  const unreadCount = notifications.filter(isNotificationUnread).length;
 
   const filteredNotifications = filter === 'unread' 
-    ? notifications.filter(n => !n.read)
+    ? notifications.filter(isNotificationUnread)
     : notifications;
 
+  const handleNotificationClick = async (notification, e) => {
+    e.stopPropagation();
+    
+    // 1. Immediately mark as read optimistically
+    if (isNotificationUnread(notification)) {
+      onMarkAsRead?.(notification._id);
+    }
+    
+    // 2. Close dropdown
+    onClose?.();
+
+    // 3. Resolve target destination & navigate
+    const destination = getNotificationRoute(notification, user?.role);
+    if (destination?.path) {
+      router.push(destination.path);
+    }
+  };
+
   return (
-    <div className={styles.dropdown} onClick={(e) => e.stopPropagation()}>
+    <div 
+      ref={dropdownRef}
+      className={styles.dropdown} 
+      onClick={(e) => e.stopPropagation()}
+      role="dialog"
+      aria-label="Notifications popover"
+    >
       <header className={styles.header}>
         <div className={styles.titleRow}>
           <h3 className={styles.title}>Notifications</h3>
@@ -29,7 +72,12 @@ export const NotificationDropdown = ({
           )}
         </div>
         <div className={styles.headerActions}>
-          <button onClick={onClose} className={styles.closeBtn} aria-label="Close notifications">
+          <button 
+            onClick={onClose} 
+            className={styles.closeBtn} 
+            aria-label="Close notifications popover"
+            title="Close"
+          >
             <X size={16} />
           </button>
         </div>
@@ -38,12 +86,14 @@ export const NotificationDropdown = ({
       {/* Filter Tabs */}
       <div className={styles.filterRow}>
         <button
+          type="button"
           className={cn(styles.filterTab, filter === 'all' && styles.filterTabActive)}
           onClick={() => setFilter('all')}
         >
           All ({notifications.length})
         </button>
         <button
+          type="button"
           className={cn(styles.filterTab, filter === 'unread' && styles.filterTabActive)}
           onClick={() => setFilter('unread')}
         >
@@ -61,25 +111,46 @@ export const NotificationDropdown = ({
             <span className={styles.emptySub}>No {filter === 'unread' ? 'unread' : 'new'} notifications right now</span>
           </div>
         ) : (
-          filteredNotifications.map(notification => (
-            <div 
-              key={notification._id} 
-              className={cn(styles.item, !notification.read && styles.unread)}
-              onClick={() => onMarkAsRead(notification._id)}
-            >
-              <div className={styles.itemContent}>
-                <div className={styles.itemHeader}>
-                  <span className={styles.subject}>{notification.subject}</span>
-                  <span className={styles.time}>
-                    {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
-                  </span>
+          filteredNotifications.map(notification => {
+            const destination = getNotificationRoute(notification, user?.role);
+            const unread = isNotificationUnread(notification);
+            const displayTitle = notification.subject || notification.title || "Notification";
+
+            return (
+              <div 
+                key={notification._id} 
+                className={cn(styles.item, unread && styles.unread)}
+                onClick={(e) => handleNotificationClick(notification, e)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleNotificationClick(notification, e);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`${displayTitle}. Navigate to ${destination.label}`}
+                title={`Click to open ${destination.label}`}
+              >
+                <div className={styles.itemContent}>
+                  <div className={styles.itemHeader}>
+                    <span className={styles.subject}>{displayTitle}</span>
+                    <span className={styles.time}>
+                      {notification.timestamp ? formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true }) : 'Recent'}
+                    </span>
+                  </div>
+                  <p className={styles.message}>{notification.message}</p>
+                  <div className={styles.footerRow}>
+                    <span className={styles.sender}>— {notification.sender || 'TalentFlow'}</span>
+                    <span className={styles.actionChip}>
+                      <span>{destination.label}</span>
+                      <ArrowUpRight size={11} />
+                    </span>
+                  </div>
                 </div>
-                <p className={styles.message}>{notification.message}</p>
-                <div className={styles.sender}>— {notification.sender}</div>
+                {unread && <div className={styles.indicator} title="Unread" />}
               </div>
-              {!notification.read && <div className={styles.indicator} />}
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from 'next/navigation';
 ;
 import { Sidebar } from "./Sidebar";
@@ -19,6 +19,7 @@ export const AppLayout = ({ children, noPadding = false }) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -29,8 +30,9 @@ export const AppLayout = ({ children, noPadding = false }) => {
   const fetchNotifications = useCallback(async () => {
     try {
       const { data } = await api.get("/notifications");
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
+      const list = Array.isArray(data) ? data : [];
+      setNotifications(list);
+      setUnreadCount(list.filter(n => !n.read && !n.isRead).length);
     } catch (err) {
       console.error("Fetch notifications error:", err);
     }
@@ -43,10 +45,24 @@ export const AppLayout = ({ children, noPadding = false }) => {
     return () => clearInterval(interval);
   }, [user, fetchNotifications]);
 
+  // Click outside to close notification dropdown
+  useEffect(() => {
+    if (!showNotifications) return;
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNotifications]);
+
   const handleMarkAsRead = async (id) => {
+    // Immediate optimistic UI update
+    setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true, isRead: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
     try {
-      await api.put(`/notifications/${id}`);
-      fetchNotifications();
+      await api.put(`/notifications/${id}/read`).catch(() => api.put(`/notifications/${id}`));
     } catch (err) {
       console.error("Mark as read error:", err);
     }
@@ -88,11 +104,12 @@ export const AppLayout = ({ children, noPadding = false }) => {
               {user.role === 'admin' ? 'Admin Console' : user.role === 'recruiter' ? 'Recruiter ATS' : 'Candidate Portal'}
             </span>
 
-            <div style={{ position: 'relative' }}>
+            <div ref={notifRef} style={{ position: 'relative' }}>
               <button 
                 className={styles.iconBtn} 
                 onClick={() => setShowNotifications(!showNotifications)}
                 aria-label="View notifications"
+                aria-expanded={showNotifications}
               >
                 <Bell size={18} />
                 {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
@@ -101,10 +118,7 @@ export const AppLayout = ({ children, noPadding = false }) => {
               {showNotifications && (
                 <NotificationDropdown 
                   notifications={notifications}
-                  onMarkAsRead={(id) => {
-                    handleMarkAsRead(id);
-                    setShowNotifications(false);
-                  }}
+                  onMarkAsRead={handleMarkAsRead}
                   onClose={() => setShowNotifications(false)}
                 />
               )}

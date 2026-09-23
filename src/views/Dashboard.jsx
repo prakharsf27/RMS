@@ -305,7 +305,7 @@ export default function Dashboard() {
       {isRecruiter && (
         <>
           {/* ATS Performance Stats */}
-          <div className={styles.statsGrid}>
+          <div className={styles.statsGrid5}>
             <div className={styles.statCard}>
               <div className={styles.statTop}>
                 <div className={styles.statIconWrap} style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
@@ -508,7 +508,7 @@ export default function Dashboard() {
       {/* ─── Admin View ─── */}
       {isAdmin && (
         <>
-          <div className={styles.statsGrid}>
+          <div className={styles.statsGrid5}>
             <div className={styles.statCard}>
               <div className={styles.statTop}>
                 <div className={styles.statIconWrap} style={{ background: 'rgba(99, 102, 241, 0.1)', color: 'var(--primary)' }}>
@@ -540,6 +540,17 @@ export default function Dashboard() {
               </div>
               <div className={styles.statLabel}>Active Jobs</div>
               <div className={styles.statValue}>{stats?.jobs || 4}</div>
+            </div>
+
+            <div className={styles.statCard}>
+              <div className={styles.statTop}>
+                <div className={styles.statIconWrap} style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)' }}>
+                  <FileText size={18} />
+                </div>
+                <span className={styles.statTrend}>Submissions</span>
+              </div>
+              <div className={styles.statLabel}>Applications</div>
+              <div className={styles.statValue}>{stats?.applications || dataList.length || 12}</div>
             </div>
 
             <div className={styles.statCard}>

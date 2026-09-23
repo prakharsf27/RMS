@@ -1,28 +1,37 @@
 .page {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 /* ─── Hero Header ─── */
 .hero {
   border-radius: var(--radius-lg);
-  padding: 1.75rem 2rem;
+  padding: 1.6rem 2rem;
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
   border: 1px solid rgba(99, 102, 241, 0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1.5rem;
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .heroContent {
   position: relative;
   z-index: 1;
   max-width: 680px;
+  min-width: 0;
 }
 
 .heroGreeting {
@@ -65,23 +74,100 @@
   gap: 0.75rem;
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
-/* ─── Stats Grid ─── */
+/* ─── Stats Grid (4 Cards: Candidate) ─── */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+@media (max-width: 1100px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Stats Grid 5 Cards (Recruiter & Admin) ─── */
+/* Large desktop (> 1440px): 5 cards per row */
+.statsGrid5 {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Standard desktop/laptop (1024px to 1440px): Intentional 3 + 2 layout! */
+@media (max-width: 1440px) {
+  .statsGrid5 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .statsGrid5 > :nth-child(1),
+  .statsGrid5 > :nth-child(2),
+  .statsGrid5 > :nth-child(3) {
+    grid-column: span 2;
+  }
+
+  .statsGrid5 > :nth-child(4),
+  .statsGrid5 > :nth-child(5) {
+    grid-column: span 3;
+  }
+}
+
+/* Tablet (641px to 1023px): 2 + 2 + 1 intentional layout */
+@media (max-width: 1023px) {
+  .statsGrid5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .statsGrid5 > :nth-child(1),
+  .statsGrid5 > :nth-child(2),
+  .statsGrid5 > :nth-child(3),
+  .statsGrid5 > :nth-child(4) {
+    grid-column: span 1;
+  }
+
+  .statsGrid5 > :nth-child(5) {
+    grid-column: span 2;
+  }
+}
+
+/* Mobile (<= 640px): 1 card per row */
+@media (max-width: 640px) {
+  .statsGrid5 {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid5 > :nth-child(n) {
+    grid-column: span 1;
+  }
+}
+
+/* ─── Standardized KPI Stat Card ─── */
 .statCard {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.25rem 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 0.65rem;
   position: relative;
   transition: border-color var(--transition-fast), transform var(--transition-fast);
 }
@@ -95,6 +181,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .statIconWrap {
@@ -104,15 +192,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .statTrend {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
   background: var(--bg-elevated);
   color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .statTrend.up {
@@ -124,16 +215,20 @@
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--text-tertiary);
+  line-height: 1.35;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .statValue {
-  font-size: 1.625rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
   line-height: 1.1;
+  word-break: break-word;
 }
 
 /* ─── Section Header ─── */
@@ -338,18 +433,22 @@
 /* ─── Funnel Display ─── */
 .funnelGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
   margin-top: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .funnelStep {
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 0.875rem 0.65rem;
+  padding: 0.875rem 0.5rem;
   text-align: center;
   position: relative;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .funnelVal {
@@ -357,6 +456,7 @@
   font-weight: 800;
   color: var(--text-primary);
   line-height: 1.1;
+  word-break: break-word;
 }
 
 .funnelLabel {
@@ -366,6 +466,7 @@
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
   margin-top: 0.35rem;
+  word-break: break-word;
 }
 
 /* ─── Activity Feed ─── */
