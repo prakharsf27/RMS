@@ -230,7 +230,7 @@ export default function Login({ initialMode = "login" }) {
             </div>
 
             {/* Quick Enterprise Demo Access */}
-            {!isRegister && (
+            {/* {!isRegister && (
               <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)' }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '0.75rem', textAlign: 'center' }}>
                   Quick Demo Access
@@ -265,7 +265,7 @@ export default function Login({ initialMode = "login" }) {
                   </Button>
                 </div>
               </div>
-            )}
+            )} */}
           </form>
 
           <div style={{ textAlign: "center", marginTop: "1.25rem" }}>
