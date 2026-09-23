@@ -81,6 +81,29 @@ exports.updateInterview = async (req, res) => {
     }
 
     const updatedInterview = await Interview.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // Send update notification & email if date/time/location modified
+    const candidate = await User.findById(updatedInterview.candidateId);
+    if (candidate) {
+      sendEmail({
+        email: candidate.email,
+        type: 'INTERVIEW_UPDATED',
+        data: {
+          jobTitle: updatedInterview.jobTitle,
+          date: updatedInterview.date,
+          time: updatedInterview.time,
+          location: updatedInterview.location,
+          meetLink: updatedInterview.meetLink
+        }
+      });
+      await Notification.create({
+        userId: updatedInterview.candidateId,
+        subject: 'Interview Schedule Updated',
+        message: `Your interview for ${updatedInterview.jobTitle} has been updated to ${updatedInterview.date} at ${updatedInterview.time}.`,
+        sender: 'TalentFlow System'
+      });
+    }
+
     res.json(updatedInterview);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -98,6 +121,24 @@ exports.deleteInterview = async (req, res) => {
     // Check ownership
     if (req.user.role === 'recruiter' && interview.recruiterId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this interview' });
+    }
+
+    const candidate = await User.findById(interview.candidateId);
+    if (candidate) {
+      sendEmail({
+        email: candidate.email,
+        type: 'INTERVIEW_CANCELLED',
+        data: {
+          jobTitle: interview.jobTitle,
+          reason: req.body?.reason || 'Cancelled by hiring team'
+        }
+      });
+      await Notification.create({
+        userId: interview.candidateId,
+        subject: 'Interview Cancelled',
+        message: `Your scheduled interview for ${interview.jobTitle} has been cancelled.`,
+        sender: 'TalentFlow System'
+      });
     }
 
     await interview.deleteOne();

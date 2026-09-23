@@ -55,13 +55,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedFields) => {
+    setUser(prev => {
+      const next = { ...prev, ...updatedFields };
+      return next;
+    });
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("rms_token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

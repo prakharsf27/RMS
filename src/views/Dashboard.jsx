@@ -45,14 +45,21 @@ export default function Dashboard() {
         ]);
 
         setStats(statsRes.data?.summary || {});
-        setActivities(statsRes.data?.activities || []);
+        setActivities(Array.isArray(statsRes.data?.activities) ? statsRes.data.activities : []);
         setInterviews(Array.isArray(intRes.data) ? intRes.data : []);
         setMessages(Array.isArray(msgRes.data) ? msgRes.data : []);
 
+        const rawJobs = Array.isArray(jobsRes.data) 
+          ? jobsRes.data 
+          : (Array.isArray(jobsRes.data?.jobs) ? jobsRes.data.jobs : []);
+        const rawApps = Array.isArray(appsRes.data) 
+          ? appsRes.data 
+          : (Array.isArray(appsRes.data?.applications) ? appsRes.data.applications : []);
+
         if (user.role === 'candidate') {
-          setDataList(jobsRes.data || []);
+          setDataList(rawJobs);
         } else {
-          setDataList(appsRes.data || []);
+          setDataList(rawApps);
         }
       } catch (err) {
         console.error("Dashboard data error:", err);
@@ -87,7 +94,8 @@ export default function Dashboard() {
   const profilePct = Math.round((doneTasks / profileTasks.length) * 100);
 
   // Recruiter Funnel Metrics
-  const totalApps = stats?.applications || dataList.length || 12;
+  const listLen = Array.isArray(dataList) ? dataList.length : 0;
+  const totalApps = stats?.applications || listLen || 12;
   const screeningCount = Math.max(1, Math.round(totalApps * 0.5));
   const interviewCount = Math.max(1, stats?.interviews || 2);
   const offerCount = Math.max(1, stats?.offers || 1);
@@ -117,7 +125,7 @@ export default function Dashboard() {
               <>
                 <div className={styles.heroChip}><Sparkles size={13} style={{ color: '#6366f1' }} /> 92% ATS Compatibility</div>
                 <div className={styles.heroChip}><FileText size={13} /> Resume Score: 88/100</div>
-                <div className={styles.heroChip}><Briefcase size={13} /> {dataList.length || 5} Matching Positions</div>
+                <div className={styles.heroChip}><Briefcase size={13} /> {listLen || 5} Matching Positions</div>
               </>
             ) : isRecruiter ? (
               <>
@@ -207,12 +215,12 @@ export default function Dashboard() {
                   <p className={styles.sectionSubtitle}>Recommended positions matching your skills and experience</p>
                 </div>
                 <button className={styles.sectionLink} onClick={() => router.push('/jobs')}>
-                  View all ({dataList.length}) <ChevronRight size={14} />
+                  View all ({listLen}) <ChevronRight size={14} />
                 </button>
               </div>
 
               <div className={styles.jobList}>
-                {dataList.slice(0, 4).map((job, idx) => (
+                {(Array.isArray(dataList) ? dataList : []).slice(0, 4).map((job, idx) => (
                   <div key={job._id || idx} className={styles.jobCard} onClick={() => router.push(`/jobs`)}>
                     <div className={styles.jobLogo}>
                       {job.company?.name?.[0] || 'T'}
@@ -414,7 +422,7 @@ export default function Dashboard() {
               </div>
 
               <div className={styles.jobList}>
-                {dataList.slice(0, 5).map((app, idx) => {
+                {(Array.isArray(dataList) ? dataList : []).slice(0, 5).map((app, idx) => {
                   const candidate = app.candidateId || {};
                   const job = app.jobId || {};
                   const match = app.matchScore || 85;
@@ -479,7 +487,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className={styles.activityFeed}>
-                  {activities.length > 0 ? (
+                  {Array.isArray(activities) && activities.length > 0 ? (
                     activities.slice(0, 4).map((act, i) => (
                       <div key={act._id || i} className={styles.activityItem}>
                         <div className={styles.activityDot} />
@@ -550,7 +558,7 @@ export default function Dashboard() {
                 <span className={styles.statTrend}>Submissions</span>
               </div>
               <div className={styles.statLabel}>Applications</div>
-              <div className={styles.statValue}>{stats?.applications || dataList.length || 12}</div>
+              <div className={styles.statValue}>{stats?.applications || listLen || 12}</div>
             </div>
 
             <div className={styles.statCard}>

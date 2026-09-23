@@ -63,6 +63,8 @@ const auditRoutes = require('./routes/audit');
 const companiesRoutes = require('./routes/companies');
 const notificationRoutes = require('./routes/notifications');
 const messageRoutes = require('./routes/messages');
+const resumeRoutes = require('./routes/resume');
+const interviewSimulatorRoutes = require('./routes/interviewSimulator');
 
 // Mount Routes
 app.use('/api/auth', authRoutes);
@@ -74,6 +76,8 @@ app.use('/api/audit', auditRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/resume', resumeRoutes);
+app.use('/api/interview-simulator', interviewSimulatorRoutes);
 
 // --- GLOBAL ERROR HANDLER ---
 app.use((err, req, res, next) => {

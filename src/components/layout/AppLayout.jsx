@@ -22,8 +22,25 @@ export const AppLayout = ({ children, noPadding = false }) => {
   const notifRef = useRef(null);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       router.replace('/login');
+      return;
+    }
+
+    // Demo accounts bypass verification and onboarding
+    if (user.isDemoAccount) return;
+
+    // Real user email verification guard
+    if (user.emailVerified === false && user.isEmailVerified === false) {
+      router.replace('/verify-email');
+      return;
+    }
+
+    // Real user onboarding guard
+    if (user.onboardingCompleted === false) {
+      router.replace('/onboarding');
+      return;
     }
   }, [user, loading, router]);
 

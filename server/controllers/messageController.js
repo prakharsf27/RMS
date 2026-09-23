@@ -83,6 +83,21 @@ exports.getMessages = async (req, res) => {
   }
 };
 
+// @desc    Get all recent messages for current user
+// @route   GET /api/messages
+// @access  Private
+exports.getAllMessages = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const messages = await Message.find({
+      $or: [{ senderId: userId }, { receiverId: userId }]
+    }).sort('-createdAt').limit(50);
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Send a message
 // @route   POST /api/messages
 // @access  Private
@@ -104,6 +119,18 @@ exports.sendMessage = async (req, res) => {
       message: `${req.user.fname} ${req.user.lname} sent you a new message.`,
       sender: 'TalentFlow Messenger'
     });
+
+    // Transactional Email for Receiver
+    const emailService = require('../services/emailService');
+    const receiver = await User.findById(receiverId);
+    if (receiver && receiver.email) {
+      emailService.sendNewMessage({
+        email: receiver.email,
+        recipientName: receiver.fname,
+        senderName: `${req.user.fname} ${req.user.lname}`,
+        previewText: content
+      }).catch(err => console.warn('Message email notification error:', err.message));
+    }
 
     res.status(201).json(message);
 

@@ -57,7 +57,10 @@ export const CandidateDrawer = ({
   const roleTitle = app.jobId?.title || user.role || 'Full Stack Engineer';
   const companyName = app.jobId?.company?.name || 'TalentFlow Technologies';
 
-  const skillsMatched = user.skills?.slice(0, 4) || ['React', 'TypeScript', 'Node.js', 'Next.js'];
+  const rawSkills = Array.isArray(user.skills) 
+    ? user.skills 
+    : (typeof user.skills === 'string' ? user.skills.split(',').map(s => s.trim()) : []);
+  const skillsMatched = rawSkills.length > 0 ? rawSkills.slice(0, 4) : ['React', 'TypeScript', 'Node.js', 'Next.js'];
   const skillsMissing = ['GraphQL', 'Kubernetes'];
 
   const handleStageSelect = async (newStage) => {
