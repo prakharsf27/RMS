@@ -5,7 +5,7 @@ import {
   User, Phone, Briefcase, GraduationCap, Code2, 
   Building2, FolderGit2, Award, FileText, Settings, 
   Check, ArrowRight, ArrowLeft, Upload, Trash2, LogOut,
-  ShieldCheck, Sparkles, AlertCircle
+  ShieldCheck, Sparkles, AlertCircle, Globe, MapPin, Mail
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
@@ -27,12 +27,11 @@ const CANDIDATE_STEPS = [
 ];
 
 const RECRUITER_STEPS = [
-  { id: 1, name: "Identity", icon: User, desc: "Recruiter identity and photo" },
-  { id: 2, name: "Contact", icon: Phone, desc: "Direct phone and contact address" },
-  { id: 3, name: "Professional Info", icon: Briefcase, desc: "Recruiter experience and department" },
-  { id: 4, name: "Company", icon: Building2, desc: "Employer organization details" },
-  { id: 5, name: "Preferences", icon: Settings, desc: "Hiring domains and headcount targets" },
-  { id: 6, name: "Verification", icon: ShieldCheck, desc: "Business credentials and compliance" }
+  { id: 1, name: "General Information", icon: Building2, desc: "Basic public credentials displayed across active job listings." },
+  { id: 2, name: "Online & Contact Presence", icon: Globe, desc: "Official domain and contact email for candidate inquiries." },
+  { id: 3, name: "Branding & Headquarters", icon: MapPin, desc: "Primary office headquarters and official square logo URL." },
+  { id: 4, name: "Compliance & Legal Registration", icon: ShieldCheck, desc: "Tax identification numbers for administrative trust authorization." },
+  { id: 5, name: "Company Culture & Mission Overview", icon: Sparkles, desc: "Summarize your engineering culture, perks, and vision for prospective candidates." }
 ];
 
 export default function Onboarding() {
@@ -76,11 +75,14 @@ export default function Onboarding() {
     },
     // Recruiter Specific
     companyName: "",
+    companyIndustry: "Enterprise Cloud Infrastructure",
     companyWebsite: "",
-    companySize: "51-200 employees",
-    companyIndustry: "Software & Technology",
+    companyEmail: "",
+    companyLogo: "",
     companyLocation: "",
-    taxId: ""
+    cinOrGst: "",
+    country: "United States",
+    companyDescription: ""
   });
 
   const [newSkillInput, setNewSkillInput] = useState("");
@@ -104,8 +106,29 @@ export default function Onboarding() {
         address: user.address || prev.address,
         state: user.state || prev.state,
         professionalHeadline: user.professionalHeadline || prev.professionalHeadline,
-        skills: user.skills?.length > 0 ? user.skills : prev.skills
+        skills: user.skills?.length > 0 ? user.skills : prev.skills,
+        companyName: user.companyName || prev.companyName,
+        companyEmail: user.email || prev.companyEmail
       }));
+
+      if (user.role === 'recruiter') {
+        api.get('/companies/my').then(({ data }) => {
+          if (data && data._id) {
+            setFormData(prev => ({
+              ...prev,
+              companyName: data.name || prev.companyName || user.companyName || "",
+              companyIndustry: data.industry || prev.companyIndustry,
+              companyWebsite: data.website || prev.companyWebsite,
+              companyEmail: data.email || prev.companyEmail || user.email || "",
+              companyLogo: data.logo || prev.companyLogo,
+              companyLocation: data.location || prev.companyLocation,
+              cinOrGst: data.cinOrGst || prev.cinOrGst,
+              country: data.country || prev.country,
+              companyDescription: data.description || prev.companyDescription
+            }));
+          }
+        }).catch(() => {});
+      }
     }
   }, [user, router]);
 
@@ -171,6 +194,41 @@ export default function Onboarding() {
 
   // Validation per step
   const validateStep = (stepNumber) => {
+    if (isRecruiter) {
+      if (stepNumber === 1) {
+        if (!formData.companyName.trim()) {
+          setError("Company Legal Name is required.");
+          return false;
+        }
+      } else if (stepNumber === 2) {
+        if (!formData.companyEmail.trim()) {
+          setError("Recruitment Contact Email is required.");
+          return false;
+        }
+      } else if (stepNumber === 3) {
+        if (!formData.companyLocation.trim()) {
+          setError("Headquarters Location is required (e.g. San Francisco, CA / Bengaluru, India).");
+          return false;
+        }
+      } else if (stepNumber === 4) {
+        if (!formData.cinOrGst.trim()) {
+          setError("CIN / GST / Corporate Tax ID is required.");
+          return false;
+        }
+        if (!formData.country.trim()) {
+          setError("Country of Incorporation is required.");
+          return false;
+        }
+      } else if (stepNumber === 5) {
+        if (!formData.companyDescription.trim()) {
+          setError("Company Culture & Mission Overview description is required.");
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Candidate Validation
     if (stepNumber === 1) {
       if (!formData.fname.trim() || !formData.lname.trim()) {
         setError("First name and last name are required.");
@@ -186,11 +244,6 @@ export default function Onboarding() {
         setError("Please enter a professional headline or current role.");
         return false;
       }
-    } else if (isRecruiter && stepNumber === 4) {
-      if (!formData.companyName.trim()) {
-        setError("Company name is required for recruitment verification.");
-        return false;
-      }
     }
     return true;
   };
@@ -200,8 +253,43 @@ export default function Onboarding() {
 
     setIsSaving(true);
     try {
+      const payload = {
+        ...formData,
+        name: formData.companyName,
+        companyName: formData.companyName,
+        industry: formData.companyIndustry,
+        companyIndustry: formData.companyIndustry,
+        website: formData.companyWebsite,
+        companyWebsite: formData.companyWebsite,
+        email: formData.companyEmail,
+        companyEmail: formData.companyEmail,
+        logo: formData.companyLogo,
+        companyLogo: formData.companyLogo,
+        location: formData.companyLocation,
+        companyLocation: formData.companyLocation,
+        cinOrGst: formData.cinOrGst,
+        taxId: formData.cinOrGst,
+        country: formData.country,
+        description: formData.companyDescription,
+        companyDescription: formData.companyDescription
+      };
+
       // Autosave current progress to profile API
-      await api.put('/auth/profile', formData);
+      await api.put('/auth/profile', payload);
+
+      if (isRecruiter) {
+        await api.post('/companies', {
+          name: formData.companyName || user?.companyName || "My Company",
+          industry: formData.companyIndustry || "Enterprise Cloud Infrastructure",
+          website: formData.companyWebsite || "",
+          email: formData.companyEmail || user?.email,
+          logo: formData.companyLogo || "",
+          location: formData.companyLocation || "San Francisco, CA",
+          cinOrGst: formData.cinOrGst || "PENDING",
+          country: formData.country || "United States",
+          description: formData.companyDescription || ""
+        }).catch(err => console.warn('Company upsert background save:', err?.message));
+      }
       
       setCompletedSteps(prev => new Set(prev).add(currentStep));
 
@@ -210,7 +298,7 @@ export default function Onboarding() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         // Final Step: Complete Onboarding!
-        const { data } = await api.post('/auth/complete-onboarding');
+        const { data } = await api.post('/auth/complete-onboarding', payload);
         if (data.user) {
           updateUser(data.user);
           localStorage.setItem("rms_user", JSON.stringify(data.user));
@@ -334,8 +422,166 @@ export default function Onboarding() {
 
           {error && <div className={styles.errorBanner}>{error}</div>}
 
-          {/* ── STEP 1: IDENTITY ── */}
-          {currentStep === 1 && (
+          {/* ════════════════════════════════════════════════════════
+              RECRUITER STEP 1: GENERAL INFORMATION
+          ════════════════════════════════════════════════════════ */}
+          {isRecruiter && currentStep === 1 && (
+            <div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Company Legal Name *</label>
+                <input 
+                  className={styles.input} 
+                  value={formData.companyName} 
+                  onChange={e => updateField('companyName', e.target.value)} 
+                  placeholder="e.g. Acme Technologies Inc."
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Industry Sector</label>
+                <input 
+                  className={styles.input} 
+                  value={formData.companyIndustry} 
+                  onChange={e => updateField('companyIndustry', e.target.value)} 
+                  placeholder="e.g. Enterprise Cloud Infrastructure"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════
+              RECRUITER STEP 2: ONLINE & CONTACT PRESENCE
+          ════════════════════════════════════════════════════════ */}
+          {isRecruiter && currentStep === 2 && (
+            <div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Official Website</label>
+                <input 
+                  type="url"
+                  className={styles.input} 
+                  value={formData.companyWebsite} 
+                  onChange={e => updateField('companyWebsite', e.target.value)} 
+                  placeholder="https://company.com"
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Recruitment Contact Email *</label>
+                <input 
+                  type="email"
+                  className={styles.input} 
+                  value={formData.companyEmail} 
+                  onChange={e => updateField('companyEmail', e.target.value)} 
+                  placeholder="talent@company.com"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════
+              RECRUITER STEP 3: BRANDING & HEADQUARTERS
+          ════════════════════════════════════════════════════════ */}
+          {isRecruiter && currentStep === 3 && (
+            <div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Square Logo URL</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                  {formData.companyLogo && (
+                    <img 
+                      src={formData.companyLogo} 
+                      alt="Company Logo Preview" 
+                      style={{ width: 44, height: 44, borderRadius: 8, objectFit: 'contain', background: '#f8fafc', border: '1px solid #e2e8f0', padding: 4 }}
+                    />
+                  )}
+                  <input 
+                    type="url"
+                    className={styles.input} 
+                    value={formData.companyLogo} 
+                    onChange={e => updateField('companyLogo', e.target.value)} 
+                    placeholder="https://domain.com/logo.png"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Headquarters Location *</label>
+                <input 
+                  className={styles.input} 
+                  value={formData.companyLocation} 
+                  onChange={e => updateField('companyLocation', e.target.value)} 
+                  placeholder="San Francisco, CA / Bengaluru, India"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════
+              RECRUITER STEP 4: COMPLIANCE & LEGAL REGISTRATION
+          ════════════════════════════════════════════════════════ */}
+          {isRecruiter && currentStep === 4 && (
+            <div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>CIN / GST / Corporate Tax ID *</label>
+                <input 
+                  className={styles.input} 
+                  value={formData.cinOrGst} 
+                  onChange={e => updateField('cinOrGst', e.target.value)} 
+                  placeholder="e.g. U74140DL2015PTC288000"
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Country of Incorporation *</label>
+                <input 
+                  className={styles.input} 
+                  value={formData.country} 
+                  onChange={e => updateField('country', e.target.value)} 
+                  placeholder="e.g. United States, India"
+                  required
+                />
+              </div>
+
+              <div style={{ padding: '1rem', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', marginTop: '1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065f46', fontWeight: 700 }}>
+                  <ShieldCheck size={18} /> Verified Employer Trust Authorization
+                </div>
+                <p style={{ fontSize: '0.813rem', color: '#047857', marginTop: '0.35rem', margin: 0 }}>
+                  Your business credentials authorize your company to publish verified job openings, invite candidates to interview rounds, and manage recruitment pipelines.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════
+              RECRUITER STEP 5: COMPANY CULTURE & MISSION OVERVIEW
+          ════════════════════════════════════════════════════════ */}
+          {isRecruiter && currentStep === 5 && (
+            <div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Company Culture & Mission Overview *</label>
+                <p style={{ fontSize: '0.813rem', color: '#64748b', marginTop: 0, marginBottom: '0.5rem' }}>
+                  Summarize your engineering culture, perks, and vision for prospective candidates.
+                </p>
+                <textarea 
+                  className={styles.textarea} 
+                  style={{ minHeight: '160px' }} 
+                  value={formData.companyDescription} 
+                  onChange={e => updateField('companyDescription', e.target.value)} 
+                  placeholder="Describe what makes your team unique..."
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 1: IDENTITY
+          ════════════════════════════════════════════════════════ */}
+          {!isRecruiter && currentStep === 1 && (
             <div>
               {/* Profile Photo */}
               <div className={styles.avatarSection}>
@@ -438,8 +684,10 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ── STEP 2: CONTACT ── */}
-          {currentStep === 2 && (
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 2: CONTACT
+          ════════════════════════════════════════════════════════ */}
+          {!isRecruiter && currentStep === 2 && (
             <div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Primary Phone Number *</label>
@@ -473,8 +721,10 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ── STEP 3: PROFESSIONAL INFO ── */}
-          {currentStep === 3 && (
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 3: PROFESSIONAL INFO
+          ════════════════════════════════════════════════════════ */}
+          {!isRecruiter && currentStep === 3 && (
             <div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Professional Headline *</label>
@@ -524,7 +774,9 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ── CANDIDATE STEP 4: EDUCATION ── */}
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 4: EDUCATION
+          ════════════════════════════════════════════════════════ */}
           {!isRecruiter && currentStep === 4 && (
             <div>
               <div className={styles.grid2}>
@@ -599,58 +851,9 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ── RECRUITER STEP 4: COMPANY ── */}
-          {isRecruiter && currentStep === 4 && (
-            <div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Company / Organization Name *</label>
-                <input 
-                  className={styles.input} 
-                  value={formData.companyName} 
-                  onChange={e => updateField('companyName', e.target.value)} 
-                  placeholder="e.g. Nova Systems Inc."
-                  required
-                />
-              </div>
-              <div className={styles.grid2}>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Company Website</label>
-                  <input 
-                    type="url" 
-                    className={styles.input} 
-                    value={formData.companyWebsite} 
-                    onChange={e => updateField('companyWebsite', e.target.value)} 
-                    placeholder="https://novasystems.com"
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Company Size</label>
-                  <select 
-                    className={styles.select} 
-                    value={formData.companySize} 
-                    onChange={e => updateField('companySize', e.target.value)}
-                  >
-                    <option value="1-10 employees">1–10 employees (Startup)</option>
-                    <option value="11-50 employees">11–50 employees (Growth)</option>
-                    <option value="51-200 employees">51–200 employees (Scale-up)</option>
-                    <option value="201-1000 employees">201–1000 employees (Mid-Enterprise)</option>
-                    <option value="1000+ employees">1000+ employees (Global Enterprise)</option>
-                  </select>
-                </div>
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Headquarters Location</label>
-                <input 
-                  className={styles.input} 
-                  value={formData.companyLocation} 
-                  onChange={e => updateField('companyLocation', e.target.value)} 
-                  placeholder="e.g. San Francisco, CA & Remote"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* ── CANDIDATE STEP 5: SKILLS ── */}
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 5: SKILLS
+          ════════════════════════════════════════════════════════ */}
           {!isRecruiter && currentStep === 5 && (
             <div>
               <div className={styles.formGroup}>
@@ -715,29 +918,9 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* ── RECRUITER STEP 5: PREFERENCES ── */}
-          {isRecruiter && currentStep === 5 && (
-            <div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Target Hiring Departments</label>
-                <input 
-                  className={styles.input} 
-                  value="Frontend, Backend, Full Stack, DevOps" 
-                  readOnly 
-                />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Expected Quarterly Open Headcount</label>
-                <select className={styles.select}>
-                  <option>1–3 roles</option>
-                  <option>4–10 roles</option>
-                  <option>10+ roles</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          {/* ── CANDIDATE STEP 6: WORK EXPERIENCE ── */}
+          {/* ════════════════════════════════════════════════════════
+              CANDIDATE STEP 6: WORK EXPERIENCE
+          ════════════════════════════════════════════════════════ */}
           {!isRecruiter && currentStep === 6 && (
             <div>
               <div className={styles.grid2}>
@@ -780,29 +963,6 @@ export default function Onboarding() {
                   }} 
                   placeholder="Engineered scalable features, optimized performance, or collaborated with agile squads..."
                 />
-              </div>
-            </div>
-          )}
-
-          {/* ── RECRUITER STEP 6: VERIFICATION ── */}
-          {isRecruiter && currentStep === 6 && (
-            <div>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Corporate Tax / CIN Registration ID</label>
-                <input 
-                  className={styles.input} 
-                  value={formData.taxId} 
-                  onChange={e => updateField('taxId', e.target.value)} 
-                  placeholder="e.g. US-EIN-98-7654321"
-                />
-              </div>
-              <div style={{ padding: '1rem', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '10px', marginTop: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#065f46', fontWeight: 700 }}>
-                  <ShieldCheck size={18} /> Ready for Verified Employer Review
-                </div>
-                <p style={{ fontSize: '0.813rem', color: '#047857', marginTop: '0.35rem', margin: 0 }}>
-                  Upon completion, your profile will be authorized to publish verified listings and invite candidates to interview rounds.
-                </p>
               </div>
             </div>
           )}

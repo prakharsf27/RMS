@@ -8,17 +8,17 @@ export const Table = ({ headers, data, renderRow, className }) => {
       <table className={styles.table}>
         <thead>
           <tr>
-            {headers.map((h, i) => (
+            {(Array.isArray(headers) ? headers : []).map((h, i) => (
               <th key={i} className={i === 0 && typeof h !== 'string' ? styles.selectionCell : ''}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
+          {Array.isArray(data) && data.length > 0 ? (
             data.map((item, i) => renderRow(item, i))
           ) : (
             <tr>
-              <td colSpan={headers.length} className={styles.empty}>
+              <td colSpan={Array.isArray(headers) ? headers.length : 1} className={styles.empty}>
                 No entries available.
               </td>
             </tr>

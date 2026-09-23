@@ -5,7 +5,7 @@ const ApplicationSchema = new mongoose.Schema({
   candidateId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   status: { 
     type: String, 
-    enum: ['applied', 'screened', 'interviewing', 'offered', 'rejected'], 
+    enum: ['applied', 'screening', 'screened', 'shortlisted', 'interview', 'interviewing', 'offered', 'hired', 'rejected'], 
     default: 'applied' 
   },
   resumeUrl: { type: String }, // Cloudinary URL

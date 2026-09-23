@@ -112,28 +112,42 @@ exports.sendMessage = async (req, res) => {
       content
     });
 
-    // Create Notification for Receiver
+    const senderName = `${req.user.fname || ''} ${req.user.lname || ''}`.trim() || 'A user';
+
+    // 1. Create In-App Notification for Receiver
     await Notification.create({
       userId: receiverId,
       subject: 'New Message Received',
-      message: `${req.user.fname} ${req.user.lname} sent you a new message.`,
+      message: `${senderName} sent you a new message on TalentFlow.`,
       sender: 'TalentFlow Messenger'
-    });
+    }).catch(err => console.warn('Message notification error:', err.message));
 
-    // Transactional Email for Receiver
+    // 2. Transactional Email for Receiver
     const emailService = require('../services/emailService');
     const receiver = await User.findById(receiverId);
     if (receiver && receiver.email) {
-      emailService.sendNewMessage({
-        email: receiver.email,
-        recipientName: receiver.fname,
-        senderName: `${req.user.fname} ${req.user.lname}`,
-        previewText: content
-      }).catch(err => console.warn('Message email notification error:', err.message));
+      if (receiver.role === 'recruiter') {
+        emailService.sendNewMessageToRecruiter({
+          email: receiver.email,
+          recruiterName: receiver.fname || 'Hiring Manager',
+          senderName,
+          previewText: content,
+          messageId: message._id,
+          idempotencyKey: `msg_rec_${message._id}`
+        }).catch(err => console.warn('Recruiter message email error:', err.message));
+      } else {
+        emailService.sendNewMessageToCandidate({
+          email: receiver.email,
+          candidateName: receiver.fname || 'there',
+          senderName,
+          previewText: content,
+          messageId: message._id,
+          idempotencyKey: `msg_cand_${message._id}`
+        }).catch(err => console.warn('Candidate message email error:', err.message));
+      }
     }
 
     res.status(201).json(message);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

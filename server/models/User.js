@@ -140,6 +140,14 @@ const UserSchema = new mongoose.Schema({
   },
   isEngaged: { type: Boolean, default: false },
 
+  emailPreferences: {
+    applicationUpdates: { type: Boolean, default: true },
+    newApplications: { type: Boolean, default: true },
+    interviews: { type: Boolean, default: true },
+    messages: { type: Boolean, default: true },
+    marketing: { type: Boolean, default: false }
+  },
+
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 }, { timestamps: true });
